@@ -200,7 +200,7 @@ app.view(
 
 (async () => {
   // Start your app
-  await app.start(process.env.PORT || 3000);
+  await app.start(process.env.PORT || 8080);
 
-  console.log("⚡️ Bolt app is running!");
+  console.log("Slack Arbeitsstunden-Bot läuft auf Port 8080");
 })();
