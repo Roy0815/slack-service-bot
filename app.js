@@ -58,21 +58,6 @@ app.command(
   }
 );
 
-// get cell content
-app.command("/getcell", async ({ ack, command, respond }) => {
-  await ack();
-  const input = command.text.split(" ").map(Number);
-  if (input.length != 2)
-    await respond("Ungültige Eingabe!\n /getCell Zeile Spalte");
-  await respond(await sheet.readCell(input[0], input[1]));
-});
-
-// register a user with a display name
-app.command("/register", async ({ ack, command, respond }) => {
-  await ack();
-  console.log(command);
-});
-
 //******************** Actions ********************//
 // handle buttons in Registration approval
 app.action(
@@ -98,8 +83,7 @@ app.action(
 
     if (!registerObj.approved) return;
     //update data in sheet
-    //registerObj.id           => hier steht die Mitgliedsnummer drin (bspw 3 bei Roy)
-    //registerObj.slackId      => hier steht die Slack ID drin, die in die Spalte im sheet soll
+    sheet.saveSlackId(registerObj);
   }
 );
 
@@ -136,7 +120,7 @@ app.action(
     );
 
     //update data in sheet
-    //alle daten stehen im "maintObj" : { slackId, title, hours, date }
+    await sheet.saveHours(maintObj);
   }
 );
 
@@ -202,5 +186,5 @@ app.view(
   // Start your app
   await app.start(process.env.PORT || 8080);
 
-  console.log("Slack Arbeitsstunden-Bot läuft auf Port 8080");
+  console.log("Slack Arbeitsstunden-Bot läuft auf Port " + process.env.PORT);
 })();

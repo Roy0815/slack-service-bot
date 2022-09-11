@@ -11,8 +11,18 @@ function formatDate(date) {
   }${date.getMonth() + 1}.${date.getFullYear()}`;
 }
 
+function convertNumberToColumn(number) {
+  let column = "";
+  while (number >= 0) {
+    column = "ABCDEFGHIJKLMNOPQRSTUVWXYZ"[(number % 26) - 1] + column;
+    number = Math.floor(number / 26) - 1;
+  }
+  return column;
+}
+
 //exports
 module.exports = {
   formatTime,
   formatDate,
+  convertNumberToColumn,
 };

@@ -1,4 +1,7 @@
 const { google } = require("googleapis");
+const sheets = google.sheets("v4");
+
+const general = require("./general");
 
 const sheetAllgDaten = "Allg Daten";
 const idColumn = 1;
@@ -6,6 +9,8 @@ const firstNameColumn = 2;
 const lastNameColumn = 3;
 const leaveDateColumn = 5;
 const slackIdColumn = 15;
+
+const sheetStunden = "Arbeitseinsätze 2022";
 
 const sheetStundenSumme = "Summe Stunden 2022";
 const workedHoursColumn = 3;
@@ -18,18 +23,9 @@ async function getUserFromSlackId(id) {
   return data.find((element) => element[slackIdColumn - 1] == id);
 }
 
-function search(array, user_id) {
-  for (var i = 1; i < array.length; i++) {
-    if (array[i][0] == user_id) return array[i];
-  }
-}
-
 // gets an array of all cells
 async function getCells(sheet) {
-  const auth = await google.auth.getClient({
-    scopes: ["https://www.googleapis.com/auth/spreadsheets.readonly"],
-  });
-  const sheets = google.sheets({ version: "v4", auth });
+  const sheets = await auth();
   const request = {
     spreadsheetId: process.env.SHEET_ID,
     range: sheet,
@@ -38,12 +34,74 @@ async function getCells(sheet) {
   return (await sheets.spreadsheets.values.get(request)).data.values;
 }
 
-//******************** Public functions ********************//
-async function readCell(row, column) {
-  console.log(await getCells(sheetAllgDaten));
-  return (await getCells())[row][column];
+async function updateCell({ range, value }) {
+  const sheets = await auth();
+
+  //Value needs to be an array holding arrays with 1 value each
+  const request = {
+    spreadsheetId: process.env.SHEET_ID,
+    range: range,
+    valueInputOption: "USER_ENTERED",
+    resource: { range: range, values: value },
+  };
+
+  await sheets.spreadsheets.values.update(request);
 }
 
+async function appendRow({ range, values }) {
+  const sheets = await auth();
+
+  //Value needs to be an array holding arrays with 1 value each
+  const request = {
+    spreadsheetId: process.env.SHEET_ID,
+    range: range,
+    valueInputOption: "USER_ENTERED",
+    resource: { range: range, values: values, majorDimension: "COLUMNS" },
+  };
+
+  await sheets.spreadsheets.values.append(request);
+}
+
+// gets the sheets in a spreadsheet
+async function getSheets() {
+  const sheets = await auth();
+  const request = {
+    spreadsheetId: process.env.SHEET_ID,
+  };
+  const response = (await sheets.spreadsheets.get(request)).data.sheets;
+  return await response;
+}
+
+// creates a copy of a sheet
+async function copySheet(sheetName) {
+  const sheets = await auth();
+  const sheetID = await getSheetID(sheetName);
+  const request = {
+    spreadsheetId: process.env.SHEET_ID,
+    sheetId: sheetID,
+    resource: {
+      // The ID of the spreadsheet to copy the sheet to.
+      destinationSpreadsheetId: process.env.SHEET_ID,
+    },
+  };
+  await sheets.spreadsheets.sheets.copyTo(request);
+}
+
+// returns sheetID
+async function getSheetID(sheetName) {
+  const sheets = await getSheets();
+  const sheet = await sheets.find((s) => s.properties.title == sheetName);
+  return await sheet.properties.sheetId;
+}
+
+async function auth() {
+  const auth = await google.auth.getClient({
+    scopes: ["https://www.googleapis.com/auth/spreadsheets"],
+  });
+  return google.sheets({ version: "v4", auth });
+}
+
+//******************** Public functions ********************//
 async function getHoursFromSlackId(id) {
   let user = await getUserFromSlackId(id);
   if (user == undefined) return undefined;
@@ -93,16 +151,38 @@ async function getAdminChannel() {
   return (await getCells(sheetStundenSumme))[0][adminChannelColumn - 1];
 }
 
-async function register(name, user_id) {
-  const array = await getCells(sheetAllgDaten);
-  const row = search(array, user_id);
+async function saveSlackId({ id, slackId }) {
+  //find line with user
+  let data = await getCells(sheetAllgDaten);
+  let index = data.findIndex((element) => element[idColumn - 1] == id) + 1;
+
+  updateCell({
+    range: `'${sheetAllgDaten}'!${general.convertNumberToColumn(
+      slackIdColumn
+    )}${index}`,
+    value: [[slackId]],
+  });
+}
+
+async function saveHours({ slackId, title, hours, date }) {
+  let user = await getUserFromSlackId(slackId);
+
+  await appendRow({
+    range: `'${sheetStunden}'!A:D`,
+    values: [
+      [date],
+      [`${user[firstNameColumn - 1]} ${user[lastNameColumn - 1]}`],
+      [title],
+      [hours],
+    ],
+  });
 }
 
 //exports
 module.exports = {
-  readCell,
-  register,
   getAllUsers,
   getAdminChannel,
   getHoursFromSlackId,
+  saveSlackId,
+  saveHours,
 };
