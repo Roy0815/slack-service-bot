@@ -1,6 +1,9 @@
 //******************** Functions ********************//
 function formatTime(date) {
-  return `${date.getUTCHours() + 2 < 10 ? "0" : ""}${date.getUTCHours() + 2}:${
+  let hours =
+    date.getUTCHours() >= 22 ? date.getUTCHours() - 22 : date.getUTCHours() + 2;
+
+  return `${hours < 10 ? "0" : ""}${hours}:${
     date.getMinutes() < 10 ? "0" : ""
   }${date.getMinutes()}`;
 }
