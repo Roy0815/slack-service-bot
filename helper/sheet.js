@@ -1,5 +1,4 @@
 const { google } = require("googleapis");
-const sheets = google.sheets("v4");
 
 const general = require("./general");
 
@@ -89,9 +88,35 @@ async function copySheet(sheetName) {
 
 // returns sheetID
 async function getSheetID(sheetName) {
-  const sheets = await getSheets();
-  const sheet = await sheets.find((s) => s.properties.title == sheetName);
+  const sheetArray= await getSheets();
+  const sheet = await sheetArray.find((s) => s.properties.title == sheetName);
   return await sheet.properties.sheetId;
+}
+
+// renames a sheet
+async function renameSheet(oldName, newName){
+  const sheets = await auth();
+  const sheetID = await getSheetID(oldName);
+  
+  const requests = [];
+  requests.push({
+    updateSheetProperties:{
+      properties: {
+        sheetId: sheetID,
+        title: newName,
+      },
+      fields: "title",
+    },
+  });
+  
+  const spreadsheetId = process.env.SHEET_ID;
+  const batchUpdateRequest = {requests};
+  
+  
+  await sheets.spreadsheets.batchUpdate({
+      spreadsheetId,
+      resource: batchUpdateRequest,
+    });  
 }
 
 async function auth() {
