@@ -124,9 +124,9 @@ app.action(
         new Date()
       )} Uhr am ${general.formatDate(new Date())} ${
         maintObj.approved ? "freigegeben" : "abgelehnt"
-      }:\n${maintObj.title}: ${maintObj.hours} Stunde${
-        maintObj.hours == 1 ? "" : "n"
-      } am ${general.formatDate(date)}.`
+      }:\n${await sheet.getNameFromSlackId(maintObj)}: "${maintObj.title}" - ${
+        maintObj.hours
+      } Stunde${maintObj.hours == 1 ? "" : "n"} am ${general.formatDate(date)}.`
     );
 
     //update data in sheet

@@ -88,19 +88,19 @@ async function copySheet(sheetName) {
 
 // returns sheetID
 async function getSheetID(sheetName) {
-  const sheetArray= await getSheets();
+  const sheetArray = await getSheets();
   const sheet = await sheetArray.find((s) => s.properties.title == sheetName);
   return await sheet.properties.sheetId;
 }
 
 // renames a sheet
-async function renameSheet(oldName, newName){
+async function renameSheet(oldName, newName) {
   const sheets = await auth();
   const sheetID = await getSheetID(oldName);
-  
+
   const requests = [];
   requests.push({
-    updateSheetProperties:{
+    updateSheetProperties: {
       properties: {
         sheetId: sheetID,
         title: newName,
@@ -108,15 +108,14 @@ async function renameSheet(oldName, newName){
       fields: "title",
     },
   });
-  
+
   const spreadsheetId = process.env.SHEET_ID;
-  const batchUpdateRequest = {requests};
-  
-  
+  const batchUpdateRequest = { requests };
+
   await sheets.spreadsheets.batchUpdate({
-      spreadsheetId,
-      resource: batchUpdateRequest,
-    });  
+    spreadsheetId,
+    resource: batchUpdateRequest,
+  });
 }
 
 async function auth() {
@@ -132,7 +131,7 @@ async function getHoursFromSlackId(id) {
   if (user == undefined) return undefined;
 
   let data = await getCells(sheetStundenSumme);
-  let userHours = data[user[0]];
+  let userHours = data[user[idColumn - 1]];
 
   return {
     workedHours: userHours[workedHoursColumn - 1],
@@ -140,6 +139,13 @@ async function getHoursFromSlackId(id) {
       ? 0
       : userHours[targetHoursColumn - 1],
   };
+}
+
+async function getNameFromSlackId({ slackId }) {
+  let user = await getUserFromSlackId(slackId);
+  if (user == undefined) return undefined;
+
+  return `${user[firstNameColumn - 1]} ${user[lastNameColumn - 1]}`;
 }
 
 async function getAllUsers() {
@@ -208,6 +214,7 @@ module.exports = {
   getAllUsers,
   getAdminChannel,
   getHoursFromSlackId,
+  getNameFromSlackId,
   saveSlackId,
   saveHours,
 };
