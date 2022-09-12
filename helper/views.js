@@ -16,6 +16,37 @@ const maintainHoursBlockHours = "hours_block";
 const maintainHoursActionHours = "hours";
 
 //******************** Views ********************//
+const homeView = {
+  // Use the user ID associated with the event
+  user_id: "",
+  view: {
+    type: "home",
+    blocks: [
+      {
+        type: "section",
+        text: {
+          type: "mrkdwn",
+          text: "Hallo 👋 Ich bin der Arbeitsstunden-Bot. Mit meiner Hilfe kannst du einfach Arbeitsstunden erfassen und abrufen:",
+        },
+      },
+      {
+        type: "section",
+        text: {
+          type: "mrkdwn",
+          text: "*1️⃣ `/arbeitsstunden_anzeigen` Kommando*:\nHiermit kannst du deine geleisteten Stunden einsehen. Das Kommando ist in allen öffentlichen Channels verfügbar, oder auch in privaten, wenn du den Arbeitsstunden-Bot hinzufügst.",
+        },
+      },
+      {
+        type: "section",
+        text: {
+          type: "mrkdwn",
+          text: "*2️⃣ `/arbeitsstunden_erfassen` Kommando:*\nMit diesem Kommando kannst du geleistete Stunden erfassen. Es wird ein Dialog geöffnet, in dem du die Details mitgeben kannst. Im Anschluss wird die Anfrage zur Genehmigung an den Vorstand weitergeleitet. Sobald dieser genehmigt hat, wirst du benachrichtigt.",
+        },
+      },
+    ],
+  },
+};
+
 const registerView = {
   trigger_id: "",
   view: {
@@ -178,6 +209,12 @@ const basicMessage = {
 };
 
 //******************** Functions ********************//
+function getHomeView(userId) {
+  let view = JSON.parse(JSON.stringify(homeView));
+  view.user_id = userId;
+  return view;
+}
+
 async function getRegisterView(triggerId) {
   let view = JSON.parse(JSON.stringify(registerView));
   view.trigger_id = triggerId;
@@ -302,15 +339,20 @@ function getUserMaintainEndMessage({ slackId, title, hours, date, approved }) {
 
 //exports
 module.exports = {
+  getHomeView,
+
   getRegisterView,
-  registerViewName,
-  registerBlockNameSelect,
-  registerActionNameSelect,
   getRegisterConfirmDialog,
   getUserRegisterStartMessage,
   getUserRegisterEndMessage,
+  registerViewName,
+  registerBlockNameSelect,
+  registerActionNameSelect,
 
   getMaintainHoursView,
+  getMaintainConfirmDialog,
+  getUserMaintainStartMessage,
+  getUserMaintainEndMessage,
   maintainHoursViewName,
   maintainHoursBlockDescription,
   maintainHoursActionDescription,
@@ -318,7 +360,4 @@ module.exports = {
   maintainHoursActionDate,
   maintainHoursBlockHours,
   maintainHoursActionHours,
-  getMaintainConfirmDialog,
-  getUserMaintainStartMessage,
-  getUserMaintainEndMessage,
 };

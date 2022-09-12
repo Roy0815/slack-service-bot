@@ -58,6 +58,18 @@ app.command(
   }
 );
 
+// test
+app.command("/test", async ({ ack, respond, command }) => {
+  await ack();
+  if ((await command.user_id) == "ULRBPGLUE")
+    sheet.test("Testname", "Delete Me");
+  else {
+    respond(
+      "Du bist nicht Ruben, du hast keine Berechtigung für dieses Kommando"
+    );
+  }
+});
+
 //******************** Actions ********************//
 // handle buttons in Registration approval
 app.action(
@@ -108,9 +120,7 @@ app.action(
     );
 
     await respond(
-      `<@${body.user.id}|${
-        body.user.username
-      }> hat folgende Stunden um ${general.formatTime(
+      `<@${body.user.id}> hat folgende Stunden um ${general.formatTime(
         new Date()
       )} Uhr am ${general.formatDate(new Date())} ${
         maintObj.approved ? "freigegeben" : "abgelehnt"
@@ -181,6 +191,11 @@ app.view(
     await client.chat.postMessage(views.getUserMaintainStartMessage(obj));
   }
 );
+
+//******************** Events Submissions ********************//
+app.event("app_home_opened", async ({ event, client }) => {
+  await client.views.publish(views.getHomeView(event.user));
+});
 
 (async () => {
   // Start your app
