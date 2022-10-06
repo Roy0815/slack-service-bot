@@ -129,6 +129,8 @@ app.action(
       } Stunde${maintObj.hours == 1 ? "" : "n"} am ${general.formatDate(date)}.`
     );
 
+    if (!maintObj.approved) return;
+
     //update data in sheet
     await sheet.saveHours(maintObj);
   }
