@@ -205,34 +205,50 @@ function setupApp(app) {
     await client.chat.postMessage(views.getUserRegisterStartMessage(obj));
   });
 
-  app.view(
-    views.maintainHoursViewName,
-    async ({ body, ack, client, payload }) => {
-      await ack();
+  app.view(views.maintainHoursViewName, async ({ body, ack, client }) => {
+    let year =
+      body.view.state.values[views.maintainHoursBlockDate][
+        views.maintainHoursActionDate
+      ].selected_date.split("-")[0];
 
-      //build maintenance object
-      let obj = {
-        slackId: body.user.id,
-        title:
-          body.view.state.values[views.maintainHoursBlockDescription][
-            views.maintainHoursActionDescription
-          ].value,
-        hours:
-          body.view.state.values[views.maintainHoursBlockHours][
-            views.maintainHoursActionHours
-          ].value,
-        date: body.view.state.values[views.maintainHoursBlockDate][
-          views.maintainHoursActionDate
-        ].selected_date,
-      };
+    let currYear = new Date().getFullYear;
 
-      //register confirmation message
-      await client.chat.postMessage(await views.getMaintainConfirmDialog(obj));
-
-      //notify user that process has started
-      await client.chat.postMessage(views.getUserMaintainStartMessage(obj));
+    if (year < currYear - 1 || year > currYear + 1) {
+      await ack({
+        response_action: "errors",
+        errors: {
+          [views.maintainHoursBlockDate]: `Du kannst nur Daten zwischen ${
+            currYear - 1
+          } und ${currYear + 1} pflegen`,
+        },
+      });
+      return;
     }
-  );
+
+    await ack();
+
+    //build maintenance object
+    let obj = {
+      slackId: body.user.id,
+      title:
+        body.view.state.values[views.maintainHoursBlockDescription][
+          views.maintainHoursActionDescription
+        ].value,
+      hours:
+        body.view.state.values[views.maintainHoursBlockHours][
+          views.maintainHoursActionHours
+        ].value,
+      date: body.view.state.values[views.maintainHoursBlockDate][
+        views.maintainHoursActionDate
+      ].selected_date,
+    };
+
+    //register confirmation message
+    await client.chat.postMessage(await views.getMaintainConfirmDialog(obj));
+
+    //notify user that process has started
+    await client.chat.postMessage(views.getUserMaintainStartMessage(obj));
+  });
 
   //******************** Events Submissions ********************//
   app.event("team_join", async ({ event, client }) => {

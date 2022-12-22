@@ -159,7 +159,7 @@ async function saveHours({ slackId, title, hours, date }) {
   await checkYearSheetsExists(date.split("-")[0]);
 
   await sheet.appendRow({
-    range: `'${getSheetNameYear(sheetStunden)}'!A:D`,
+    range: `'${getSheetNameYear(sheetStunden, date.split("-")[0])}'!A:D`,
     values: [
       [date],
       [`${user[firstNameColumn - 1]} ${user[lastNameColumn - 1]}`],
