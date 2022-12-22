@@ -1,5 +1,3 @@
-const { google } = require("googleapis");
-
 const general = require("../general/util");
 const sheet = require("../general/sheet");
 
