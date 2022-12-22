@@ -9,12 +9,40 @@ function setupApp(app) {
     "/arbeitsstunden_anzeigen",
     async ({ ack, command, respond, client }) => {
       await ack();
-      let hours = await sheet.getHoursFromSlackId(command.user_id);
+
+      //if year was filled, validate
+      if (command.text != "") {
+        //validate number
+        let text = /^[0-9]+$/;
+        if (!text.test(command.text)) {
+          await respond("Bitte ein gültiges Jahr eingeben");
+          return;
+        }
+
+        let currYear = new Date().getFullYear();
+        if (command.text < 2022 || command.text > currYear) {
+          await respond(
+            `Bitte ein Jahr zwischen 2022 und ${currYear} eingeben`
+          );
+          return;
+        }
+      }
+
+      let hours = await sheet.getHoursFromSlackId({
+        id: command.user_id,
+        year: command.text,
+      });
 
       // if registered, display
       if (hours != undefined) {
         respond(
-          `Du hast dieses Jahr bereits ${hours.workedHours} Arbeitsstunden geleistet. Du musst noch ${hours.targetHours} Stunden leisten.`
+          `Du hast ${
+            command.text != "" ? command.text : "dieses Jahr" //year
+          } bereits ${
+            hours.workedHours
+          } Arbeitsstunden geleistet. Du musst noch ${
+            hours.targetHours
+          } Stunden leisten.`
         );
         return;
       }
@@ -31,7 +59,9 @@ function setupApp(app) {
       await ack();
 
       // check user is registered
-      if ((await sheet.getHoursFromSlackId(command.user_id)) == undefined) {
+      if (
+        (await sheet.getHoursFromSlackId({ id: command.user_id })) == undefined
+      ) {
         // not registered: start dialog
         await client.views.open(
           await views.getRegisterView(command.trigger_id)

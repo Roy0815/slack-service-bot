@@ -31,7 +31,7 @@ async function copySheetToNewYear(nameBase, year) {
   } else {
     currYear = new Date().getFullYear();
   }
-  let oldYear = currYear - 1;
+  let oldYear = 2022;
 
   let copiedName = await sheet.copySheet(`${nameBase} ${oldYear}`);
   let newName = `${nameBase} ${currYear}`;
@@ -75,13 +75,15 @@ function getSheetNameYear(name, year) {
 
 //******************** Public functions ********************//
 
-async function getHoursFromSlackId(id) {
+async function getHoursFromSlackId({ id, year }) {
   let user = await getUserFromSlackId(id);
   if (user == undefined) return undefined;
 
-  await checkYearSheetsExists(2023);
+  if (year == "") year = new Date().getFullYear();
 
-  let data = await sheet.getCells(getSheetNameYear(sheetStundenSumme));
+  await checkYearSheetsExists(year);
+
+  let data = await sheet.getCells(getSheetNameYear(sheetStundenSumme, year));
   let userHours = data[user[0]];
 
   return {
@@ -123,7 +125,7 @@ async function getAllUsers() {
 }
 
 async function getAdminChannel() {
-  await checkYearSheetsExists();
+  await checkYearSheetsExists(new Date().getFullYear());
   return (await sheet.getCells(getSheetNameYear(sheetStundenSumme)))[0][
     adminChannelColumn - 1
   ];
