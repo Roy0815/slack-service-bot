@@ -9,6 +9,10 @@ const leaveDateColumn = 5;
 const slackIdColumn = 15;
 
 const sheetStunden = "Arbeitseinsätze";
+const dateColumn = 1;
+const nameColumn = 2;
+const descriptionColumn = 3;
+const hoursColumn = 4;
 
 const sheetStundenSumme = "Summe Stunden";
 const workedHoursColumn = 3;
@@ -73,7 +77,7 @@ function getSheetNameYear(name, year) {
 
 //******************** Public functions ********************//
 
-async function getHoursFromSlackId({ id, year }) {
+async function getHoursFromSlackId({ id, year, details }) {
   let user = await getUserFromSlackId(id);
   if (user == undefined) return undefined;
 
@@ -81,15 +85,39 @@ async function getHoursFromSlackId({ id, year }) {
 
   await checkYearSheetsExists(year);
 
-  let data = await sheet.getCells(getSheetNameYear(sheetStundenSumme, year));
-  let userHours = data[user[0]];
+  let dataSum = await sheet.getCells(getSheetNameYear(sheetStundenSumme, year));
 
-  return {
-    workedHours: userHours[workedHoursColumn - 1],
-    targetHours: userHours[targetHoursColumn - 1].includes("-")
+  let returnObj = {
+    workedHours: dataSum[user[idColumn - 1]][workedHoursColumn - 1],
+    targetHours: dataSum[user[idColumn - 1]][targetHoursColumn - 1].includes(
+      "-"
+    )
       ? 0
-      : userHours[targetHoursColumn - 1],
+      : dataSum[user[idColumn - 1]][targetHoursColumn - 1],
+    details: [],
   };
+
+  if (details) {
+    let dataDetails = await sheet.getCells(
+      getSheetNameYear(sheetStunden, year)
+    );
+    let userDetails = dataDetails.filter(
+      (row) =>
+        row[nameColumn - 1] ==
+        `${user[firstNameColumn - 1]} ${user[lastNameColumn - 1]}`
+    );
+
+    userDetails.array.forEach((element) => {
+      returnObj.details.push({
+        date: element[dateColumn - 1],
+        name: element[nameColumn - 1],
+        description: element[descriptionColumn - 1],
+        hours: element[hoursColumn - 1],
+      });
+    });
+  }
+
+  return returnObj;
 }
 
 async function getAllUsers() {

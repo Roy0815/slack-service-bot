@@ -10,15 +10,14 @@ function setupApp(app) {
     async ({ ack, command, respond, client }) => {
       await ack();
 
+      //see if user wanted detailes
+      let details = command.text.includes("details");
+
+      //remove everything but numbers
+      command.text = command.text.replace(/\D/g, "");
+
       //if year was filled, validate
       if (command.text != "") {
-        //validate number
-        let text = /^[0-9]+$/;
-        if (!text.test(command.text)) {
-          await respond("Bitte ein gültiges Jahr eingeben");
-          return;
-        }
-
         let currYear = new Date().getFullYear();
         if (command.text < 2022 || command.text > currYear) {
           await respond(
@@ -28,53 +27,88 @@ function setupApp(app) {
         }
       }
 
-      let hours = await sheet.getHoursFromSlackId({
+      let hoursObj = await sheet.getHoursFromSlackId({
         id: command.user_id,
         year: command.text,
+        details: details,
       });
 
-      // if registered, display
-      if (hours != undefined) {
-        respond(
-          `Du hast ${
-            command.text != "" ? command.text : "dieses Jahr" //year
-          } bereits ${
-            hours.workedHours
-          } Arbeitsstunden geleistet. Du musst noch ${
-            hours.targetHours
-          } Stunden leisten.`
-        );
-        return;
-      }
-
       // not registered: start dialog
-      await client.views.open(await views.getRegisterView(command.trigger_id));
-    }
-  );
-
-  // Maintain hours
-  app.command(
-    "/arbeitsstunden_erfassen",
-    async ({ ack, command, respond, client }) => {
-      await ack();
-
-      // check user is registered
-      if (
-        (await sheet.getHoursFromSlackId({ id: command.user_id })) == undefined
-      ) {
-        // not registered: start dialog
+      if (hoursObj == undefined) {
         await client.views.open(
           await views.getRegisterView(command.trigger_id)
         );
         return;
       }
 
-      // registered: start maintenance dialog
-      await client.views.open(
-        await views.getMaintainHoursView(command.trigger_id)
-      );
+      // if registered, display
+      let response = {
+        blocks: [
+          {
+            type: "section",
+            text: {
+              type: "mrkdwn",
+              text: `Du hast ${
+                command.text != "" ? command.text : "dieses Jahr" //year
+              } bereits ${
+                hours.workedHours
+              } Arbeitsstunden geleistet. Du musst noch ${
+                hours.targetHours
+              } Stunden leisten.`,
+            },
+          },
+        ],
+      };
+
+      if (hoursObj.details.length > 0)
+        response.blocks.push(
+          {
+            type: "divider",
+          },
+          {
+            type: "section",
+            text: {
+              type: "mrkdwn",
+              text: "Datum\t\t\tStunden\tTätigkeit",
+            },
+          },
+          {
+            type: "divider",
+          }
+        );
+
+      hoursObj.details.array.forEach((element) => {
+        response.blocks.push({
+          type: "section",
+          text: {
+            type: "mrkdwn",
+            text: `*${element.date}*\t${element.hours}\t\t\t\t_${element.description}_`,
+          },
+        });
+      });
+
+      respond(response);
     }
   );
+
+  // Maintain hours
+  app.command("/arbeitsstunden_erfassen", async ({ ack, command, client }) => {
+    await ack();
+
+    // check user is registered
+    if (
+      (await sheet.getHoursFromSlackId({ id: command.user_id })) == undefined
+    ) {
+      // not registered: start dialog
+      await client.views.open(await views.getRegisterView(command.trigger_id));
+      return;
+    }
+
+    // registered: start maintenance dialog
+    await client.views.open(
+      await views.getMaintainHoursView(command.trigger_id)
+    );
+  });
 
   //******************** Actions ********************//
   // handle buttons in Registration approval
@@ -182,7 +216,7 @@ function setupApp(app) {
   );
 
   //******************** View Submissions ********************//
-  app.view(views.registerViewName, async ({ body, ack, client, payload }) => {
+  app.view(views.registerViewName, async ({ body, ack, client }) => {
     await ack();
 
     //register object
