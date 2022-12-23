@@ -51,16 +51,16 @@ function setupApp(app) {
               text: `Du hast ${
                 command.text != "" ? command.text : "dieses Jahr" //year
               } bereits ${
-                hours.workedHours
+                hoursObj.workedHours
               } Arbeitsstunden geleistet. Du musst noch ${
-                hours.targetHours
+                hoursObj.targetHours
               } Stunden leisten.`,
             },
           },
         ],
       };
 
-      if (hoursObj.details.length > 0)
+      if (hoursObj.details.length > 0) {
         response.blocks.push(
           {
             type: "divider",
@@ -77,15 +77,16 @@ function setupApp(app) {
           }
         );
 
-      hoursObj.details.array.forEach((element) => {
-        response.blocks.push({
-          type: "section",
-          text: {
-            type: "mrkdwn",
-            text: `*${element.date}*\t${element.hours}\t\t\t\t_${element.description}_`,
-          },
+        hoursObj.details.forEach((element) => {
+          response.blocks.push({
+            type: "section",
+            text: {
+              type: "mrkdwn",
+              text: `*${element.date}*\t${element.hours}\t\t\t\t_${element.description}_`,
+            },
+          });
         });
-      });
+      }
 
       respond(response);
     }
