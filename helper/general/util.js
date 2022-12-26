@@ -1,9 +1,6 @@
 //******************** Functions ********************//
 function formatTime(date) {
-  let hours =
-    date.getUTCHours() >= 22 ? date.getUTCHours() - 22 : date.getUTCHours() + 2;
-
-  return `${hours < 10 ? "0" : ""}${hours}:${
+  return `${date.getUTCHours() + 2 < 10 ? "0" : ""}${date.getUTCHours() + 2}:${
     date.getMinutes() < 10 ? "0" : ""
   }${date.getMinutes()}`;
 }
@@ -17,7 +14,7 @@ function formatDate(date) {
 function convertNumberToColumn(number) {
   let column = "";
   while (number >= 0) {
-    column = "ABCDEFGHIJKLMNOPQRSTUVWXYZ"[(number % 26) - 1] + column;
+    column = "ABCDEFGHIJKLMNOPQRSTUVWXYZ"[number % 26 - 1] + column;
     number = Math.floor(number / 26) - 1;
   }
   return column;

@@ -1,6 +1,6 @@
 // local references
 const sheet = require("./sheet");
-const general = require("./general");
+const util = require("../general/util");
 
 // constants
 const registerViewName = "registerview";
@@ -9,6 +9,7 @@ const registerActionNameSelect = "name_select";
 
 const maintainHoursViewName = "maintainhours";
 const maintainHoursBlockDescription = "description_block";
+const autoregisterInputBlock = "autoregisterinput_block";
 const maintainHoursActionDescription = "description";
 const maintainHoursBlockDate = "date_block";
 const maintainHoursActionDate = "date";
@@ -16,37 +17,6 @@ const maintainHoursBlockHours = "hours_block";
 const maintainHoursActionHours = "hours";
 
 //******************** Views ********************//
-const homeView = {
-  // Use the user ID associated with the event
-  user_id: "",
-  view: {
-    type: "home",
-    blocks: [
-      {
-        type: "section",
-        text: {
-          type: "mrkdwn",
-          text: "Hallo 👋 Ich bin der Arbeitsstunden-Bot. Mit meiner Hilfe kannst du einfach Arbeitsstunden erfassen und abrufen:",
-        },
-      },
-      {
-        type: "section",
-        text: {
-          type: "mrkdwn",
-          text: "*1️⃣ `/arbeitsstunden_anzeigen` Kommando*:\nHiermit kannst du deine geleisteten Stunden einsehen. Das Kommando ist in allen öffentlichen Channels verfügbar, oder auch in privaten, wenn du den Arbeitsstunden-Bot hinzufügst.",
-        },
-      },
-      {
-        type: "section",
-        text: {
-          type: "mrkdwn",
-          text: "*2️⃣ `/arbeitsstunden_erfassen` Kommando:*\nMit diesem Kommando kannst du geleistete Stunden erfassen. Es wird ein Dialog geöffnet, in dem du die Details mitgeben kannst. Im Anschluss wird die Anfrage zur Genehmigung an den Vorstand weitergeleitet. Sobald dieser genehmigt hat, wirst du benachrichtigt.",
-        },
-      },
-    ],
-  },
-};
-
 const registerView = {
   trigger_id: "",
   view: {
@@ -208,13 +178,32 @@ const basicMessage = {
   text: "",
 };
 
-//******************** Functions ********************//
-function getHomeView(userId) {
-  let view = JSON.parse(JSON.stringify(homeView));
-  view.user_id = userId;
-  return view;
-}
+const newUserJoinedMessage = {
+  channel: "",
+  text: "", //set in method
+  blocks: [
+    {
+      type: "input",
+      element: {
+        type: "external_select",
+        placeholder: {
+          type: "plain_text",
+          text: "Name auswählen",
+          emoji: true,
+        },
+        action_id: "user_options",
+        min_query_length: 0,
+      },
+      label: {
+        type: "plain_text",
+        text: "", // set in method
+        emoji: true,
+      },
+    },
+  ],
+};
 
+//******************** Functions ********************//
 async function getRegisterView(triggerId) {
   let view = JSON.parse(JSON.stringify(registerView));
   view.trigger_id = triggerId;
@@ -232,6 +221,49 @@ async function getRegisterView(triggerId) {
       value: user.id,
     });
   }
+
+  return view;
+}
+
+async function getAutoRegisterMessage(slackId) {
+  let view = JSON.parse(JSON.stringify(basicConfirmDialogView));
+  view.channel = "GPD9S0RU2"; //await sheet.getAdminChannel();
+
+  view.text =
+    view.blocks[0].text.text = `<@${slackId}> ist beigetreten und noch nicht registriert. Bitte wähle den Namen aus:`;
+
+  view.blocks[1].elements[0].value = slackId;
+  view.blocks[1].elements[0].text.text = "Submit";
+  view.blocks[1].elements[0].action_id = "auto-register-submit-button";
+  view.blocks[1].block_id = autoregisterInputBlock;
+
+  //add user select
+  let users = await sheet.getAllUsers();
+
+  view.blocks[1].elements.unshift({
+    type: "static_select",
+    placeholder: {
+      type: "plain_text",
+      text: "Name",
+      emoji: true,
+    },
+    options: [], //users go here
+    action_id: registerActionNameSelect,
+  });
+
+  for (let user of users) {
+    view.blocks[1].elements[0].options.push({
+      text: {
+        type: "plain_text",
+        text: user.name,
+        emoji: true,
+      },
+      value: user.id,
+    });
+  }
+
+  //remove decline button
+  view.blocks[1].elements.pop();
 
   return view;
 }
@@ -295,7 +327,7 @@ async function getMaintainConfirmDialog(entity) {
     entity.slackId
   }> möchte folgenden Arbeitseinsatz erfassen:\n${entity.title}: ${
     entity.hours
-  } Stunde${entity.hours == 1 ? "" : "n"} am ${general.formatDate(dateObj)}`;
+  } Stunde${entity.hours == 1 ? "" : "n"} am ${util.formatDate(dateObj)}`;
 
   view.blocks[1].elements[0].value = JSON.stringify(entity);
   view.blocks[1].elements[0].action_id = "maintain-approve-button";
@@ -314,7 +346,7 @@ function getUserMaintainStartMessage({ slackId, title, hours, date }) {
   );
 
   view.channel = slackId;
-  view.text = `Deine Erfassung von ${hours} Stunden am ${general.formatDate(
+  view.text = `Deine Erfassung von ${hours} Stunden am ${util.formatDate(
     dateObj
   )} für "${title}" wurde zur Freigabe weitergeleitet.\nDu wirst informiert, sobald die Stunden genehmigt wurden.`;
 
@@ -330,24 +362,38 @@ function getUserMaintainEndMessage({ slackId, title, hours, date, approved }) {
   );
 
   view.channel = slackId;
-  view.text = `Deine Erfassung von ${hours} Stunden am ${general.formatDate(
+  view.text = `Deine Erfassung von ${hours} Stunden am ${util.formatDate(
     dateObj
   )} für "${title}" wurde ${approved ? "genehmigt" : "abgelehnt"}.`;
 
   return view;
 }
 
+async function getNewUserJoinedMessage({ slackId }) {
+  let view = newUserJoinedMessage;
+
+  view.channel = "GPPHHTLSU"; //= await sheet.getAdminChannel();
+  view.text =
+    view.blocks[0].label.text = `Nutzer <@${slackId}> ist neu in Slack. Mit welchem Namen soll er verknüpft werden?`;
+
+  //todo: Buttons mit slackID
+
+  return view;
+}
+
 //exports
 module.exports = {
-  getHomeView,
+  getNewUserJoinedMessage,
 
   getRegisterView,
   getRegisterConfirmDialog,
   getUserRegisterStartMessage,
   getUserRegisterEndMessage,
+  getAutoRegisterMessage,
   registerViewName,
   registerBlockNameSelect,
   registerActionNameSelect,
+  autoregisterInputBlock,
 
   getMaintainHoursView,
   getMaintainConfirmDialog,
