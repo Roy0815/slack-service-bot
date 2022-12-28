@@ -2,8 +2,24 @@ const views = require("./views");
 
 function setupApp(app) {
   //******************** Commands ********************//
-  app.command(`/weristda`, async ({ command, ack, client }) => {
+  app.command(`/weristda`, async ({ command, ack, client, respond }) => {
     await ack();
+
+    //Datum validieren falls eingegeben
+    if (command.text != "") {
+      let dateArr = command.text.split(".");
+      dateArr[0] = parseInt(dateArr[0]);
+      dateArr[1] = parseInt(dateArr[1]) - 1;
+      dateArr[2] = parseInt(dateArr[2]);
+
+      let date = new Date(dateArr[2], dateArr[1], dateArr[0]);
+
+      if (dateArr.length != 3 || date.getFullYear() == NaN) {
+        respond("Bitte ein gültiges Datum eingeben");
+        return;
+      }
+    }
+
     await client.chat.postMessage(views.getWhoIsThereMessage(command));
   });
 

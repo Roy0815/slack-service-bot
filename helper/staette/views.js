@@ -1,3 +1,6 @@
+//imports
+const util = require("../general/util");
+
 //constants
 const whoIsThereInputBlockName = "whoIsThereBlock";
 const whoIsThereTimePickerName = "whoIsThereTimePicker";
@@ -18,10 +21,17 @@ const whoIsThereMessage = {
     },
     {
       type: "section",
+      text: {
+        type: "mrkdwn",
+        text: "", //set in method
+      },
+    },
+    {
+      type: "section",
       block_id: whoIsThereInputBlockName,
       text: {
         type: "mrkdwn",
-        text: "Wann bist du heute da?",
+        text: "", //set in method
       },
       accessory: {
         type: "timepicker",
@@ -65,10 +75,20 @@ const whoIsThereMessage = {
 };
 
 //******************** Functions ********************//
-function getWhoIsThereMessage({ user_id }) {
+function getWhoIsThereMessage({ user_id, text }) {
   let view = JSON.parse(JSON.stringify(whoIsThereMessage));
+
+  let today = new Date();
+
+  let day = text == `${util.formatDate(today)}` ? "heute" : `am ${text}`;
+
+  view.blocks[0].text.text = `\`${text}\``;
+
   view.text =
-    view.blocks[0].text.text = `<@${user_id}> will wissen wer heute in der Stätte ist`;
+    view.blocks[1].text.text = `<@${user_id}> will wissen wer ${day} in der Stätte ist`;
+
+  view.blocks[2].text.text = `Wann bist du ${day} da?`;
+
   return view;
 }
 

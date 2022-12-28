@@ -52,7 +52,7 @@ const homeView = {
         type: "section",
         text: {
           type: "mrkdwn",
-          text: "*`/weristda` Kommando:*\nMit diesem Kommando kannst du eine Abfrage starten wer heute in der Trainingsstätte ist. Die anderen Mitglieder können dann ihre Zeiten einpflegen.",
+          text: "*`/weristda [DD.MM.YYYY]` Kommando:*\nMit diesem Kommando kannst du eine Abfrage starten wer heute in der Trainingsstätte ist. Die anderen Mitglieder können dann ihre Zeiten einpflegen.\nDu kannst optional ein Datum mitgeben, um einen anderen Termin abzufragen. Beispiel: `/weristda 01.01.2000`",
         },
       },
     ],
@@ -60,7 +60,7 @@ const homeView = {
 };
 
 //******************** Functions ********************//
-function getHomeView({user}) {
+function getHomeView({ user }) {
   let view = JSON.parse(JSON.stringify(homeView));
   view.user_id = user;
   return view;
