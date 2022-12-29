@@ -59,14 +59,14 @@ async function copySheetToNewYear(nameBase, year) {
 
 async function checkYearSheetsExists(year) {
   try {
-    await sheet.getSheetID(getSheetNameYear(sheetStundenSumme, year));
-  } catch (err) {
-    copySheetToNewYear(sheetStundenSumme, year);
-  }
-  try {
     await sheet.getSheetID(getSheetNameYear(sheetStunden, year));
   } catch (err) {
-    copySheetToNewYear(sheetStunden, year);
+    await copySheetToNewYear(sheetStunden, year);
+  }
+  try {
+    await sheet.getSheetID(getSheetNameYear(sheetStundenSumme, year));
+  } catch (err) {
+    await copySheetToNewYear(sheetStundenSumme, year);
   }
 }
 
@@ -81,7 +81,7 @@ async function getHoursFromSlackId({ id, year, details }) {
   let user = await getUserFromSlackId(id);
   if (user == undefined) return undefined;
 
-  if (year == "") year = new Date().getFullYear();
+  if (year == undefined || year == "") year = new Date().getFullYear();
 
   await checkYearSheetsExists(year);
 
@@ -107,7 +107,7 @@ async function getHoursFromSlackId({ id, year, details }) {
         `${user[firstNameColumn - 1]} ${user[lastNameColumn - 1]}`
     );
 
-    userDetails.array.forEach((element) => {
+    userDetails.forEach((element) => {
       returnObj.details.push({
         date: element[dateColumn - 1],
         name: element[nameColumn - 1],
@@ -157,15 +157,6 @@ async function getAdminChannel() {
   ];
 }
 
-async function test(oldName, newName) {
-  /*try {
-    console.log(await getSheetID("test"));
-  } catch (err) {
-    console.log(err);
-  }*/
-  await checkYearSheetsExists(2023);
-}
-
 async function saveSlackId({ id, slackId }) {
   //find line with user
   let data = await sheet.getCells(sheetAllgDaten);
@@ -181,7 +172,6 @@ async function saveSlackId({ id, slackId }) {
 
 async function saveHours({ slackId, title, hours, date }) {
   let user = await getUserFromSlackId(slackId);
-
   await checkYearSheetsExists(date.split("-")[0]);
 
   await sheet.appendRow({
@@ -195,12 +185,19 @@ async function saveHours({ slackId, title, hours, date }) {
   });
 }
 
+async function getNameFromSlackId({ slackId }) {
+  let user = await getUserFromSlackId(slackId);
+  if (user == undefined) return undefined;
+
+  return `${user[firstNameColumn - 1]} ${user[lastNameColumn - 1]}`;
+}
+
 //exports
 module.exports = {
   getAllUsers,
+  getNameFromSlackId,
   getAdminChannel,
   getHoursFromSlackId,
   saveSlackId,
   saveHours,
-  test,
 };

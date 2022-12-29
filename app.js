@@ -1,20 +1,15 @@
 // Require the Bolt package (github.com/slackapi/bolt)
-const { App, ExpressReceiver } = require("@slack/bolt");
+const { App } = require("@slack/bolt");
 
 //local references
 const views = require("./helper/general/views");
 const asApp = require("./helper/arbeitsstunden/app");
 const staetteApp = require("./helper/staette/app");
 
-// Create receiver
-const receiver = new ExpressReceiver({
-  signingSecret: process.env.SLACK_SIGNING_SECRET,
-});
-
 // Create Bolt App
 const app = new App({
   token: process.env.SLACK_BOT_TOKEN,
-  receiver,
+  signingSecret: process.env.SLACK_SIGNING_SECRET,
 });
 
 //******************** Setup listeners ********************//
