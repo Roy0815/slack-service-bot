@@ -78,9 +78,7 @@ const whoIsThereMessage = {
 function getWhoIsThereMessage({ user_id, text }) {
   let view = JSON.parse(JSON.stringify(whoIsThereMessage));
 
-  let today = new Date();
-
-  let day = text == `${util.formatDate(today)}` ? "heute" : `am ${text}`;
+  let day = text == `${util.formatDate(new Date())}` ? "heute" : `am ${text}`;
 
   view.blocks[0].text.text = `\`${text}\``;
 

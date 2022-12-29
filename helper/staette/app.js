@@ -1,3 +1,5 @@
+//imports
+const util = require("../general/util");
 const views = require("./views");
 
 function setupApp(app) {
@@ -18,7 +20,7 @@ function setupApp(app) {
         respond("Bitte ein gültiges Datum eingeben");
         return;
       }
-    }
+    } else command.text = util.formatDate(new Date());
 
     await client.chat.postMessage(views.getWhoIsThereMessage(command));
   });
