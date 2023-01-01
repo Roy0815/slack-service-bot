@@ -227,7 +227,7 @@ async function getRegisterView(triggerId) {
 
 async function getAutoRegisterMessage(slackId) {
   let view = JSON.parse(JSON.stringify(basicConfirmDialogView));
-  view.channel = "GPD9S0RU2"; //await sheet.getAdminChannel();
+  view.channel = await sheet.getAdminChannel();
 
   view.text =
     view.blocks[0].text.text = `<@${slackId}> ist beigetreten und noch nicht registriert. Bitte wähle den Namen aus:`;
