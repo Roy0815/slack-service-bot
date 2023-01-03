@@ -287,7 +287,7 @@ function setupApp(app) {
 
   //******************** Events Submissions ********************//
   app.event("team_join", async ({ event, client }) => {
-    if (event.is_bot) return;
+    if (event.user.is_bot) return;
 
     await client.chat.postMessage(
       await views.getAutoRegisterMessage(event.user.id)
