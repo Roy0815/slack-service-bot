@@ -59,6 +59,11 @@ const homeView = {
   },
 };
 
+const basicMessage = {
+  channel: "",
+  text: "",
+};
+
 //******************** Functions ********************//
 function getHomeView({ user }) {
   let view = JSON.parse(JSON.stringify(homeView));
@@ -69,4 +74,6 @@ function getHomeView({ user }) {
 //******************** Export ********************//
 module.exports = {
   getHomeView,
+
+  basicMessage,
 };

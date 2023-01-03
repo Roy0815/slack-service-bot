@@ -1,6 +1,7 @@
 // local references
 const sheet = require("./sheet");
 const util = require("../general/util");
+const views = require("../general/views");
 
 // constants
 const registerViewName = "registerview";
@@ -173,11 +174,6 @@ const basicConfirmDialogView = {
   ],
 };
 
-const basicMessage = {
-  channel: "",
-  text: "",
-};
-
 const newUserJoinedMessage = {
   channel: "",
   text: "", //set in method
@@ -285,7 +281,7 @@ async function getRegisterConfirmDialog(registerObj) {
 }
 
 function getUserRegisterStartMessage({ slackId, name }) {
-  let view = JSON.parse(JSON.stringify(basicMessage));
+  let view = JSON.parse(JSON.stringify(views.basicMessage));
   view.channel = slackId;
 
   view.text = `Deine Registrierung als ${name} wurde zur Freigabe weitergeleitet.\nDu wirst informiert, sobald die Verlinkung freigegeben wurde.`;
@@ -294,7 +290,7 @@ function getUserRegisterStartMessage({ slackId, name }) {
 }
 
 function getUserRegisterEndMessage({ slackId, name, approved }) {
-  let view = JSON.parse(JSON.stringify(basicMessage));
+  let view = JSON.parse(JSON.stringify(views.basicMessage));
   view.channel = slackId;
 
   view.text = `Deine Registrierung als ${name} wurde ${
@@ -338,7 +334,7 @@ async function getMaintainConfirmDialog(entity) {
 }
 
 function getUserMaintainStartMessage({ slackId, title, hours, date }) {
-  let view = JSON.parse(JSON.stringify(basicMessage));
+  let view = JSON.parse(JSON.stringify(views.basicMessage));
   let dateObj = new Date(
     date.split("-")[0],
     date.split("-")[1] - 1,
@@ -354,7 +350,7 @@ function getUserMaintainStartMessage({ slackId, title, hours, date }) {
 }
 
 function getUserMaintainEndMessage({ slackId, title, hours, date, approved }) {
-  let view = JSON.parse(JSON.stringify(basicMessage));
+  let view = JSON.parse(JSON.stringify(views.basicMessage));
   let dateObj = new Date(
     date.split("-")[0],
     date.split("-")[1] - 1,
