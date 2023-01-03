@@ -1,0 +1,26 @@
+version: "3.9"
+
+services:
+  slack-arbeitsstunden-bot:
+    image: roylotzwik/slack-arbeitsstunden-bot:latest
+    container_name: slack-arbeitsstunden-bot
+    volumes:
+      - ./volume:/var/lib/files
+    restart: always
+    environment:
+      SHEET_ID: 1csZdIyqa2xDHtxCTmkFowGoTm-XXr8FFMPeQHzVVfr8
+      GOOGLE_APPLICATION_CREDENTIALS: /var/lib/files/secret.json
+      SLACK_SIGNING_SECRET: 7b8381d48ef9d70948d1291d58df5cc8
+      SLACK_BOT_TOKEN: xoxb-488748942452-4025753763734-WpmFqDVX86uFHjMdGKbsiyzt
+      PORT: 8080
+      STAETTE_CHANNEL: CHW68AJQ2
+    #    ports:
+    #      - "8080"
+    networks:
+      - proxy
+      - default
+
+networks:
+  proxy:
+    external:
+      name: proxy
