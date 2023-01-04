@@ -5,6 +5,7 @@ const { App } = require("@slack/bolt");
 const views = require("./helper/general/views");
 const asApp = require("./helper/arbeitsstunden/app");
 const staetteApp = require("./helper/staette/app");
+const pollzApp = require("./helper/pollz/app");
 
 // Create Bolt App
 const app = new App({
@@ -15,6 +16,7 @@ const app = new App({
 //******************** Setup listeners ********************//
 asApp.setupApp(app);
 staetteApp.setupApp(app);
+pollzApp.setupApp(app);
 
 app.event("app_home_opened", async ({ event, client }) => {
   await client.views.publish(views.getHomeView(event));
