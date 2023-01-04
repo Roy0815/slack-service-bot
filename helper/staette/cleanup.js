@@ -12,7 +12,7 @@ const app = new App({
 // log job execution
 app.client.chat.postMessage({
   token: process.env.SLACK_BOT_TOKEN,
-  channel: "D041KC005C2",
+  channel: "GPD9S0RU2",
   text: `Job ran at ${util.formatDate(new Date())} and ${util.formatTime(
     new Date()
   )}`,
