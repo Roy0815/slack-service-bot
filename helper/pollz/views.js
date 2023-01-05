@@ -2,22 +2,27 @@
 const util = require("../general/util");
 
 // constants
-const pollViewName = "pollView";
+const pollViewName = "pollz-pollView";
 
-const questionBlockName = "questionBlock";
-const questionInputAction = "question_input-action";
+const questionBlockName = "pollz-questionBlock";
+const questionInputAction = "pollz-question_input-action";
 
-const typeSelectBlockName = "typeSelectBlock";
-const typeSelectAction = "type_select-action";
+const typeSelectBlockName = "pollz-typeSelectBlock";
+const typeSelectAction = "pollz-type_select-action";
 
-const conversationSelectBlockName = "conversationSelectBlock";
-const conversationSelectAction = "conversations_select-action";
+const conversationSelectBlockName = "pollz-conversationSelectBlock";
+const conversationSelectAction = "pollz-conversations_select-action";
 
-const optionsBlockName = "optionsBlock";
-const optionsAction = "options-action";
+const optionsBlockName = "pollz-optionsBlock";
+const optionsAction = "pollz-options-action";
+const optionAddAllowed = "addoptions";
 
-const newAnswerBlockName = "newAnswerBlock";
-const newAnswerInputAction = "newAnswerInput-action";
+const newAnswerBlockName = "pollz-newAnswerBlock";
+const newAnswerInputAction = "pollz-newAnswerInput-action";
+
+const addAnswerAction = "pollz-add-answer";
+const deleteSingleAnswerAction = "pollz-delete-single-answer";
+const deleteAllAnswerAction = "pollz-delete-all-answers";
 
 //******************** Views ********************//
 const pollView = {
@@ -58,7 +63,7 @@ const pollView = {
       {
         type: "divider",
       },
-      {
+      /* {
         type: "input",
         block_id: typeSelectBlockName,
         element: {
@@ -104,7 +109,7 @@ const pollView = {
           text: "Typ",
           emoji: true,
         },
-      },
+      }, */
       {
         type: "input",
         block_id: conversationSelectBlockName,
@@ -128,7 +133,7 @@ const pollView = {
             {
               text: {
                 type: "plain_text",
-                text: "Mehrere Antworten auswählbar",
+                text: "mehrere Antworten auswählbar",
                 emoji: true,
               },
               value: "multiplechoice",
@@ -139,7 +144,7 @@ const pollView = {
                 text: "Teilnehmer können Optionen hinzufügen",
                 emoji: true,
               },
-              value: "addoptions",
+              value: optionAddAllowed,
             },
             {
               text: {
@@ -195,7 +200,7 @@ const pollView = {
               emoji: true,
             },
             value: "add",
-            action_id: "pollz-add-answer",
+            action_id: addAnswerAction,
           },
           {
             type: "button",
@@ -206,7 +211,7 @@ const pollView = {
             },
             style: "danger",
             value: "all",
-            action_id: "pollz-delete-all-answer",
+            action_id: deleteAllAnswerAction,
           },
         ],
       },
@@ -232,8 +237,90 @@ const answerView = {
     },
     style: "danger",
     value: "", //set in method
-    action_id: "pollz-delete-single-answer",
+    action_id: deleteSingleAnswerAction,
   },
+};
+
+const pollMessage = {
+  channel: "",
+  text: "", // Text in the notification, set in the method
+  emoji: true,
+  unfurl_links: false,
+  blocks: [
+    {
+      type: "section",
+      text: {
+        type: "mrkdwn",
+        text: "", //set in the method
+      },
+    },
+    {
+      type: "context",
+      elements: [
+        {
+          type: "mrkdwn",
+          text: "", //set in the method
+        },
+      ],
+    },
+    {
+      type: "divider",
+    },
+    {
+      type: "divider",
+    },
+    {
+      type: "actions",
+      elements: [
+        {
+          type: "button",
+          text: {
+            type: "plain_text",
+            emoji: true,
+            text: "Antwort hinzufügen",
+          },
+          value: "click_me_123",
+        },
+        {
+          type: "button",
+          style: "danger",
+          text: {
+            type: "plain_text",
+            emoji: true,
+            text: "Meine Antwort/en löschen",
+          },
+          value: "click_me_123",
+        },
+      ],
+    },
+  ],
+};
+
+const answerBlockMessage = {
+  type: "section",
+  text: {
+    type: "mrkdwn",
+    text: "", //set in method, contains answer option
+  },
+  accessory: {
+    type: "button",
+    text: {
+      type: "plain_text",
+      emoji: true,
+      text: "Abstimmen",
+    },
+    value: "", //set in method, contains answer number
+  },
+};
+
+const resultBlockMessage = {
+  type: "context",
+  elements: [
+    {
+      type: "mrkdwn",
+      text: "Keine Stimmen", //set in method, contains result (count/people)
+    },
+  ],
 };
 
 //******************** Functions ********************//
@@ -277,7 +364,7 @@ function deleteAnswer({ id, hash, blocks }, { value }) {
     view.view.blocks = blocks.filter(
       (block) =>
         !block.accessory ||
-        block.accessory.action_id != "pollz-delete-single-answer"
+        block.accessory.action_id != deleteSingleAnswerAction
     );
   } else {
     //delete selected
@@ -289,7 +376,7 @@ function deleteAnswer({ id, hash, blocks }, { value }) {
     view.view.blocks.forEach((block, index) => {
       if (
         block.accessory &&
-        block.accessory.action_id == "pollz-delete-single-answer"
+        block.accessory.action_id == deleteSingleAnswerAction
       ) {
         block.accessory.value = `${index + 1}`;
       }
@@ -300,39 +387,74 @@ function deleteAnswer({ id, hash, blocks }, { value }) {
 }
 
 function getPollMessage({ user, view }) {
-  let text =
-    `<@${user.id}> hat eine Umfrage erstellt: *${view.state.values[questionBlockName][questionInputAction].value}*` +
-    `\nSenden an Channel: <#${view.state.values[conversationSelectBlockName][conversationSelectAction].selected_conversation}>` +
-    `\nOptionen:`;
+  let retView = JSON.parse(JSON.stringify(pollMessage));
 
-  view.state.values[optionsBlockName][optionsAction].selected_options.forEach(
-    (option) => {
-      text += `\n- ${option.text.text}`;
-    }
-  );
+  //set question
+  retView.text =
+    view.state.values[questionBlockName][questionInputAction].value;
 
-  if (
-    view.state.values[optionsBlockName][optionsAction].selected_options
-      .length === 0
-  )
-    text += "\nkeine";
+  //set text in Message
+  retView.blocks[0].text.text = `Neue Umfrage von <@${user.id}>\n*${view.state.values[questionBlockName][questionInputAction].value}*`;
 
-  text += "\nAntworten:";
+  //set channel
+  retView.channel =
+    view.state.values[conversationSelectBlockName][
+      conversationSelectAction
+    ].selected_conversation;
 
+  //set options
+  let displayedOptions = view.state.values[optionsBlockName][
+    optionsAction
+  ].selected_options.filter((option) => option.value != optionAddAllowed);
+
+  if (displayedOptions.length === 0) {
+    retView.blocks.splice(1, 1);
+  } else {
+    displayedOptions.forEach((option, index) => {
+      retView.blocks[1].elements[0].text += `${index == 0 ? "" : ", "}${
+        option.text.text
+      }`;
+    });
+  }
+
+  //set answers
   view.blocks
     .filter(
       (block) =>
-        block.accessory &&
-        block.accessory.action_id == "pollz-delete-single-answer"
+        block.accessory && block.accessory.action_id == deleteSingleAnswerAction
     )
-    .forEach((element) => {
-      text += `\n- ${element.text.text}`;
+    .forEach((element, index) => {
+      let answerView = JSON.parse(JSON.stringify(answerBlockMessage));
+      answerView.accessory.value = `${index}`;
+      answerView.text.text = `*${element.text.text}*`;
+
+      let resultView = JSON.parse(JSON.stringify(resultBlockMessage));
+
+      retView.blocks.splice(3 + index * 2, 0, answerView, resultView);
     });
 
-  return {
-    channel: "GPPHHTLSU",
-    text: text,
-  };
+  return retView;
+}
+
+function answerOptionsValid({ view }) {
+  let answers = view.blocks.filter(
+    (block) =>
+      block.accessory && block.accessory.action_id == deleteSingleAnswerAction
+  );
+
+  if (answers.length === 0) {
+    //check options
+    let addAnswers = view.state.values[optionsBlockName][
+      optionsAction
+    ].selected_options.filter((option) => option.value == optionAddAllowed);
+
+    //add Options not selected: error
+    if (addAnswers.length === 0) {
+      return false;
+    }
+  }
+
+  return true;
 }
 
 //exports
@@ -341,8 +463,12 @@ module.exports = {
   addAnswer,
   deleteAnswer,
   getPollMessage,
+  answerOptionsValid,
 
   newAnswerBlockName,
   newAnswerInputAction,
   pollViewName,
+  addAnswerAction,
+  deleteSingleAnswerAction,
+  deleteAllAnswerAction,
 };
