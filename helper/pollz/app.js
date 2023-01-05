@@ -12,7 +12,7 @@ function setupApp(app) {
   });
 
   //******************** Actions ********************//
-  app.action("pollz-add-answer", async ({ ack, client, body }) => {
+  app.action(views.addAnswerAction, async ({ ack, client, body }) => {
     await ack();
 
     if (
@@ -26,8 +26,10 @@ function setupApp(app) {
   });
 
   app.action(
-    new RegExp(`^pollz-delete-(single)*(all)*-answer$`),
-    async ({ ack, action, client, respond, body }) => {
+    new RegExp(
+      `^(${views.deleteSingleAnswerAction})*(${views.deleteAllAnswerAction})*$`
+    ),
+    async ({ ack, action, client, body }) => {
       await ack();
 
       await client.views.update(views.deleteAnswer(body.view, action));
@@ -36,6 +38,18 @@ function setupApp(app) {
 
   //******************** View Submissions ********************//
   app.view(views.pollViewName, async ({ body, ack, client }) => {
+    //check if answers exist if no adding is allowed
+    if (!views.answerOptionsValid(body)) {
+      await ack({
+        response_action: "errors",
+        errors: {
+          [views.newAnswerBlockName]:
+            "Bitte Antwortmöglichkeiten eingeben oder hinzufügen erlauben",
+        },
+      });
+      return;
+    }
+
     await ack();
 
     //send poll
