@@ -9,14 +9,14 @@ const app = new App({
   signingSecret: process.env.SLACK_SIGNING_SECRET,
 });
 
+// cleanup old messages
+let count = functions.cleanup(app);
+
 // log job execution
 app.client.chat.postMessage({
   token: process.env.SLACK_BOT_TOKEN,
   channel: "GPD9S0RU2",
-  text: `Job ran at ${util.formatDate(new Date())} and ${util.formatTime(
+  text: `Job ran at ${util.formatDate(new Date())} ${util.formatTime(
     new Date()
-  )}`,
+  )} and deleted ${count} Message${count == 1 ? "" : "s"}`,
 });
-
-// cleanup old messages
-functions.cleanup(app);

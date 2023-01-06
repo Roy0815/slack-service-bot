@@ -20,6 +20,8 @@ async function cleanup({ client }) {
   let cutoffDate = new Date();
   cutoffDate.setDate(cutoffDate.getDate() - 2);
 
+  let count = 0;
+
   filtered.forEach((msg) => {
     //get date from message
     let text = msg.blocks[0].text.text.replace("`", "");
@@ -37,8 +39,11 @@ async function cleanup({ client }) {
         ts: msg.ts,
         token: process.env.SLACK_BOT_TOKEN,
       });
+      count++;
     }
   });
+
+  return count;
 }
 
 //******************** Exports ********************//
