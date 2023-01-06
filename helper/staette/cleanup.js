@@ -10,13 +10,13 @@ const app = new App({
 });
 
 // cleanup old messages
-let count = functions.cleanup(app);
-
-// log job execution
-app.client.chat.postMessage({
-  token: process.env.SLACK_BOT_TOKEN,
-  channel: "GPD9S0RU2",
-  text: `Job ran at ${util.formatDate(new Date())} ${util.formatTime(
-    new Date()
-  )} and deleted ${count} Message${count == 1 ? "" : "s"}`,
+functions.cleanup(app).then((result) => {
+  // log job execution
+  app.client.chat.postMessage({
+    token: process.env.SLACK_BOT_TOKEN,
+    channel: "GPD9S0RU2",
+    text: `Job ran at ${util.formatDate(new Date())} ${util.formatTime(
+      new Date()
+    )} and deleted ${result} Message${result == 1 ? "" : "s"}`,
+  });
 });
