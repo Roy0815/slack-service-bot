@@ -1,9 +1,10 @@
 // local references
 const util = require("../general/util");
 
-// constants
+//******************** Constants ********************//
 const pollViewName = "pollz-pollView";
 
+// Creation Modal
 const questionBlockName = "pollz-questionBlock";
 const questionInputAction = "pollz-question_input-action";
 
@@ -16,6 +17,8 @@ const conversationSelectAction = "pollz-conversations_select-action";
 const optionsBlockName = "pollz-optionsBlock";
 const optionsAction = "pollz-options-action";
 const optionAddAllowed = "addoptions";
+const optionMultipleSelect = "multiplechoice";
+const optionAnonym = "anon";
 
 const newAnswerBlockName = "pollz-newAnswerBlock";
 const newAnswerInputAction = "pollz-newAnswerInput-action";
@@ -23,6 +26,12 @@ const newAnswerInputAction = "pollz-newAnswerInput-action";
 const addAnswerAction = "pollz-add-answer";
 const deleteSingleAnswerAction = "pollz-delete-single-answer";
 const deleteAllAnswerAction = "pollz-delete-all-answers";
+
+// Poll Message
+const messageAddAnswerAction = "pollz-message-add-answer";
+const messageDeleteAnswersAction = "pollz-message-delete-answers";
+
+const voteButtonAction = "pollz-vote";
 
 //******************** Views ********************//
 const pollView = {
@@ -136,7 +145,7 @@ const pollView = {
                 text: "mehrere Antworten auswählbar",
                 emoji: true,
               },
-              value: "multiplechoice",
+              value: optionMultipleSelect,
             },
             {
               text: {
@@ -152,7 +161,7 @@ const pollView = {
                 text: "Anonym",
                 emoji: true,
               },
-              value: "anon",
+              value: optionAnonym,
             },
           ],
           action_id: optionsAction,
@@ -279,7 +288,8 @@ const pollMessage = {
             emoji: true,
             text: "Antwort hinzufügen",
           },
-          value: "click_me_123",
+          //value: "click_me_123",
+          action_id: messageAddAnswerAction,
         },
         {
           type: "button",
@@ -289,7 +299,8 @@ const pollMessage = {
             emoji: true,
             text: "Meine Antwort/en löschen",
           },
-          value: "click_me_123",
+          value: "", //store info about options in method here
+          action_id: messageDeleteAnswersAction,
         },
       ],
     },
@@ -309,7 +320,8 @@ const answerBlockMessage = {
       emoji: true,
       text: "Abstimmen",
     },
-    value: "", //set in method, contains answer number
+    value: "", //set in method, contains answer number and peoples ids (split by -)
+    action_id: voteButtonAction,
   },
 };
 
@@ -402,20 +414,37 @@ function getPollMessage({ user, view }) {
       conversationSelectAction
     ].selected_conversation;
 
-  //set options
-  let displayedOptions = view.state.values[optionsBlockName][
+  //-- set options --//
+  // anonymous
+  let option = view.state.values[optionsBlockName][
     optionsAction
-  ].selected_options.filter((option) => option.value != optionAddAllowed);
+  ].selected_options.find((option) => option.value == optionAnonym);
 
-  if (displayedOptions.length === 0) {
-    retView.blocks.splice(1, 1);
-  } else {
-    displayedOptions.forEach((option, index) => {
-      retView.blocks[1].elements[0].text += `${index == 0 ? "" : ", "}${
-        option.text.text
-      }`;
-    });
-  }
+  if (option) {
+    //set text
+    retView.blocks[1].elements[0].text = "Anonym";
+    //set value to store
+    retView.blocks[4].elements[1].value = optionAnonym;
+  } else retView.blocks[1].elements[0].text = "nicht Anonym";
+
+  // multiple select
+  option = view.state.values[optionsBlockName][
+    optionsAction
+  ].selected_options.find((option) => option.value == optionMultipleSelect);
+
+  if (option) {
+    //set text
+    retView.blocks[1].elements[0].text += `, mehrere Antworten auswählbar`;
+    //set value to store
+    retView.blocks[4].elements[1].value += optionMultipleSelect;
+  } else retView.blocks[1].elements[0].text += `, eine Antwort auswählbar`;
+
+  // add answers
+  option = view.state.values[optionsBlockName][
+    optionsAction
+  ].selected_options.find((option) => option.value == optionAddAllowed);
+
+  if (!option) retView.blocks[4].elements.shift(); // remove button if not selected
 
   //set answers
   view.blocks
@@ -457,6 +486,69 @@ function answerOptionsValid({ view }) {
   return true;
 }
 
+function vote({ message, state, user }, { value }) {
+  let view = JSON.parse(JSON.stringify(pollMessage));
+
+  //take over all information
+  view.text = message.text;
+  view.blocks = message.blocks;
+
+  //get options
+  let options =
+    view.blocks[view.blocks.length - 1].elements[
+      view.blocks[view.blocks.length - 1].elements.length - 1
+    ].value;
+
+  //find block to be modified
+  let index = view.blocks.findIndex(
+    (block) => block.accessory && block.accessory.value == value
+  );
+
+  if (index === -1) {
+    return view;
+  }
+
+  //get users that already voted + remove answer number
+  let users = value.split("-");
+  users.shift();
+
+  //see if user already voted
+  let indexUser = users.indexOf(user.id);
+
+  if (indexUser == -1) {
+    //add user
+    users.push(user.id);
+  } else {
+    //remove user
+    users.splice(indexUser, 1);
+  }
+
+  view.blocks[index].accessory.value = value.split("-")[0];
+  view.blocks[index + 1].elements[0].text = "";
+
+  users.forEach((user, idx) => {
+    //fill value
+    view.blocks[index].accessory.value += `-${user}`;
+
+    //fill text only if not anonymous
+    if (options.includes(optionAnonym)) return; //goes into next iteration
+
+    view.blocks[index + 1].elements[0].text += `${
+      idx != 0 ? ", " : ""
+    }<@${user}>`;
+  });
+
+  //add total number of votes
+  if (users.length == 0)
+    view.blocks[index + 1].elements[0].text += "Keine Stimmen";
+  else
+    view.blocks[index + 1].elements[0].text += `\n${users.length} ${
+      users.length == 1 ? "Stimme" : "Stimmen"
+    }`;
+
+  return view;
+}
+
 //exports
 module.exports = {
   getPollsView,
@@ -464,6 +556,7 @@ module.exports = {
   deleteAnswer,
   getPollMessage,
   answerOptionsValid,
+  vote,
 
   newAnswerBlockName,
   newAnswerInputAction,
@@ -471,4 +564,5 @@ module.exports = {
   addAnswerAction,
   deleteSingleAnswerAction,
   deleteAllAnswerAction,
+  voteButtonAction,
 };

@@ -29,12 +29,18 @@ function setupApp(app) {
     new RegExp(
       `^(${views.deleteSingleAnswerAction})*(${views.deleteAllAnswerAction})*$`
     ),
-    async ({ ack, action, client, body }) => {
+    async ({ ack, action, body, client }) => {
       await ack();
 
       await client.views.update(views.deleteAnswer(body.view, action));
     }
   );
+
+  app.action(views.voteButtonAction, async ({ ack, action, body, respond }) => {
+    await ack();
+
+    await respond(views.vote(body, action));
+  });
 
   //******************** View Submissions ********************//
   app.view(views.pollViewName, async ({ body, ack, client }) => {
