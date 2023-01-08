@@ -11,6 +11,7 @@ const pollzApp = require("./helper/pollz/app");
 const app = new App({
   token: process.env.SLACK_BOT_TOKEN,
   signingSecret: process.env.SLACK_SIGNING_SECRET,
+  extendedErrorHandler: true,
 });
 
 //******************** Setup listeners ********************//
@@ -27,6 +28,25 @@ app.action(new RegExp(`.*`), async ({ ack }) => {
   try {
     await ack();
   } catch (err) {} //ReceiverMultipleAckError
+});
+
+//******************** Error notifies Admin ********************//
+app.error(({ error, context, body }) => {
+  app.client.files.upload({
+    token: process.env.SLACK_BOT_TOKEN,
+    channels: "UED3FPWE9",
+    filetype: "javascript",
+    title: `Body`,
+    content: JSON.stringify(body, null, "\t"),
+  });
+  app.client.files.upload({
+    token: process.env.SLACK_BOT_TOKEN,
+    channels: "UED3FPWE9",
+    filetype: "javascript",
+    initial_comment: `Error:\n${error}`,
+    title: `Context`,
+    content: JSON.stringify(context, null, "\t"),
+  });
 });
 
 //******************** Start App ********************//
