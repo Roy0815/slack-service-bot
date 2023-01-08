@@ -5,6 +5,8 @@ const util = require("../general/util");
 const whoIsThereInputBlockName = "whoIsThereBlock";
 const whoIsThereTimePickerName = "whoIsThereTimePicker";
 
+const sectionUsers = 5;
+
 //******************** Views ********************//
 const whoIsThereMessage = {
   channel: process.env.STAETTE_CHANNEL,
@@ -97,9 +99,9 @@ function updateWhoIsThereMessage({ user, time, xdelete }, { text, blocks }) {
   view.blocks = blocks;
   view.text = text;
 
-  if (view.blocks[4]) {
+  if (view.blocks[sectionUsers]) {
     //get user list
-    view.blocks[4].text.text.split("\n").forEach((element) => {
+    view.blocks[sectionUsers].text.text.split("\n").forEach((element) => {
       let userArr = element.split("\t");
       users.push({
         time: userArr[0],
@@ -114,19 +116,20 @@ function updateWhoIsThereMessage({ user, time, xdelete }, { text, blocks }) {
     if (index != -1) users.splice(index, 1);
 
     //reset text
-    view.blocks[4].text.text = "";
+    view.blocks[sectionUsers].text.text = "";
   }
 
   //no time = delete: return view now
   if (xdelete) {
     users.forEach((element, index) => {
-      view.blocks[4].text.text = `${view.blocks[4].text.text}${
-        index > 0 ? "\n" : ""
-      }${element.time}\t${element.user}`;
+      view.blocks[sectionUsers].text.text = `${
+        view.blocks[sectionUsers].text.text
+      }${index > 0 ? "\n" : ""}${element.time}\t${element.user}`;
     });
 
-    //if empty, delete section
-    if (users.length == 0 && view.blocks[4]) view.blocks.pop();
+    //if empty, delete section(s)
+    if (users.length == 0 && view.blocks[sectionUsers])
+      view.blocks.splice(sectionUsers - 1, 3);
 
     return view;
   }
@@ -141,25 +144,32 @@ function updateWhoIsThereMessage({ user, time, xdelete }, { text, blocks }) {
     return 0;
   });
 
-  //build view
-  if (!view.blocks[3])
-    view.blocks.push({
+  //build view (replace old blocks)
+  view.blocks.splice(
+    //start
+    sectionUsers - 1,
+    //delete
+    3,
+    //adding objects
+    {
       type: "divider",
-    });
-
-  if (!view.blocks[4])
-    view.blocks.push({
+    },
+    {
       type: "section",
       text: {
         type: "mrkdwn",
         text: "",
       },
-    });
+    },
+    {
+      type: "divider",
+    }
+  );
 
   users.forEach((element, index) => {
-    view.blocks[4].text.text = `${view.blocks[4].text.text}${
-      index > 0 ? "\n" : ""
-    }${element.time}\t${element.user}`;
+    view.blocks[sectionUsers].text.text = `${
+      view.blocks[sectionUsers].text.text
+    }${index > 0 ? "\n" : ""}${element.time}\t${element.user}`;
   });
 
   return view;
