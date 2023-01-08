@@ -42,6 +42,15 @@ function setupApp(app) {
     await respond(views.vote(body, action));
   });
 
+  app.action(
+    views.messageDeleteAnswersAction,
+    async ({ ack, action, body, respond }) => {
+      await ack();
+
+      await respond(views.deleteMyVotes(body));
+    }
+  );
+
   //******************** View Submissions ********************//
   app.view(views.pollViewName, async ({ body, ack, client }) => {
     //check if answers exist if no adding is allowed

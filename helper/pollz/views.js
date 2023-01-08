@@ -439,6 +439,10 @@ function getPollMessage({ user, view }) {
     retView.blocks[4].elements[1].value += optionMultipleSelect;
   } else retView.blocks[1].elements[0].text += `, eine Antwort auswählbar`;
 
+  //make sure value is not initial
+  if (retView.blocks[4].elements[1].value == "")
+    retView.blocks[4].elements[1].value = "_";
+
   // add answers
   option = view.state.values[optionsBlockName][
     optionsAction
@@ -486,14 +490,14 @@ function answerOptionsValid({ view }) {
   return true;
 }
 
-function vote({ message, state, user }, { value }) {
+function vote({ message, user }, { value }) {
   let view = JSON.parse(JSON.stringify(pollMessage));
 
   //take over all information
   view.text = message.text;
   view.blocks = message.blocks;
 
-  //get options
+  //get options from "delete my answers" button
   let options =
     view.blocks[view.blocks.length - 1].elements[
       view.blocks[view.blocks.length - 1].elements.length - 1
@@ -549,6 +553,69 @@ function vote({ message, state, user }, { value }) {
   return view;
 }
 
+function deleteMyVotes({ message, user }) {
+  let view = JSON.parse(JSON.stringify(pollMessage));
+
+  //take over all information
+  view.text = message.text;
+  view.blocks = message.blocks;
+
+  //get options from "delete my answers" button
+  let options =
+    view.blocks[view.blocks.length - 1].elements[
+      view.blocks[view.blocks.length - 1].elements.length - 1
+    ].value;
+
+  //get index of all answer blocks
+  let answerIdxs = [];
+
+  view.blocks.forEach((block, index) => {
+    if (block.accessory && /^\d*/.test(block.accessory.value))
+      answerIdxs.push(index);
+  });
+
+  //modify each block if user voted there
+  answerIdxs.forEach((element) => {
+    //get users that already voted + remove answer number
+    let users = view.blocks[element].accessory.value.split("-");
+    users.shift();
+
+    //see if user already voted
+    let indexUser = users.indexOf(user.id);
+
+    if (indexUser == -1) return;
+
+    //remove user
+    users.splice(indexUser, 1);
+
+    view.blocks[element].accessory.value =
+      view.blocks[element].accessory.value.split("-")[0];
+    view.blocks[element + 1].elements[0].text = "";
+
+    users.forEach((user, idx) => {
+      //fill value
+      view.blocks[element].accessory.value += `-${user}`;
+
+      //fill text only if not anonymous
+      if (options.includes(optionAnonym)) return; //goes into next iteration
+
+      view.blocks[element + 1].elements[0].text += `${
+        idx != 0 ? ", " : ""
+      }<@${user}>`;
+    });
+
+    //add total number of votes
+    if (users.length == 0)
+      view.blocks[element + 1].elements[0].text += "Keine Stimmen";
+    else
+      view.blocks[element + 1].elements[0].text += `\n${users.length} ${
+        users.length == 1 ? "Stimme" : "Stimmen"
+      }`;
+  });
+
+  return view;
+}
+
 //exports
 module.exports = {
   getPollsView,
@@ -557,6 +624,7 @@ module.exports = {
   getPollMessage,
   answerOptionsValid,
   vote,
+  deleteMyVotes,
 
   newAnswerBlockName,
   newAnswerInputAction,
@@ -565,4 +633,5 @@ module.exports = {
   deleteSingleAnswerAction,
   deleteAllAnswerAction,
   voteButtonAction,
+  messageDeleteAnswersAction,
 };
