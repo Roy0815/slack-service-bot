@@ -31,21 +31,21 @@ app.action(new RegExp(`.*`), async ({ ack }) => {
 });
 
 //******************** Error notifies Admin ********************//
-app.error(({ error, context, body }) => {
-  app.client.files.upload({
-    token: process.env.SLACK_BOT_TOKEN,
-    channels: "UED3FPWE9",
-    filetype: "javascript",
-    title: `Body`,
-    content: JSON.stringify(body, null, "\t"),
-  });
-  app.client.files.upload({
+app.error(async ({ error, context, body }) => {
+  await app.client.files.upload({
     token: process.env.SLACK_BOT_TOKEN,
     channels: "UED3FPWE9",
     filetype: "javascript",
     initial_comment: `Error:\n${error}`,
     title: `Context`,
     content: JSON.stringify(context, null, "\t"),
+  });
+  await app.client.files.upload({
+    token: process.env.SLACK_BOT_TOKEN,
+    channels: "UED3FPWE9",
+    filetype: "javascript",
+    title: `Body`,
+    content: JSON.stringify(body, null, "\t"),
   });
 });
 
