@@ -52,7 +52,7 @@ function setupApp(app) {
 
   app.action(
     views.messageOverflowAction,
-    async ({ ack, body, respond, action }) => {
+    async ({ ack, body, respond, action, client }) => {
       await ack();
 
       if (
@@ -60,8 +60,15 @@ function setupApp(app) {
         action.selected_option.value.split("-")[0] !=
           views.messageOverflowDelete ||
         action.selected_option.value.split("-")[1] != body.user.id
-      )
+      ) {
+        await client.chat.postEphemeral({
+          token: process.env.SLACK_BOT_TOKEN,
+          channel: body.channel.id,
+          text: "Du bist nicht der Fragesteller",
+          user: body.user.id,
+        });
         return;
+      }
 
       await respond({ delete_original: true });
     }
