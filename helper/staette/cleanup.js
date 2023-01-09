@@ -14,7 +14,7 @@ functions.cleanup(app).then((result) => {
   // log job execution
   app.client.chat.postMessage({
     token: process.env.SLACK_BOT_TOKEN,
-    channel: "GPD9S0RU2",
+    channel: "UED3FPWE9",
     text: `Job ran at ${util.formatDate(new Date())} ${util.formatTime(
       new Date()
     )} and deleted ${result} Message${result == 1 ? "" : "s"}`,
