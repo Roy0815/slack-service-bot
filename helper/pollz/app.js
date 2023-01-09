@@ -50,6 +50,23 @@ function setupApp(app) {
     }
   );
 
+  app.action(
+    views.messageOverflowAction,
+    async ({ ack, body, respond, action }) => {
+      await ack();
+
+      if (
+        !action.selected_option ||
+        action.selected_option.value.split("-")[0] !=
+          views.messageOverflowDelete ||
+        action.selected_option.value.split("-")[1] != body.user.id
+      )
+        return;
+
+      await respond({ delete_original: true });
+    }
+  );
+
   //******************** View Submissions ********************//
   app.view(views.pollViewName, async ({ body, ack, client }) => {
     //check if answers exist if no adding is allowed

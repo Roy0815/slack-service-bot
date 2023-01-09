@@ -314,7 +314,7 @@ const pollMessage = {
                 text: "Admin: Umfrage löschen",
                 emoji: true,
               },
-              value: messageOverflowDelete,
+              value: messageOverflowDelete, // delete + admin (added in method)
             },
             /* {
               text: {
@@ -439,6 +439,9 @@ function getPollMessage({ user, view }) {
       conversationSelectAction
     ].selected_conversation;
 
+  //store admin in overflow button
+  retView.blocks[4].elements[2].options[0].value += `-${user.id}`;
+
   //-- set options --//
   // anonymous
   let option = view.state.values[optionsBlockName][
@@ -525,7 +528,7 @@ function vote({ message, user }, { value }) {
   //get options from "delete my answers" button
   let options =
     view.blocks[view.blocks.length - 1].elements[
-      view.blocks[view.blocks.length - 1].elements.length - 1
+      view.blocks[view.blocks.length - 1].elements.length - 2
     ].value;
 
   //find block to be modified
@@ -659,4 +662,6 @@ module.exports = {
   deleteAllAnswerAction,
   voteButtonAction,
   messageDeleteAnswersAction,
+  messageOverflowAction,
+  messageOverflowDelete,
 };
