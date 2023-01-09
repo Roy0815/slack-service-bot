@@ -1,5 +1,4 @@
 //imports
-const util = require("../general/util");
 const views = require("./views");
 
 function setupApp(app) {
@@ -44,7 +43,7 @@ function setupApp(app) {
 
   app.action(
     views.messageDeleteAnswersAction,
-    async ({ ack, action, body, respond }) => {
+    async ({ ack, body, respond }) => {
       await ack();
 
       await respond(views.deleteMyVotes(body));
