@@ -30,6 +30,9 @@ const deleteAllAnswerAction = "pollz-delete-all-answers";
 // Poll Message
 const messageAddAnswerAction = "pollz-message-add-answer";
 const messageDeleteAnswersAction = "pollz-message-delete-answers";
+const messageOverflowAction = "pollz-message-overflow";
+const messageOverflowShow = "show";
+const messageOverflowDelete = "delete";
 
 const voteButtonAction = "pollz-vote";
 
@@ -301,6 +304,28 @@ const pollMessage = {
           },
           value: "", //store info about options in method here
           action_id: messageDeleteAnswersAction,
+        },
+        {
+          type: "overflow",
+          options: [
+            {
+              text: {
+                type: "plain_text",
+                text: "Admin: Umfrage löschen",
+                emoji: true,
+              },
+              value: messageOverflowDelete,
+            },
+            /* {
+              text: {
+                type: "plain_text",
+                text: "Alle Stimmen zeigen",
+                emoji: true,
+              },
+              value: messageOverflowShow,
+            }, */
+          ],
+          action_id: messageOverflowAction,
         },
       ],
     },
