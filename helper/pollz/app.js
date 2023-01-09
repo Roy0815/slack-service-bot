@@ -67,6 +67,12 @@ function setupApp(app) {
     }
   );
 
+  app.action(views.messageAddAnswerAction, async ({ ack, client, body }) => {
+    await ack();
+
+    client.views.open(views.getAddAnswerView(body));
+  });
+
   //******************** View Submissions ********************//
   app.view(views.pollViewName, async ({ body, ack, client }) => {
     //check if answers exist if no adding is allowed
@@ -85,6 +91,21 @@ function setupApp(app) {
 
     //send poll
     await client.chat.postMessage(views.getPollMessage(body));
+  });
+
+  app.view(views.addAnswerViewName, async ({ view, ack, client }) => {
+    await ack();
+
+    //get source message
+    let result = await client.conversations.history({
+      token: process.env.SLACK_BOT_TOKEN,
+      channel: view.private_metadata.split("-")[0],
+      latest: view.private_metadata.split("-")[1],
+      inclusive: true,
+      limit: 1,
+    });
+
+    await client.chat.update(views.addAnswerMessage(view, result.messages[0]));
   });
 }
 

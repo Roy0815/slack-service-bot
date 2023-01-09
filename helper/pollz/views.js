@@ -34,6 +34,9 @@ const messageOverflowAction = "pollz-message-overflow";
 const messageOverflowShow = "show";
 const messageOverflowDelete = "delete";
 
+const addAnswerViewName = "pollz-addAnswerView";
+const addAnswerViewTextInput = "pollz-addAnswerViewTextInput";
+
 const voteButtonAction = "pollz-vote";
 
 //******************** Views ********************//
@@ -350,6 +353,46 @@ const answerBlockMessage = {
   },
 };
 
+const addAnswerView = {
+  trigger_id: "", //set in method
+  view: {
+    type: "modal",
+    private_metadata: "", //set in method, contains message info
+    callback_id: addAnswerViewName,
+    title: {
+      type: "plain_text",
+      text: "Neue Antwort hinzufügen",
+    },
+    submit: {
+      type: "plain_text",
+      text: "Hinzufügen",
+    },
+    type: "modal",
+    close: {
+      type: "plain_text",
+      text: "Abbrechen",
+    },
+    blocks: [
+      {
+        type: "input",
+        block_id: newAnswerBlockName,
+        element: {
+          type: "plain_text_input",
+          placeholder: {
+            type: "plain_text",
+            text: "Antwort",
+          },
+          action_id: addAnswerViewTextInput,
+        },
+        label: {
+          type: "plain_text",
+          text: " ",
+        },
+      },
+    ],
+  },
+};
+
 const resultBlockMessage = {
   type: "context",
   elements: [
@@ -591,7 +634,7 @@ function deleteMyVotes({ message, user }) {
   //get options from "delete my answers" button
   let options =
     view.blocks[view.blocks.length - 1].elements[
-      view.blocks[view.blocks.length - 1].elements.length - 1
+      view.blocks[view.blocks.length - 1].elements.length - 2
     ].value;
 
   //get index of all answer blocks
@@ -644,6 +687,41 @@ function deleteMyVotes({ message, user }) {
   return view;
 }
 
+function getAddAnswerView({ trigger_id, message, channel }) {
+  let view = JSON.parse(JSON.stringify(addAnswerView));
+
+  view.trigger_id = trigger_id;
+
+  view.view.private_metadata = `${channel.id}-${message.ts}`;
+
+  return view;
+}
+
+function addAnswerMessage({ private_metadata, state: { values } }, { blocks }) {
+  let updateMessage = {
+    token: process.env.SLACK_BOT_TOKEN,
+    channel: private_metadata.split("-")[0],
+    ts: private_metadata.split("-")[1],
+    blocks: blocks,
+  };
+
+  //count current answers to get index
+  let idx = 0;
+  blocks.forEach((block) => {
+    if (block.accessory && /^\d*/.test(block.accessory.value)) idx += 1;
+  });
+
+  let answerView = JSON.parse(JSON.stringify(answerBlockMessage));
+  answerView.accessory.value = `${idx}`;
+  answerView.text.text = `*${values[newAnswerBlockName][addAnswerViewTextInput].value}*`;
+
+  let resultView = JSON.parse(JSON.stringify(resultBlockMessage));
+
+  updateMessage.blocks.splice(blocks.length - 2, 0, answerView, resultView);
+
+  return updateMessage;
+}
+
 //exports
 module.exports = {
   getPollsView,
@@ -653,6 +731,8 @@ module.exports = {
   answerOptionsValid,
   vote,
   deleteMyVotes,
+  getAddAnswerView,
+  addAnswerMessage,
 
   newAnswerBlockName,
   newAnswerInputAction,
@@ -661,7 +741,9 @@ module.exports = {
   deleteSingleAnswerAction,
   deleteAllAnswerAction,
   voteButtonAction,
+  messageAddAnswerAction,
   messageDeleteAnswersAction,
   messageOverflowAction,
   messageOverflowDelete,
+  addAnswerViewName,
 };
