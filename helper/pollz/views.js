@@ -561,7 +561,8 @@ function answerOptionsValid({ view }) {
   return true;
 }
 
-function vote({ message, user }, { value }) {
+//value = undefined means delete all answers of user
+function vote({ message, user }, action) {
   let view = JSON.parse(JSON.stringify(pollMessage));
 
   //take over all information
@@ -573,113 +574,64 @@ function vote({ message, user }, { value }) {
     view.blocks[view.blocks.length - 1].elements[
       view.blocks[view.blocks.length - 1].elements.length - 2
     ].value;
-
-  //find block to be modified
-  let index = view.blocks.findIndex(
-    (block) => block.accessory && block.accessory.value == value
-  );
-
-  if (index === -1) {
-    return view;
-  }
-
-  //get users that already voted + remove answer number
-  let users = value.split("-");
-  users.shift();
-
-  //see if user already voted
-  let indexUser = users.indexOf(user.id);
-
-  if (indexUser == -1) {
-    //add user
-    users.push(user.id);
-  } else {
-    //remove user
-    users.splice(indexUser, 1);
-  }
-
-  view.blocks[index].accessory.value = value.split("-")[0];
-  view.blocks[index + 1].elements[0].text = "";
-
-  users.forEach((user, idx) => {
-    //fill value
-    view.blocks[index].accessory.value += `-${user}`;
-
-    //fill text only if not anonymous
-    if (options.includes(optionAnonym)) return; //goes into next iteration
-
-    view.blocks[index + 1].elements[0].text += `${
-      idx != 0 ? ", " : ""
-    }<@${user}>`;
-  });
-
-  //add total number of votes
-  if (users.length == 0)
-    view.blocks[index + 1].elements[0].text += "Keine Stimmen";
-  else
-    view.blocks[index + 1].elements[0].text += `\n${users.length} ${
-      users.length == 1 ? "Stimme" : "Stimmen"
-    }`;
-
-  return view;
-}
-
-function deleteMyVotes({ message, user }) {
-  let view = JSON.parse(JSON.stringify(pollMessage));
-
-  //take over all information
-  view.text = message.text;
-  view.blocks = message.blocks;
-
-  //get options from "delete my answers" button
-  let options =
-    view.blocks[view.blocks.length - 1].elements[
-      view.blocks[view.blocks.length - 1].elements.length - 2
-    ].value;
-
-  //get index of all answer blocks
-  let answerIdxs = [];
 
   view.blocks.forEach((block, index) => {
-    if (block.accessory && /^\d*/.test(block.accessory.value))
-      answerIdxs.push(index);
-  });
+    if (!block.accessory || !/^\d*/.test(block.accessory.value)) return;
 
-  //modify each block if user voted there
-  answerIdxs.forEach((element) => {
     //get users that already voted + remove answer number
-    let users = view.blocks[element].accessory.value.split("-");
+    let users = block.accessory.value.split("-");
     users.shift();
 
     //see if user already voted
     let indexUser = users.indexOf(user.id);
 
-    if (indexUser == -1) return;
+    //action is "delete all votes"
+    if (!action) {
+      //user didn't vote
+      if (indexUser == -1) return;
+      //user did vote: remove
+      users.splice(indexUser, 1);
+    }
 
-    //remove user
-    users.splice(indexUser, 1);
+    //action is "vote"
+    if (action) {
+      //check if the current block was voted on,
+      //or if "single select" is enabled (all other blocks are cleared from user)optionMultipleSelect
+      if (
+        block.accessory.value != action.value &&
+        options.includes(optionMultipleSelect)
+      )
+        return;
 
-    view.blocks[element].accessory.value =
-      view.blocks[element].accessory.value.split("-")[0];
-    view.blocks[element + 1].elements[0].text = "";
+      //not voted block: remove user
+      //or voted block, but user had already voted on it
+      if (block.accessory.value != action.value || indexUser != -1)
+        users.splice(indexUser, 1);
+      //user didn't vote yet: add
+      else users.push(user.id);
+    }
+
+    //reset block
+    block.accessory.value = block.accessory.value.split("-")[0];
+    view.blocks[index + 1].elements[0].text = "";
 
     users.forEach((user, idx) => {
       //fill value
-      view.blocks[element].accessory.value += `-${user}`;
+      block.accessory.value += `-${user}`;
 
       //fill text only if not anonymous
       if (options.includes(optionAnonym)) return; //goes into next iteration
 
-      view.blocks[element + 1].elements[0].text += `${
+      view.blocks[index + 1].elements[0].text += `${
         idx != 0 ? ", " : ""
       }<@${user}>`;
     });
 
     //add total number of votes
     if (users.length == 0)
-      view.blocks[element + 1].elements[0].text += "Keine Stimmen";
+      view.blocks[index + 1].elements[0].text += "Keine Stimmen";
     else
-      view.blocks[element + 1].elements[0].text += `\n${users.length} ${
+      view.blocks[index + 1].elements[0].text += `\n${users.length} ${
         users.length == 1 ? "Stimme" : "Stimmen"
       }`;
   });
@@ -730,7 +682,6 @@ module.exports = {
   getPollMessage,
   answerOptionsValid,
   vote,
-  deleteMyVotes,
   getAddAnswerView,
   addAnswerMessage,
 

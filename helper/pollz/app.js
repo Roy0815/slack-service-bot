@@ -46,7 +46,7 @@ function setupApp(app) {
     async ({ ack, body, respond }) => {
       await ack();
 
-      await respond(views.deleteMyVotes(body));
+      await respond(views.vote(body));
     }
   );
 
