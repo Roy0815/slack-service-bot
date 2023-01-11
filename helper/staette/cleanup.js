@@ -12,11 +12,16 @@ const app = new App({
 // cleanup old messages
 functions.cleanup(app).then((result) => {
   // log job execution
-  app.client.chat.postMessage({
+  app.client.files.upload({
     token: process.env.SLACK_BOT_TOKEN,
-    channel: "UED3FPWE9",
-    text: `Job ran at ${util.formatDate(new Date())} ${util.formatTime(
+    channels: "UED3FPWE9",
+    filetype: "javascript",
+    initial_comment: `Job ran at ${util.formatDate(
       new Date()
-    )} and deleted ${result} Message${result == 1 ? "" : "s"}`,
+    )} ${util.formatTime(new Date())} and deleted ${result.count} Message${
+      result.count == 1 ? "" : "s"
+    }`,
+    title: `Messages`,
+    content: JSON.stringify(result.messages, null, "\t"),
   });
 });

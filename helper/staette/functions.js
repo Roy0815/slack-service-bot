@@ -20,7 +20,7 @@ async function cleanup({ client }) {
   let cutoffDate = new Date();
   cutoffDate.setDate(cutoffDate.getDate() - 2);
 
-  let count = 0;
+  let returnObj = { count: 0, messages: [] };
 
   filtered.forEach((msg) => {
     //get date from message
@@ -39,11 +39,12 @@ async function cleanup({ client }) {
         ts: msg.ts,
         token: process.env.SLACK_BOT_TOKEN,
       });
-      count++;
+      returnObj.messages.push(msg);
+      returnObj.count++;
     }
   });
 
-  return count;
+  return returnObj;
 }
 
 //******************** Exports ********************//
