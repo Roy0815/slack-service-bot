@@ -16,7 +16,11 @@ function setupApp(app) {
 
       let date = new Date(dateArr[2], dateArr[1], dateArr[0]);
 
-      if (dateArr.length != 3 || date.getFullYear() == NaN) {
+      if (
+        dateArr.length != 3 ||
+        date.getFullYear() == NaN ||
+        date < new Date()
+      ) {
         respond("Bitte ein gültiges Datum eingeben");
         return;
       }
