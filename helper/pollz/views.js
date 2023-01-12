@@ -314,10 +314,10 @@ const pollMessage = {
             {
               text: {
                 type: "plain_text",
-                text: "Admin: Umfrage löschen",
+                text: "Ersteller: Umfrage löschen",
                 emoji: true,
               },
-              value: messageOverflowDelete, // delete + admin (added in method)
+              value: messageOverflowDelete, // delete-{ admin } (added in method)
             },
             /* {
               text: {
@@ -561,7 +561,7 @@ function answerOptionsValid({ view }) {
   return true;
 }
 
-//value = undefined means delete all answers of user
+//action = undefined means delete all answers of user
 function vote({ message, user }, action) {
   let view = JSON.parse(JSON.stringify(pollMessage));
 
@@ -596,19 +596,19 @@ function vote({ message, user }, action) {
     //action is "vote"
     if (action) {
       //check if the current block was voted on,
-      //or if "single select" is enabled (all other blocks are cleared from user)optionMultipleSelect
+      //or if "single select" is enabled (all other blocks are cleared from user)
       if (
         block.accessory.value != action.value &&
         options.includes(optionMultipleSelect)
       )
         return;
 
-      //not voted block: remove user
-      //or voted block, but user had already voted on it
-      if (block.accessory.value != action.value || indexUser != -1)
-        users.splice(indexUser, 1);
-      //user didn't vote yet: add
-      else users.push(user.id);
+      //user has already voted: remove user
+      //no matter if voted block or not
+      if (indexUser != -1) users.splice(indexUser, 1);
+      //user didn't vote yet and it's voted block: add
+      else if (indexUser == -1 && block.accessory.value == action.value)
+        users.push(user.id);
     }
 
     //reset block
