@@ -2,8 +2,11 @@
 const util = require("../general/util");
 
 //constants
-const whoIsThereInputBlockName = "whoIsThereBlock";
-const whoIsThereTimePickerName = "whoIsThereTimePicker";
+const whoIsThereInputBlockName = "staette-whoIsThereBlock";
+const whoIsThereTimePickerName = "staette-whoIsThereTimePicker";
+
+const messageOverflowAction = "staette-overflow-action";
+const messageOverflowDelete = "delete";
 
 const sectionUsers = 5;
 
@@ -58,7 +61,7 @@ const whoIsThereMessage = {
             emoji: true,
           },
           value: "update",
-          action_id: "action-whoisthere-update",
+          action_id: "staette-whoisthere-update",
         },
         {
           type: "button",
@@ -69,7 +72,21 @@ const whoIsThereMessage = {
             emoji: true,
           },
           value: "delete",
-          action_id: "action-whoisthere-delete",
+          action_id: "staette-whoisthere-delete",
+        },
+        {
+          type: "overflow",
+          options: [
+            {
+              text: {
+                type: "plain_text",
+                text: "Ersteller: Abfrage löschen",
+                emoji: true,
+              },
+              value: messageOverflowDelete, // delete-{ admin } (added in method)
+            },
+          ],
+          action_id: messageOverflowAction,
         },
       ],
     },
@@ -80,10 +97,16 @@ const whoIsThereMessage = {
 function getWhoIsThereMessage({ user_id, text }) {
   let view = JSON.parse(JSON.stringify(whoIsThereMessage));
 
+  //set admin in overflow button
+  view.blocks[3].elements[2].options[0].value += `-${user_id}`;
+
+  //get day description
   let day = text == `${util.formatDate(new Date())}` ? "heute" : `am ${text}`;
 
+  //set date
   view.blocks[0].text.text = `\`${text}\``;
 
+  //set questions
   view.text =
     view.blocks[1].text.text = `<@${user_id}> will wissen wer ${day} in der Stätte ist`;
 
@@ -182,4 +205,6 @@ module.exports = {
 
   whoIsThereInputBlockName,
   whoIsThereTimePickerName,
+  messageOverflowAction,
+  messageOverflowDelete,
 };
