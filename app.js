@@ -13,8 +13,8 @@ const app = new App({
 });
 
 //******************** Setup listeners ********************//
-Object.entries(apps).forEach((element) => {
-  element[1].setupApp(app);
+apps.apps.forEach((element) => {
+  element.setupApp(app);
 });
 
 app.event("app_home_opened", async ({ event, client }) => {
