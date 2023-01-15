@@ -30,6 +30,39 @@ function setupApp(app) {
   });
 
   //******************** Actions ********************//
+  app.action(views.homeViewCommand, async ({ ack, body, client }) => {
+    await ack();
+
+    let date =
+      body.view.state.values[views.homeViewInputBlockId][
+        views.homeViewDatePickerAction
+      ].selected_date;
+
+    if (date != null) {
+      date = new Date(
+        date.split("-")[0],
+        date.split("-")[1] - 1,
+        date.split("-")[2]
+      );
+
+      if (date < new Date()) {
+        client.chat.postMessage({
+          channel: body.user.id,
+          text: `*Stätte Abfrage*\nDatum ${util.formatDate(
+            date
+          )} liegt in der Vergangenheit. Bitte ein Datum größer heute eingeben.`,
+        });
+        return;
+      }
+
+      date = util.formatDate(date);
+    } else date = util.formatDate(new Date());
+
+    await client.chat.postMessage(
+      views.getWhoIsThereMessage({ user_id: body.user.id, text: date })
+    );
+  });
+
   app.action(
     new RegExp(`staette-whoisthere-(update)*(delete)*`),
     async ({ ack, action, respond, body }) => {

@@ -10,6 +10,10 @@ const messageOverflowDelete = "delete";
 
 const sectionUsers = 5;
 
+const homeViewCommand = "staette-home-command";
+const homeViewInputBlockId = "staette-home-input-block";
+const homeViewDatePickerAction = "staette-home-datepicker-action";
+
 //******************** Views ********************//
 const whoIsThereMessage = {
   channel: process.env.STAETTE_CHANNEL,
@@ -108,6 +112,30 @@ const homeView = [
       type: "mrkdwn",
       text: "*`/weristda [DD.MM.YYYY]` Kommando:*\nMit diesem Kommando kannst du eine Abfrage starten wer heute in der Trainingsstätte ist. Die anderen Mitglieder können dann ihre Zeiten einpflegen.\nDu kannst optional ein Datum mitgeben, um einen anderen Termin abzufragen. Beispiel: `/weristda 01.01.2000`",
     },
+  },
+  {
+    type: "actions",
+    block_id: homeViewInputBlockId,
+    elements: [
+      {
+        type: "button",
+        text: {
+          type: "plain_text",
+          text: "/weristda",
+          emoji: true,
+        },
+        action_id: homeViewCommand,
+      },
+      {
+        type: "datepicker",
+        placeholder: {
+          type: "plain_text",
+          text: "Datum (optional)",
+          emoji: true,
+        },
+        action_id: homeViewDatePickerAction,
+      },
+    ],
   },
 ];
 
@@ -219,6 +247,9 @@ function updateWhoIsThereMessage({ user, time, xdelete }, { text, blocks }) {
 //exports
 module.exports = {
   homeView,
+  homeViewCommand,
+  homeViewInputBlockId,
+  homeViewDatePickerAction,
 
   getWhoIsThereMessage,
   updateWhoIsThereMessage,
