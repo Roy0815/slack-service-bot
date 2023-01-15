@@ -1,7 +1,6 @@
 // local references
 const sheet = require("./sheet");
 const util = require("../general/util");
-const views = require("../general/views");
 
 // constants
 const registerViewName = "registerview";
@@ -17,6 +16,12 @@ const maintainHoursActionDate = "date";
 const maintainHoursBlockHours = "hours_block";
 const maintainHoursActionHours = "hours";
 
+const homeViewInputBlockId = "as-home-view-input-block";
+const homeViewYearSelect = "as-home-year-select-action";
+const homeViewDetailsSelect = "as-home-details-select-action";
+const homeViewDisplayHours = "as-home-display-hours-action";
+const homeViewMaintainHours = "as-home-maintain-hours-action";
+
 //******************** Views ********************//
 const registerView = {
   trigger_id: "",
@@ -30,12 +35,12 @@ const registerView = {
     },
     submit: {
       type: "plain_text",
-      text: "Submit",
+      text: "Abschicken",
       emoji: true,
     },
     close: {
       type: "plain_text",
-      text: "Cancel",
+      text: "Abbrechen",
       emoji: true,
     },
     blocks: [
@@ -73,12 +78,12 @@ const maintainHoursView = {
     },
     submit: {
       type: "plain_text",
-      text: "Submit",
+      text: "Einreichen",
       emoji: true,
     },
     close: {
       type: "plain_text",
-      text: "Cancel",
+      text: "Abbrechen",
       emoji: true,
     },
     blocks: [
@@ -151,7 +156,7 @@ const basicConfirmDialogView = {
           type: "button",
           text: {
             type: "plain_text",
-            text: "Approve",
+            text: "Genehmigen",
             emoji: true,
           },
           style: "primary",
@@ -162,7 +167,7 @@ const basicConfirmDialogView = {
           type: "button",
           text: {
             type: "plain_text",
-            text: "Reject",
+            text: "Ablehnen",
             emoji: true,
           },
           style: "danger",
@@ -216,11 +221,60 @@ const homeView = [
     },
   },
   {
+    type: "actions",
+    block_id: homeViewInputBlockId,
+    elements: [
+      {
+        type: "checkboxes",
+        options: [
+          {
+            text: {
+              type: "plain_text",
+              text: "Details",
+              emoji: true,
+            },
+            value: "1",
+          },
+        ],
+        action_id: homeViewDetailsSelect,
+      },
+      {
+        type: "static_select",
+        initial_option: "", //object like in options. Filled in method
+        options: [], //filled in method
+        action_id: homeViewYearSelect,
+      },
+      {
+        type: "button",
+        text: {
+          type: "plain_text",
+          text: "/arbeitsstunden_anzeigen",
+          emoji: true,
+        },
+        action_id: homeViewDisplayHours,
+      },
+    ],
+  },
+  {
     type: "section",
     text: {
       type: "mrkdwn",
       text: "*2️⃣ `/arbeitsstunden_erfassen` Kommando:*\nMit diesem Kommando kannst du geleistete Stunden erfassen. Es wird ein Dialog geöffnet, in dem du die Details mitgeben kannst. Im Anschluss wird die Anfrage zur Genehmigung an den Vorstand weitergeleitet. Sobald dieser genehmigt hat, wirst du benachrichtigt.",
     },
+  },
+  {
+    type: "actions",
+    elements: [
+      {
+        type: "button",
+        text: {
+          type: "plain_text",
+          text: "/arbeitsstunden_erfassen",
+          emoji: true,
+        },
+        action_id: homeViewMaintainHours,
+      },
+    ],
   },
 ];
 
@@ -306,25 +360,21 @@ async function getRegisterConfirmDialog(registerObj) {
 }
 
 function getUserRegisterStartMessage({ slackId, name }) {
-  let view = JSON.parse(JSON.stringify(views.basicMessage));
-  view.channel = slackId;
-
-  view.text = `Deine Registrierung als ${name} wurde zur Freigabe weitergeleitet.\nDu wirst informiert, sobald die Verlinkung freigegeben wurde.`;
-
-  return view;
+  return {
+    channel: slackId,
+    text: `Deine Registrierung als ${name} wurde zur Freigabe weitergeleitet.\nDu wirst informiert, sobald die Verlinkung freigegeben wurde.`,
+  };
 }
 
 function getUserRegisterEndMessage({ slackId, name, approved }) {
-  let view = JSON.parse(JSON.stringify(views.basicMessage));
-  view.channel = slackId;
-
-  view.text = `Deine Registrierung als ${name} wurde ${
-    approved
-      ? "genehmigt. Du kannst jetzt deine Arbeitsstunden erfassen und abrufen."
-      : "abgelehnt."
-  }`;
-
-  return view;
+  return {
+    channel: slackId,
+    text: `Deine Registrierung als ${name} wurde ${
+      approved
+        ? "genehmigt. Du kannst jetzt deine Arbeitsstunden erfassen und abrufen."
+        : "abgelehnt."
+    }`,
+  };
 }
 
 function getMaintainHoursView(triggerId) {
@@ -359,35 +409,33 @@ async function getMaintainConfirmDialog(entity) {
 }
 
 function getUserMaintainStartMessage({ slackId, title, hours, date }) {
-  let view = JSON.parse(JSON.stringify(views.basicMessage));
   let dateObj = new Date(
     date.split("-")[0],
     date.split("-")[1] - 1,
     date.split("-")[2]
   );
 
-  view.channel = slackId;
-  view.text = `Deine Erfassung von ${hours} Stunden am ${util.formatDate(
-    dateObj
-  )} für "${title}" wurde zur Freigabe weitergeleitet.\nDu wirst informiert, sobald die Stunden genehmigt wurden.`;
-
-  return view;
+  return {
+    channel: slackId,
+    text: `Deine Erfassung von ${hours} Stunden am ${util.formatDate(
+      dateObj
+    )} für "${title}" wurde zur Freigabe weitergeleitet.\nDu wirst informiert, sobald die Stunden genehmigt wurden.`,
+  };
 }
 
 function getUserMaintainEndMessage({ slackId, title, hours, date, approved }) {
-  let view = JSON.parse(JSON.stringify(views.basicMessage));
   let dateObj = new Date(
     date.split("-")[0],
     date.split("-")[1] - 1,
     date.split("-")[2]
   );
 
-  view.channel = slackId;
-  view.text = `Deine Erfassung von ${hours} Stunden am ${util.formatDate(
-    dateObj
-  )} für "${title}" wurde ${approved ? "genehmigt" : "abgelehnt"}.`;
-
-  return view;
+  return {
+    channel: slackId,
+    text: `Deine Erfassung von ${hours} Stunden am ${util.formatDate(
+      dateObj
+    )} für "${title}" wurde ${approved ? "genehmigt" : "abgelehnt"}.`,
+  };
 }
 
 async function getNewUserJoinedMessage({ slackId }) {
@@ -402,9 +450,37 @@ async function getNewUserJoinedMessage({ slackId }) {
   return view;
 }
 
+function getHomeView() {
+  let view = JSON.parse(JSON.stringify(homeView));
+
+  //add year options
+  let year = new Date().getFullYear();
+
+  while (year >= 2022) {
+    view[2].elements[1].options.push({
+      text: {
+        type: "plain_text",
+        text: `${year}`,
+        emoji: true,
+      },
+      value: `${year}`,
+    });
+    year--;
+  }
+
+  view[2].elements[1].initial_option = view[2].elements[1].options[0];
+
+  return view;
+}
+
 //exports
 module.exports = {
-  homeView,
+  getHomeView,
+  homeViewInputBlockId,
+  homeViewYearSelect,
+  homeViewDetailsSelect,
+  homeViewDisplayHours,
+  homeViewMaintainHours,
 
   getNewUserJoinedMessage,
 

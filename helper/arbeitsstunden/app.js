@@ -10,7 +10,7 @@ function setupApp(app) {
     async ({ ack, command, respond, client }) => {
       await ack();
 
-      //see if user wanted detailes
+      //see if user wanted details
       let details = command.text.includes("details");
 
       //remove everything but numbers
@@ -112,6 +112,90 @@ function setupApp(app) {
   });
 
   //******************** Actions ********************//
+  app.action(views.homeViewDisplayHours, async ({ ack, client, body }) => {
+    await ack();
+
+    let year =
+      body.view.state.values[views.homeViewInputBlockId][
+        views.homeViewYearSelect
+      ].selected_option.value;
+
+    let details =
+      body.view.state.values[views.homeViewInputBlockId][
+        views.homeViewDetailsSelect
+      ].selected_options.length > 0;
+
+    let hoursObj = await sheet.getHoursFromSlackId({
+      id: body.user.id,
+      year: year,
+      details: details,
+    });
+
+    // not registered: start dialog
+    if (hoursObj == undefined) {
+      await client.views.open(await views.getRegisterView(body.trigger_id));
+      return;
+    }
+
+    //build message
+    let message = {
+      channel: body.user.id,
+      blocks: [
+        {
+          type: "section",
+          text: {
+            type: "mrkdwn",
+            text: `Du hast ${year} bereits ${hoursObj.workedHours} Arbeitsstunden geleistet. Du musst noch ${hoursObj.targetHours} Stunden leisten.`,
+          },
+        },
+      ],
+    };
+
+    if (hoursObj.details.length > 0) {
+      message.blocks.push(
+        {
+          type: "divider",
+        },
+        {
+          type: "section",
+          text: {
+            type: "mrkdwn",
+            text: "Datum\t\t\tStunden\tTätigkeit",
+          },
+        },
+        {
+          type: "divider",
+        }
+      );
+
+      hoursObj.details.forEach((element) => {
+        message.blocks.push({
+          type: "section",
+          text: {
+            type: "mrkdwn",
+            text: `*${element.date}*\t${element.hours}\t\t\t\t_${element.description}_`,
+          },
+        });
+      });
+    }
+
+    await client.chat.postMessage(message);
+  });
+
+  app.action(views.homeViewMaintainHours, async ({ ack, client, body }) => {
+    await ack();
+
+    // check user is registered
+    if ((await sheet.getHoursFromSlackId({ id: body.user.id })) == undefined) {
+      // not registered: start dialog
+      await client.views.open(await views.getRegisterView(body.trigger_id));
+      return;
+    }
+
+    // registered: start maintenance dialog
+    await client.views.open(await views.getMaintainHoursView(body.trigger_id));
+  });
+
   // handle buttons in Registration approval
   app.action(
     new RegExp(`^register-(approve)*(reject)*-button$`),
