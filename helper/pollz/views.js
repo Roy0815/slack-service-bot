@@ -403,6 +403,31 @@ const resultBlockMessage = {
   ],
 };
 
+const homeView = [
+  {
+    type: "section",
+    text: {
+      type: "mrkdwn",
+      text: "*`/umfrage [Frage]` Kommando:*\nMit diesem Kommando kannst du eine Umfrage starten. Es öffnet sich ein Popup, in dem du die Optionen und Antworten einstellen kannst.\nAußerden kannst du optional direkt die Frage mitgeben.\nBeispiel: `/umfrage Wer will mit Pizza bestellen?`",
+    },
+  },
+  {
+    type: "actions",
+    elements: [
+      {
+        type: "button",
+        text: {
+          type: "plain_text",
+          text: "/umfrage",
+          emoji: true,
+        },
+        value: "click_me_123",
+        action_id: "actionId-0",
+      },
+    ],
+  },
+];
+
 //******************** Functions ********************//
 function getPollsView({ trigger_id, text }) {
   let view = JSON.parse(JSON.stringify(pollView));
@@ -676,6 +701,8 @@ function addAnswerMessage({ private_metadata, state: { values } }, { blocks }) {
 
 //exports
 module.exports = {
+  homeView,
+
   getPollsView,
   addAnswer,
   deleteAnswer,
