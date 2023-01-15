@@ -3,7 +3,7 @@ const views = require("./views");
 
 function setupApp(app) {
   //******************** Commands ********************//
-  app.command(`/test`, async ({ command, ack, client }) => {
+  app.command(`/umfrage`, async ({ command, ack, client }) => {
     await ack();
 
     //open modal
