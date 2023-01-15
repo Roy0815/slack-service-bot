@@ -244,9 +244,13 @@ function updateWhoIsThereMessage({ user, time, xdelete }, { text, blocks }) {
   return view;
 }
 
+function getHomeView() {
+  return JSON.parse(JSON.stringify(homeView));
+}
+
 //exports
 module.exports = {
-  homeView,
+  getHomeView,
   homeViewCommand,
   homeViewInputBlockId,
   homeViewDatePickerAction,

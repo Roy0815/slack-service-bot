@@ -701,9 +701,13 @@ function addAnswerMessage({ private_metadata, state: { values } }, { blocks }) {
   return updateMessage;
 }
 
+function getHomeView() {
+  return JSON.parse(JSON.stringify(homeView));
+}
+
 //exports
 module.exports = {
-  homeView,
+  getHomeView,
   homeViewCommand,
 
   getPollsView,

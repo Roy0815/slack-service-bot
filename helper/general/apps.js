@@ -10,6 +10,6 @@ const pollzView = require("../pollz/views");
 module.exports = {
   //all of the apps have to contain a function "setupApp" that takes in the bolt app
   apps: [asApp, staetteApp, pollzApp],
-  //all of the views have to contain a variable "homeView" that contains the blocks of their respective home view
+  //all of the views have to contain a function "getHomeView" that returns the blocks of their respective home view
   views: [asView, staetteView, pollzView],
 };

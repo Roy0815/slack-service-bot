@@ -31,13 +31,11 @@ function getHomeView({ user }) {
 
   //add homeviews of apps
   apps.views.forEach((element) => {
-    if (!element.homeView) return;
-
     view.view.blocks.push({
       type: "divider",
     });
 
-    view.view.blocks = view.view.blocks.concat(element.homeView);
+    view.view.blocks = view.view.blocks.concat(element.getHomeView());
   });
 
   return view;
