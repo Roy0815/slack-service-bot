@@ -3,7 +3,7 @@ const views = require("./views");
 
 function setupApp(app) {
   //******************** Commands ********************//
-  app.command(`/test`, async ({ command, ack, client, respond }) => {
+  app.command(`/test`, async ({ command, ack, client }) => {
     await ack();
 
     //open modal
@@ -11,6 +11,15 @@ function setupApp(app) {
   });
 
   //******************** Actions ********************//
+  app.action(views.homeViewCommand, async ({ ack, client, body }) => {
+    await ack();
+
+    //open modal
+    await client.views.open(
+      views.getPollsView({ trigger_id: body.trigger_id, text: "" })
+    );
+  });
+
   app.action(views.addAnswerAction, async ({ ack, client, body }) => {
     await ack();
 

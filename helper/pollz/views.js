@@ -39,6 +39,9 @@ const addAnswerViewTextInput = "pollz-addAnswerViewTextInput";
 
 const voteButtonAction = "pollz-vote";
 
+//home view
+const homeViewCommand = "pollz-home-command";
+
 //******************** Views ********************//
 const pollView = {
   //trigger_id: "",
@@ -408,7 +411,7 @@ const homeView = [
     type: "section",
     text: {
       type: "mrkdwn",
-      text: "*`/umfrage [Frage]` Kommando:*\nMit diesem Kommando kannst du eine Umfrage starten. Es öffnet sich ein Popup, in dem du die Optionen und Antworten einstellen kannst.\nAußerden kannst du optional direkt die Frage mitgeben.\nBeispiel: `/umfrage Wer will mit Pizza bestellen?`",
+      text: "*`/umfrage [Frage]` Kommando:*\nMit diesem Kommando kannst du eine Umfrage starten. Es öffnet sich ein Popup, in dem du die Optionen und Antworten einstellen kannst.\nAußerden kannst du optional direkt die Frage mitgeben.\nWillst du eine Umfrage zuerst testen, schicke sie an den Channel mit deinem Namen.\nBeispiel: `/umfrage Wer will mit Pizza bestellen?`",
     },
   },
   {
@@ -421,8 +424,7 @@ const homeView = [
           text: "/umfrage",
           emoji: true,
         },
-        value: "click_me_123",
-        action_id: "actionId-0",
+        action_id: homeViewCommand,
       },
     ],
   },
@@ -702,6 +704,7 @@ function addAnswerMessage({ private_metadata, state: { values } }, { blocks }) {
 //exports
 module.exports = {
   homeView,
+  homeViewCommand,
 
   getPollsView,
   addAnswer,
