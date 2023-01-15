@@ -45,6 +45,7 @@ app.error(async ({ error, context, body }) => {
     title: `Body`,
     content: JSON.stringify(body, null, "\t"),
   });
+  console.log(error);
 });
 
 //******************** Start App ********************//
