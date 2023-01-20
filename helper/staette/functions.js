@@ -18,7 +18,7 @@ async function cleanup({ client }) {
   let filtered = result.messages.filter((msg) => msg.bot_id == botId);
 
   let cutoffDate = new Date();
-  cutoffDate.setDate(cutoffDate.getDate() - 2);
+  cutoffDate.setDate(cutoffDate.getDate() - 1);
 
   let returnObj = { count: 0, messages: [] };
 
