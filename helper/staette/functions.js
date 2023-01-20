@@ -14,8 +14,14 @@ async function cleanup({ client }) {
     channel: process.env.STAETTE_CHANNEL,
   });
 
-  //filter for messages from this user
-  let filtered = result.messages.filter((msg) => msg.bot_id == botId);
+  let filtered = result.messages.filter(
+    (msg) =>
+      msg.bot_id == botId && //messages from this user
+      msg.blocks &&
+      msg.blocks.length > 0 &&
+      msg.blocks[0].text &&
+      /^`[0-3]\d\.[0-1]\d\.20[2-9]\d`$/.test(msg.blocks[0].text.text) //messages with date
+  );
 
   let cutoffDate = new Date();
   cutoffDate.setDate(cutoffDate.getDate() - 1);
@@ -47,7 +53,51 @@ async function cleanup({ client }) {
   return returnObj;
 }
 
+async function sortMessages(client) {
+  //get bot ID
+  const botId = (
+    await client.auth.test({
+      token: process.env.SLACK_BOT_TOKEN,
+    })
+  ).bot_id;
+
+  //get messages in channel
+  let result = await client.conversations.history({
+    // The token you used to initialize your app
+    token: process.env.SLACK_BOT_TOKEN,
+    channel: process.env.STAETTE_CHANNEL,
+  });
+
+  let filtered = result.messages.filter(
+    (msg) =>
+      msg.bot_id == botId && //messages from this user
+      msg.blocks &&
+      msg.blocks.length > 0 &&
+      msg.blocks[0].text &&
+      /^`[0-3]\d\.[0-1]\d\.20[2-9]\d`$/.test(msg.blocks[0].text.text) //messages with date
+  );
+
+  //sort by date
+  filtered.sort((a, b) => {
+    let textA = a.blocks[0].text.text.replace("`", "");
+    let textB = b.blocks[0].text.text.replace("`", "");
+
+    let dateA = new Date(
+      textA.split(".")[2],
+      textA.split(".")[1] - 1,
+      textA.split(".")[0]
+    );
+    let dateB = new Date(
+      textB.split(".")[2],
+      textB.split(".")[1] - 1,
+      textB.split(".")[0]
+    );
+    return dateA - dateB;
+  });
+}
+
 //******************** Exports ********************//
 module.exports = {
   cleanup,
+  sortMessages,
 };

@@ -1,6 +1,7 @@
 //imports
 const util = require("../general/util");
 const views = require("./views");
+const functions = require("./functions");
 
 function setupApp(app) {
   //******************** Commands ********************//
@@ -27,6 +28,8 @@ function setupApp(app) {
     } else command.text = util.formatDate(new Date());
 
     await client.chat.postMessage(views.getWhoIsThereMessage(command));
+
+    //await functions.sortMessages(client);
   });
 
   //******************** Actions ********************//
@@ -61,6 +64,8 @@ function setupApp(app) {
     await client.chat.postMessage(
       views.getWhoIsThereMessage({ user_id: body.user.id, text: date })
     );
+
+    //await functions.sortMessages(client);
   });
 
   app.action(
