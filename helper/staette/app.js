@@ -11,18 +11,15 @@ function setupApp(app) {
     //Datum validieren falls eingegeben
     if (command.text != "") {
       let dateArr = command.text.split(".");
-      dateArr[0] = parseInt(dateArr[0]);
-      dateArr[1] = parseInt(dateArr[1]) - 1;
-      dateArr[2] = parseInt(dateArr[2]);
 
-      let date = new Date(dateArr[2], dateArr[1], dateArr[0]);
+      let date = new Date(dateArr[2], dateArr[1] - 1, dateArr[0]);
 
       if (
         dateArr.length != 3 ||
         date.getFullYear() == NaN ||
         date < new Date()
       ) {
-        respond("Bitte ein gültiges Datum eingeben");
+        respond("Bitte ein gültiges Datum im Format DD.MM.YYYY eingeben");
         return;
       }
     } else command.text = util.formatDate(new Date());
