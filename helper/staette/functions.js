@@ -118,8 +118,35 @@ async function sortMessages({ client, date }) {
   }
 }
 
+async function dateIsUnique({ client, date }) {
+  //get bot ID
+  const botId = (
+    await client.auth.test({
+      token: process.env.SLACK_BOT_TOKEN,
+    })
+  ).bot_id;
+
+  //get messages in channel
+  let result = await client.conversations.history({
+    token: process.env.SLACK_BOT_TOKEN,
+    channel: process.env.STAETTE_CHANNEL,
+  });
+
+  let filtered = result.messages.filter(
+    (msg) =>
+      msg.bot_id == botId && //messages from this user
+      msg.blocks &&
+      msg.blocks.length > 0 &&
+      msg.blocks[0].text &&
+      msg.blocks[0].text.text == `\`${date}\`` //current date
+  );
+
+  return !(filtered.length > 0);
+}
+
 //******************** Exports ********************//
 module.exports = {
   cleanup,
   sortMessages,
+  dateIsUnique,
 };

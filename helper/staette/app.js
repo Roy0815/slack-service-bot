@@ -26,6 +26,11 @@ function setupApp(app) {
       }
     }
 
+    if (!(await functions.dateIsUnique({ client, date: command.text }))) {
+      respond(`Für das Datum ${command.text} existiert bereits eine Abfrage`);
+      return;
+    }
+
     await client.chat.postMessage(views.getWhoIsThereMessage(command));
 
     await functions.sortMessages({ client, date: command.text });
@@ -59,6 +64,14 @@ function setupApp(app) {
 
       date = util.formatDate(date);
     } else date = util.formatDate(new Date());
+
+    if (!(await functions.dateIsUnique({ client, date }))) {
+      client.chat.postMessage({
+        channel: body.user.id,
+        text: `*Stätte Abfrage*\nFür das Datum ${date} existiert bereits eine Abfrage`,
+      });
+      return;
+    }
 
     await client.chat.postMessage(
       views.getWhoIsThereMessage({ user_id: body.user.id, text: date })
