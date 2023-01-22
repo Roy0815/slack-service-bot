@@ -26,7 +26,7 @@ function setupApp(app) {
 
     await client.chat.postMessage(views.getWhoIsThereMessage(command));
 
-    //await functions.sortMessages(client);
+    await functions.sortMessages({ client, date: command.text });
   });
 
   //******************** Actions ********************//
@@ -62,7 +62,7 @@ function setupApp(app) {
       views.getWhoIsThereMessage({ user_id: body.user.id, text: date })
     );
 
-    //await functions.sortMessages(client);
+    await functions.sortMessages({ client, date });
   });
 
   app.action(

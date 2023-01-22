@@ -30,7 +30,7 @@ async function cleanup({ client }) {
 
   filtered.forEach((msg) => {
     //get date from message
-    let text = msg.blocks[0].text.text.replace("`", "");
+    let text = msg.blocks[0].text.text.replace(/`/g, "");
     let dateArr = text.split(".");
     dateArr[0] = parseInt(dateArr[0]);
     dateArr[1] = parseInt(dateArr[1]) - 1;
@@ -53,7 +53,7 @@ async function cleanup({ client }) {
   return returnObj;
 }
 
-async function sortMessages(client) {
+async function sortMessages({ client, date }) {
   //get bot ID
   const botId = (
     await client.auth.test({
@@ -63,7 +63,6 @@ async function sortMessages(client) {
 
   //get messages in channel
   let result = await client.conversations.history({
-    // The token you used to initialize your app
     token: process.env.SLACK_BOT_TOKEN,
     channel: process.env.STAETTE_CHANNEL,
   });
@@ -74,26 +73,49 @@ async function sortMessages(client) {
       msg.blocks &&
       msg.blocks.length > 0 &&
       msg.blocks[0].text &&
-      /^`[0-3]\d\.[0-1]\d\.20[2-9]\d`$/.test(msg.blocks[0].text.text) //messages with date
+      /^`[0-3]\d\.[0-1]\d\.20[2-9]\d`$/.test(msg.blocks[0].text.text) && //messages with date
+      msg.blocks[0].text.text != `\`${date}\`` //not current date
   );
 
-  //sort by date
-  filtered.sort((a, b) => {
-    let textA = a.blocks[0].text.text.replace("`", "");
-    let textB = b.blocks[0].text.text.replace("`", "");
+  //get messages with date later than current message
+  let messagesOrdered = [];
+  let currDate = new Date(
+    date.split(".")[2],
+    date.split(".")[1] - 1,
+    date.split(".")[0]
+  );
 
-    let dateA = new Date(
-      textA.split(".")[2],
-      textA.split(".")[1] - 1,
-      textA.split(".")[0]
+  filtered.forEach((msg) => {
+    let text = msg.blocks[0].text.text.replace(/`/g, "");
+
+    let msgDate = new Date(
+      text.split(".")[2],
+      text.split(".")[1] - 1,
+      text.split(".")[0]
     );
-    let dateB = new Date(
-      textB.split(".")[2],
-      textB.split(".")[1] - 1,
-      textB.split(".")[0]
-    );
-    return dateA - dateB;
+
+    if (msgDate < currDate) return;
+
+    messagesOrdered.splice(0, 0, msg);
   });
+
+  messagesOrdered.forEach((msg) => {
+    client.chat.delete({
+      channel: process.env.STAETTE_CHANNEL,
+      ts: msg.ts,
+      token: process.env.SLACK_BOT_TOKEN,
+    });
+  });
+
+  for (let index = 0; index < messagesOrdered.length; index++) {
+    let msg = {
+      channel: process.env.STAETTE_CHANNEL,
+      text: messagesOrdered[index].blocks[1].text.text,
+      blocks: messagesOrdered[index].blocks,
+    };
+
+    await client.chat.postMessage(msg);
+  }
 }
 
 //******************** Exports ********************//
