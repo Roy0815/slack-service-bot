@@ -9,20 +9,22 @@ function setupApp(app) {
     await ack();
 
     //Datum validieren falls eingegeben
-    if (command.text != "") {
+    if (command.text == "") command.text = util.formatDate(new Date());
+    else {
       let dateArr = command.text.split(".");
 
       let date = new Date(dateArr[2], dateArr[1] - 1, dateArr[0]);
 
-      if (
-        dateArr.length != 3 ||
-        date.getFullYear() == NaN ||
-        date < new Date()
-      ) {
+      if (dateArr.length != 3 || date.getFullYear() == NaN) {
         respond("Bitte ein gültiges Datum im Format DD.MM.YYYY eingeben");
         return;
       }
-    } else command.text = util.formatDate(new Date());
+
+      if (date < new Date()) {
+        respond("Bitte ein Datum >= heute angeben");
+        return;
+      }
+    }
 
     await client.chat.postMessage(views.getWhoIsThereMessage(command));
 
@@ -50,7 +52,7 @@ function setupApp(app) {
           channel: body.user.id,
           text: `*Stätte Abfrage*\nDatum ${util.formatDate(
             date
-          )} liegt in der Vergangenheit. Bitte ein Datum größer heute eingeben.`,
+          )} liegt in der Vergangenheit. Bitte ein Datum >= heute angeben`,
         });
         return;
       }
