@@ -15,7 +15,11 @@ function setupApp(app) {
 
       let date = new Date(dateArr[2], dateArr[1] - 1, dateArr[0]);
 
-      if (dateArr.length != 3 || date.getFullYear() == NaN) {
+      if (
+        dateArr.length != 3 ||
+        date.getFullYear() == NaN ||
+        !/^`[0-3]\d\.[0-1]\d\.20[2-9]\d`$/.test(command.text)
+      ) {
         respond("Bitte ein gültiges Datum im Format DD.MM.YYYY eingeben");
         return;
       }
