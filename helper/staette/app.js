@@ -18,7 +18,7 @@ function setupApp(app) {
       if (
         dateArr.length != 3 ||
         date.getFullYear() == NaN ||
-        !/^`[0-3]\d\.[0-1]\d\.20[2-9]\d`$/.test(command.text)
+        !/^[0-3]\d\.[0-1]\d\.20[2-9]\d$/.test(command.text)
       ) {
         respond("Bitte ein gültiges Datum im Format DD.MM.YYYY eingeben");
         return;
