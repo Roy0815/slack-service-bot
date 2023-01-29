@@ -300,6 +300,36 @@ function setupApp(app) {
     }
   );
 
+  //******************** Options ********************//
+  app.options(views.registerActionNameSelect, async ({ ack, options }) => {
+    let users = await sheet.getAllUsers();
+
+    if (!users) {
+      await ack();
+      return;
+    }
+
+    let userOptions = [];
+
+    users
+      .filter((element) =>
+        element.name.toLowerCase().includes(options.value.toLowerCase())
+      )
+      .forEach((user) => {
+        userOptions.push({
+          text: {
+            type: "plain_text",
+            text: user.name,
+          },
+          value: user.id,
+        });
+      });
+
+    await ack({
+      options: userOptions,
+    });
+  });
+
   //******************** View Submissions ********************//
   app.view(views.registerViewName, async ({ body, ack, client }) => {
     await ack();

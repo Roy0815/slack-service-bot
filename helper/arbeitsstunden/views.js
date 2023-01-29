@@ -313,29 +313,15 @@ async function getAutoRegisterMessage(slackId) {
   view.blocks[1].block_id = autoregisterInputBlock;
 
   //add user select
-  let users = await sheet.getAllUsers();
-
   view.blocks[1].elements.unshift({
-    type: "static_select",
+    type: "external_select",
     placeholder: {
       type: "plain_text",
       text: "Name",
-      emoji: true,
     },
-    options: [], //users go here
+    min_query_length: 0,
     action_id: registerActionNameSelect,
   });
-
-  for (let user of users) {
-    view.blocks[1].elements[0].options.push({
-      text: {
-        type: "plain_text",
-        text: user.name,
-        emoji: true,
-      },
-      value: user.id,
-    });
-  }
 
   //remove decline button
   view.blocks[1].elements.pop();
@@ -438,18 +424,6 @@ function getUserMaintainEndMessage({ slackId, title, hours, date, approved }) {
   };
 }
 
-async function getNewUserJoinedMessage({ slackId }) {
-  let view = newUserJoinedMessage;
-
-  view.channel = "GPPHHTLSU"; //= await sheet.getAdminChannel();
-  view.text =
-    view.blocks[0].label.text = `Nutzer <@${slackId}> ist neu in Slack. Mit welchem Namen soll er verknüpft werden?`;
-
-  //todo: Buttons mit slackID
-
-  return view;
-}
-
 function getHomeView() {
   let view = JSON.parse(JSON.stringify(homeView));
 
@@ -481,8 +455,6 @@ module.exports = {
   homeViewDetailsSelect,
   homeViewDisplayHours,
   homeViewMaintainHours,
-
-  getNewUserJoinedMessage,
 
   getRegisterView,
   getRegisterConfirmDialog,
