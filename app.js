@@ -30,17 +30,20 @@ app.action(new RegExp(`.*`), async ({ ack }) => {
 
 //******************** Error notifies Admin ********************//
 app.error(async ({ error, context, body }) => {
+  //no admin maintained: no message
+  if (!process.env.APP_ADMIN) return;
+
   await app.client.files.upload({
     token: process.env.SLACK_BOT_TOKEN,
-    channels: "UED3FPWE9",
+    channels: process.env.APP_ADMIN,
     filetype: "javascript",
     initial_comment: `Error:\n${error}`,
     title: `Context`,
     content: JSON.stringify(context, null, "\t"),
   });
   await app.client.files.upload({
-    token: process.env.SLACK_BOT_TOKEN,
-    channels: "UED3FPWE9",
+    token: process.env.APP_ADMIN,
+    channels: process.env.APP_ADMIN,
     filetype: "javascript",
     title: `Body`,
     content: JSON.stringify(body, null, "\t"),

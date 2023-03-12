@@ -13,7 +13,8 @@ services:
       SLACK_SIGNING_SECRET: #
       SLACK_BOT_TOKEN: #
       PORT: 8080
-      STAETTE_CHANNEL: CHW68AJQ2
+      STAETTE_CHANNEL: #
+      APP_ADMIN: #
     #    ports:
     #      - "8080"
     networks:
