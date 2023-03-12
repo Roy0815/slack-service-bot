@@ -230,6 +230,8 @@ function setupApp(app) {
   app.action(
     "auto-register-submit-button",
     async ({ ack, respond, body, action }) => {
+      await ack();
+
       let selOpt =
         body.state.values[views.autoregisterInputBlock][
           views.registerActionNameSelect
@@ -244,8 +246,6 @@ function setupApp(app) {
           views.registerActionNameSelect
         ].selected_option
       );
-      console.log(action);
-      await ack();
 
       //edit approval message to show final result
       await respond(
