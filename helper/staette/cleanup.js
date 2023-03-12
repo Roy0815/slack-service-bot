@@ -12,9 +12,11 @@ const app = new App({
 // cleanup old messages
 functions.cleanup(app).then((result) => {
   // log job execution
+  if (!process.env.CRONJOB_LOG_TO_ADMIN) return;
+
   app.client.files.upload({
     token: process.env.SLACK_BOT_TOKEN,
-    channels: "UED3FPWE9",
+    channels: process.env.APP_ADMIN,
     filetype: "javascript",
     initial_comment: `Job ran at ${util.formatDate(
       new Date()
