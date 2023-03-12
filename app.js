@@ -30,6 +30,14 @@ app.action(new RegExp(`.*`), async ({ ack }) => {
 
 //******************** Error notifies Admin ********************//
 app.error(async ({ error, context, body }) => {
+  //catch server reponse time: notify user
+  if (body.command && error.data.error == "expired_trigger_id") {
+    await client.chat.postMessage({
+      channel: body.user_id,
+      text: `Deine Aktion ${body.command} konnte leider vom Server nicht rechtzeitig verarbeitet werden. Bitte versuche es einfach nochmal. Soory für die Umstände!`,
+    });
+  }
+
   //no admin maintained: no message
   if (!process.env.APP_ADMIN) return;
 
