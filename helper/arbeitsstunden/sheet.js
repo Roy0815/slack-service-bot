@@ -127,6 +127,10 @@ async function getAllUsers() {
   let today = new Date();
 
   for (let user of array) {
+    //firstname and lastname empty: skip
+    if (user[firstNameColumn - 1] == "" && user[lastNameColumn - 1] == "")
+      continue;
+
     // if leave date empty: active
     if (user[leaveDateColumn - 1] == "") {
       activeUsers.push({
