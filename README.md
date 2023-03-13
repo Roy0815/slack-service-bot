@@ -8,18 +8,18 @@ Hier im Setup werde ich die Schritte auflisten, die ich beim Aufsetzen meines Se
 
 **Wo immer möglich habe ich Links zu Guides eingefügt. Trotzdem kann hier oder auch an anderen Stellen eine kurze Google Recherche notwendig sein.**
 
-1. [Server aufsetzen](https://github.com/Roy0815/slack-arbeitsstunden-bot/blob/main/README.md#1-server-aufsetzen)
-2. [Google und Slack Zugangsdaten holen](https://github.com/Roy0815/slack-arbeitsstunden-bot/blob/main/README.md#2-google-und-slack-zugangsdaten-holen)
-3. [Docker Image starten](https://github.com/Roy0815/slack-arbeitsstunden-bot/blob/main/README.md#3-docker-image-starten)
-4. [Slack App verlinken](https://github.com/Roy0815/slack-arbeitsstunden-bot/blob/main/README.md#4-slack-app-verlinken)
+1. [Server aufsetzen](#1-server-aufsetzen)
+2. [Google und Slack Zugangsdaten holen](#2-google-und-slack-zugangsdaten-holen)
+3. [Docker Image starten](#3-docker-image-starten)
+4. [Slack App verlinken](#4-slack-app-verlinken)
 5. [Google Sheets verknüpfen](#5-google-sheets-verkn%C3%BCpfen)
 
 ### 1. Server aufsetzen
-- [Server mieten](https://github.com/Roy0815/slack-arbeitsstunden-bot/blob/main/README.md#server-mieten)
-- [*[optional]* Domain kaufen und verlinken](https://github.com/Roy0815/slack-arbeitsstunden-bot/blob/main/README.md#optional-domain-kaufen-und-verlinken)
-- [Server sichern](https://github.com/Roy0815/slack-arbeitsstunden-bot/blob/main/README.md#server-sichern)
-- [Docker installieren](https://github.com/Roy0815/slack-arbeitsstunden-bot/blob/main/README.md#docker-installieren)
-- [*[optional]* Nginx Proxy Manager](https://github.com/Roy0815/slack-arbeitsstunden-bot/blob/main/README.md#optional-nginx-proxy-manager)
+- [Server mieten](#server-mieten)
+- [*[optional]* Domain kaufen und verlinken](#optional-domain-kaufen-und-verlinken)
+- [Server sichern](#server-sichern)
+- [Docker installieren](#docker-installieren)
+- [*[optional]* Nginx Proxy Manager](#optional-nginx-proxy-manager)
 
 #### Server mieten
 Ich habe mich auf Grund des Preis-/Leistungsverhältnisses für einen Server von [Netcup](https://www.netcup-sonderangebote.de/) entschieden. Das Produkt ist ein VPS (Virtual Private Server) mit 2GB Arbeitsspeicher und 20GB Festplatte.
@@ -53,9 +53,9 @@ tbd
 ## Funktionen
 Der Service Bot hat verschiedene Funktionen und ist in Bereiche unterteilt. Die generellen Funktionen und Besonderheiten werden hier erläutert.
 
-1. [Pollz](https://github.com/Roy0815/slack-arbeitsstunden-bot/blob/main/README.md#1-pollz)
-2. [Staette](https://github.com/Roy0815/slack-arbeitsstunden-bot/blob/main/README.md#2-staette)
-3. [Arbeitsstunden](https://github.com/Roy0815/slack-arbeitsstunden-bot/blob/main/README.md#3-arbeitsstunden)
+1. [Pollz](#1-pollz)
+2. [Staette](#2-staette)
+3. [Arbeitsstunden](#3-arbeitsstunden)
 
 ### 1. Pollz
 tbd
