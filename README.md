@@ -28,7 +28,9 @@ Ich habe mich auf Grund des Preis-/Leistungsverhältnisses für einen Server von
 Eine Domain wird nicht unbedingt benötigt, da man auch über die IP des Servers zugreifen kann. Falls man dennoch eine möchte muss man diese kaufen/mieten und mit dem Server verlinken. Bei Netcup geht das im [Customer Control Panel](https://www.customercontrolpanel.de/).
 
 #### Server sichern
-Nun geht es ans technische Einrichten des Servers. Hierbei habe ich mich auf die Basics beschränkt diesen zu sichern. Dazu gibt es einmal ein paar [generelle Hinweise](https://forum.netcup.de/administration-eines-server-vserver/vserver-server-kvm-server/10174-basics-administration-eines-virtuellen-oder-dedizierten-linux-servers/), [Fail2Ban](https://www.digitalocean.com/community/tutorials/how-to-protect-ssh-with-fail2ban-on-ubuntu-14-04) und den [Remote Zugriff per SSH](https://linuxhint.com/enable_ssh_debian_10/). Außerdem habe ich mir einen User mit root Berechtigungen angelegt und den root User deaktiviert.
+Nun geht es ans technische Einrichten des Servers. Hierbei habe ich mich auf die Basics beschränkt diesen zu sichern. Dazu gibt es einmal ein paar [generelle Hinweise](https://forum.netcup.de/administration-eines-server-vserver/vserver-server-kvm-server/10174-basics-administration-eines-virtuellen-oder-dedizierten-linux-servers/), [Fail2Ban](https://www.digitalocean.com/community/tutorials/how-to-protect-ssh-with-fail2ban-on-ubuntu-14-04) und den [Remote Zugriff per SSH](https://linuxhint.com/enable_ssh_debian_10/). Außerdem habe ich mir einen User mit root Berechtigungen angelegt und den root User deaktiviert für zusätzliche Sicherheit. [Guide](https://www.digitalocean.com/community/tutorials/initial-server-setup-with-ubuntu-20-04)
+
+[Fail2Ban](https://www.the-lazy-dev.com/en/install-fail2ban-with-docker/) gibts auch für Docker, habe ich aktuell noch nicht.
 
 #### Docker installieren
 Docker ist das Herz wenn man das Image laufen lassen möchte. Es gibt eine ausführliche [Dokumentation](https://docs.docker.com/engine/install/ubuntu/).
