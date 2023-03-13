@@ -28,7 +28,7 @@ tbd
 tbd
 
 ## Funktionen
-Der Service Bot hat verrschiedene Funktionen und ist in Bereiche unterteilt. Die generellen Funktionen und Besonderheiten werden hier erläutert.
+Der Service Bot hat verschiedene Funktionen und ist in Bereiche unterteilt. Die generellen Funktionen und Besonderheiten werden hier erläutert.
 
 1. [Pollz](https://github.com/Roy0815/slack-arbeitsstunden-bot/blob/main/README.md#1-pollz)
 2. [Staette](https://github.com/Roy0815/slack-arbeitsstunden-bot/blob/main/README.md#2-staette)
