@@ -166,7 +166,20 @@ volumes:
     - ./volume:/var/lib/files
 ```
 
-tbd: Infos über Sheet Struktur und Hintergrund Funktionen
+**Google Sheet Struktur**
+
+Das Google Sheet erwartet eine spezielle Struktur. Bei den Sheets kommt es auf die Namen an, bei den Spalten nur auf die Reihenfolge, nicht die Titel. Sollte die Struktur unbedingt verändert werden müssen, muss auch der Code angepasst werden (x steht jeweils für das Jahr):
+
+1. Sheet `Allg Daten`
+   ![Struktur Sheet Allg Daten](/images/%5BARBEITSSTUNDEN%5D%20Sheet%20Allg%20Daten.png)
+2. Sheet `Arbeitseinsätze x`
+
+   ![Struktur Sheet Arbeitseinsätze x](/images/%5BARBEITSSTUNDEN%5D%20Sheet%20Arbeitseins%C3%A4tze%20x.png)
+
+3. Sheet `Summe Stunden x`
+   ![Struktur Sheet Summe Stunden x](/images/%5BARBEITSSTUNDEN%5D%20Sheet%20Summe%20Stunden%20x.png)
+
+Das erste valide Jahr ist 2022. Sollte ein User eine Abfrage für ein Jahr starten, für das es noch kein Sheet gibt, so kopiert die App die beiden Sheets des letzten Jahres und leert alle Arbeitseinsätze. Die Soll-Stunden, sowie der Admin Channel können im "Summe Stunden x" Sheet angepasst werden.
 
 ## Upgrades & Contribution
 
