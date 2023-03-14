@@ -67,6 +67,8 @@ Danach muss die Google Sheets API im Projekt [aktiviert](https://console.cloud.g
 
 Nun wird noch ein Dienstkonto benötigt. Das kann [hier](https://console.cloud.google.com/iam-admin/serviceaccounts?hl=de) errstellt werden.
 
+Die Email des Dienstkontos muss als Bearbeiter bei der Google Sheet Datei hinzugefügt werden.
+
 ### **3. Google und Slack Zugangsdaten holen**
 
 Slack
@@ -161,6 +163,8 @@ Bei den `GOOGLE_APPLICATION_CREDENTIALS` wird der Pfad **im Docker Container** z
 volumes:
     - ./volume:/var/lib/files
 ```
+
+tbd: Infos über Sheet Struktur und Hintergrund Funktionen
 
 ## Upgrades & Contribution
 
