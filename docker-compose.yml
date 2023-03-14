@@ -16,7 +16,7 @@ services:
       PORT: 8080
       ## Arbeitsstunden config
       SHEET_ID: #sheet with hours and user data
-      GOOGLE_APPLICATION_CREDENTIALS: #app credentials stored in a secret.json file
+      GOOGLE_APPLICATION_CREDENTIALS: /var/lib/files/secret.json #path to app credentials stored in a secret.json file
       ## Staette config
       STAETTE_CHANNEL: #channel for staette polls
       CRONJOB_LOG_TO_ADMIN: X #X for log, for no log: delete line
