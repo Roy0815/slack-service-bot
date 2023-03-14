@@ -164,7 +164,66 @@ volumes:
 
 ## Upgrades & Contribution
 
-WIP
+1. [Generelle Projektstruktur](#1-generelle-projektstruktur)
+2. [Slack App Entwicklung](#2-slack-app-entwicklung)
+3. [Docker Image Deployment](#3-docker-image-deployment)
+4. [Contribution Guidelines](#4-contribution-guidelines)
+
+### **1. Generelle Projektstruktur**
+
+Die [Hauptapp](app.js) enthält zentrale Komponenten für die Slack App wie Error Handling und die Erstellung des Home-Views.
+Im Ordner [`/helper`](/helper) gibt es für jede Komponente ein Unterverzeichnis. Zusätzlich gibt es ein Unterverzeichnis [`/helper/general`](/helper/general) für allgemeine Funktionen und Komponenten.
+
+Ich habe versucht den Code innerhalb der Komponenten bestmöglich zu Kapseln. Hauptaugenmerk lag hierbei auf der Unterscheidung zwischen der `app.js` und `views.js`. Die `app.js` nimmt die Anpassungen an der Slack App vor und implementiert die erforderliche Logik. Die Views, die z.B. für Nachrichten, Modals und den Homeview genutzt werden sind in der `views.js` definiert und werden mit Hilfe exportierter Funktionen abgerufen.
+
+Alle anderen Versuche den Code zu kapseln sind als nicht festgelegt zu betrachten und meist historisch gewachsen. Sie können also gerne umstrukturiert werden, eventuell nach vorheriger Absprache.
+
+### **2. Slack App Entwicklung**
+
+Slack hat eine sehr gute [API Dokumentation](https://api.slack.com/docs). Hier finden sich alle verfügbaren Methoden und Konzepte.
+
+Slack hat ein eigenes Framework entwickelt, welches das Aufsetzen und Entwickeln von Slack Apps deutlich vereinfach: [Bolt](https://slack.dev/bolt-js/concepts). Hier können wieder viele Beispiele und Konzepte gefunden werden.
+
+Um Layouts für Nachrichten, Popups und den Homeview zu testen kann man einfach den [Block Kit Builder](https://api.slack.com/tools/block-kit-builder) von Slack nutzen. Ist man bei seinem Workspace angemeldet kann man sich die Nachrichten probeweise schicken lassen, oder sogar die Metadaten von Aktionen wie Buttonklicks sehen.
+
+Da Docker das Testen in der Produktivumgebung etwas verlangsamt und man im Zweifel seine Features erstmal lokal testen möchte habe ich oft auf [Glitch](https://glitch.com/) zurückgegriffen. Angemeldet mit Github kann man hier ein Projekt erstellen und es läuft während man entwickelt ein Server, der von Slack angesprochen werden kann. Auch wenn es als Entwicklungsumgebung sagen wir ausbaufähig ist, so kann man doch seine Änderungen innerhalb weniger Sekunden testen. Dafür legt man ein neues Projekt an (oder "remixt" die offizielle [Bolt Vorlage](https://glitch.com/edit/#!/bolt-app-template)) und kopiert seine Projektfiles ins Glitch Projekt. Hier läuft direkt der Server. Drückt man unten auf "Preview", dann auf die 3 Punkte und kopiert sich den Link, kann dieser genau wie die eigene Server URL genutzt werden, um die Slack App statt mit dem eigenen Server mit dem Glitch Server zu verbinden. Möchte man möglichst wenig an der Produktionsapp verändern kann man sich einfach eine Test-Slackapp anlegen, welche die Glitch URL für alles nutzt. Nimmt man nun Änderungen am Code in Glitch vor, werden die Änderungen sofort aktiviert und man kann in Slack testen.
+
+### **3. Docker Image Deployment**
+
+Möchte man Änderungen am Code nun auf den Server Deployen muss man folgende Schritte ausführen:
+
+1. Account bei einem Docker Hub erstellen (ich bin bei [hub.docker.com](https://hub.docker.com/), da es einfach und kostenlos war)
+2. öffentliches Image anlegen
+3. in deiner lokalen IDE Docker installieren ([Guide](https://docs.docker.com/get-docker/))
+4. bei Dockerhub einloggen
+
+```bash
+docker login -u *username*
+```
+
+5. Docker Image erstellen
+
+```bash
+docker build -t *username*/*imagename* .
+```
+
+6. Docker Image pushen
+
+```bash
+docker push *username*/*imagename*
+```
+
+7. auf dem Server ins Verzeichnis der `docker-compose.yml` gehen, die neusten Images ziehen und Container neu erstellen
+
+```bash
+sudo docker-compose pull && sudo docker-compose up -d
+```
+
+### **4. Contribution Guidelines**
+
+Die [generelle Projektstruktur](#1-generelle-projektstruktur) sollte beibehalten werden.
+
+Wenn eine neue Komponente hinzugefügt wird, sollte diese auch mindestens eine `app.js` und `views.js` Datei in einem neuen Verzeichnis liefern. Außerdem muss die [`apps.js`](/helper/general/apps.js) mit den neuen Dateien ergänzt werden. Die `app.js` muss eine Funktion `setupApp` exportieren, welche die erforderlichen Anpassungen an der Slack App vornimmt (Commands, Actions, Events, etc.). Die `views.js` muss eine Funktion `getHomeView` exportieren, welche einen Teil des Homeviews liefert, der in Slack angezeigt wird und Informationen über die Funktionsweise der Komponente beinhaltet.
 
 ## Version
 
