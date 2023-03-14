@@ -56,7 +56,7 @@ SSL Verschlüsselung, Subdomains und Ports für Docker Container festlegen kann 
 
 Für den NPM ist es notwendig ein Docker Netzwerk zu [erstellen](https://docs.docker.com/engine/reference/commandline/network_create/), welches es den Containern ermöglicht untereinander zu kommunizieren.
 
-Beispiel: [`docker-compose.yml`](/other-docker-compose-files/npm-docker-compose.yml) für NPM
+Beispiel: [`docker-compose.yml`](/example-docker-compose-files/npm-docker-compose.yml) für NPM
 
 Hier müssen die mit `#` gefüllten Variablen festgelegt werden. Ich weiß nicht mehr genau ob NPM die User für die Datenbank im Container selbst anlegt, oder ob man das manuell übernehmen muss.
 
