@@ -408,6 +408,14 @@ const resultBlockMessage = {
 
 const homeView = [
   {
+    type: "header",
+    text: {
+      type: "plain_text",
+      text: "Umfragen stellen",
+      emoji: true,
+    },
+  },
+  {
     type: "section",
     text: {
       type: "mrkdwn",
