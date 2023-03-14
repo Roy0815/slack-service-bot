@@ -3,3 +3,4 @@
 .prettierrc.json
 secret.json
 docker-compose.yml
+other-docker-compose-files
