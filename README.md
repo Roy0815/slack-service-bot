@@ -219,6 +219,12 @@ docker push *username*/*imagename*
 sudo docker-compose pull && sudo docker-compose up -d
 ```
 
+8. regelmäßig die alten Images vom Server entfernen um Speicher freizugeben
+
+```bash
+sudo docker image prune
+```
+
 ### **4. Contribution Guidelines**
 
 Die [generelle Projektstruktur](#1-generelle-projektstruktur) sollte beibehalten werden.
