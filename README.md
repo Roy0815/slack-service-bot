@@ -56,7 +56,9 @@ SSL Verschlüsselung, Subdomains und Ports für Docker Container festlegen kann 
 
 Für den NPM ist es notwendig ein Docker Netzwerk zu [erstellen](https://docs.docker.com/engine/reference/commandline/network_create/), welches es den Containern ermöglicht untereinander zu kommunizieren.
 
-tbd: docker-compose verlinken
+Beispiel: [`docker-compose.yml`](/other-docker-compose-files/npm-docker-compose.yml) für NPM
+
+Hier müssen die mit `#` gefüllten Variablen festgelegt werden. Ich weiß nicht mehr genau ob NPM die User für die Datenbank im Container selbst anlegt, oder ob man das manuell übernehmen muss.
 
 ### **2. Google Sheets einrichten**
 
@@ -89,7 +91,7 @@ Während man im Verzeichnis ist kann man dann mit den folgenden Kommandos die ne
 sudo docker-compose pull && sudo docker-compose up -d
 ```
 
-Sollte man keinen [NPM](#optional-nginx-proxy-manager) verwenden, muss der Abschnitt `networks` aus der [docker-compose.yml](docker-compose.yml) gelöscht werden:
+Sollte man keinen [NPM](#optional-nginx-proxy-manager) verwenden, muss der Abschnitt `networks` aus der [`docker-compose.yml`](docker-compose.yml) gelöscht werden:
 
 ```
 networks:
@@ -147,7 +149,7 @@ Pollz hat aktuell nur eine Funktion und die ist das Kommando `/umfrage`. Es gibt
 
 Staette stellt aktuell das Kommando `/weristda` zur Verfügung. Dafür muss die [Environment Variable](#4-docker-image-starten) `STAETTE_CHANNEL` mit der ID des Channels gefüllt werden in dem die Abfragen landen sollen.
 
-Das Docker Image beinhaltet außerdem einen Cronjob, welcher täglich um 1 Uhr CET läuft und die Abfragen von vergangenen Tagen automatisch löscht. Der Admin hat die Option darüber benachrichtigt zu werden um möglicherweise falsches Systemverhalten besser zu untersuchen. Dafür muss er nur die [Environment Variable](#4-docker-image-starten) `CRONJOB_LOG_TO_ADMIN` setzen. Möchte er nicht benachrichtigt werden kann diese Variable aus dem [docker-compose.yml](docker-compose.yml) gelöscht werden.
+Das Docker Image beinhaltet außerdem einen Cronjob, welcher täglich um 1 Uhr CET läuft und die Abfragen von vergangenen Tagen automatisch löscht. Der Admin hat die Option darüber benachrichtigt zu werden um möglicherweise falsches Systemverhalten besser zu untersuchen. Dafür muss er nur die [Environment Variable](#4-docker-image-starten) `CRONJOB_LOG_TO_ADMIN` setzen. Möchte er nicht benachrichtigt werden kann diese Variable aus dem [`docker-compose.yml`](docker-compose.yml) gelöscht werden.
 
 ### **3. Arbeitsstunden**
 
@@ -157,7 +159,7 @@ Für diesen Bereich müssen die [Environment Variablen](#4-docker-image-starten)
 
 Die `SHEET_ID` findet man in der URL der Tabelle um die es geht. Sie steht zwischen `docs.google.com/spreadsheets/d/` und dem nächsten `/`.
 
-Bei den `GOOGLE_APPLICATION_CREDENTIALS` wird der Pfad **im Docker Container** zu einer `secret.json` Datei angegeben. Diese Datei enthält die Daten, die beim erstellen der [Google Zugangsdaten](#3-google-und-slack-zugangsdaten-holen) heruntergeladen wurden. Da die Docker Container bei jedem neu erstellen ihre Daten verlieren, können gewisse Verzeichnisse auf die Verzeichnisse des Servers _gemounted_ werden. Das heißt, dass Dateien, die hier auf dem Server liegen auch immer im angegebenen Verzeichnis im Container verfügbar sind. Im [docker-compose.yml](docker-compose.yml) ist vorgesehen, dass im Ordner dieser Datei ein weiterer Ordner `volume` existiert, in welchem die `secret.json` liegen soll. Folgender Teil im [docker-compose.yml](docker-compose.yml) führt das "mounting" durch:
+Bei den `GOOGLE_APPLICATION_CREDENTIALS` wird der Pfad **im Docker Container** zu einer `secret.json` Datei angegeben. Diese Datei enthält die Daten, die beim erstellen der [Google Zugangsdaten](#3-google-und-slack-zugangsdaten-holen) heruntergeladen wurden. Da die Docker Container bei jedem neu erstellen ihre Daten verlieren, können gewisse Verzeichnisse auf die Verzeichnisse des Servers _gemounted_ werden. Das heißt, dass Dateien, die hier auf dem Server liegen auch immer im angegebenen Verzeichnis im Container verfügbar sind. Im [`docker-compose.yml`](docker-compose.yml) ist vorgesehen, dass im Ordner dieser Datei ein weiterer Ordner `volume` existiert, in welchem die `secret.json` liegen soll. Folgender Teil im [`docker-compose.yml`](docker-compose.yml) führt das "mounting" durch:
 
 ```
 volumes:
