@@ -34,7 +34,7 @@ app.error(async ({ error, context, body }) => {
   if (body.command && error.data.error == "expired_trigger_id") {
     await client.chat.postMessage({
       channel: body.user_id,
-      text: `Deine Aktion ${body.command} konnte leider vom Server nicht rechtzeitig verarbeitet werden. Bitte versuche es einfach nochmal. Soory für die Umstände!`,
+      text: `Deine Aktion ${body.command} konnte leider vom Server nicht rechtzeitig verarbeitet werden. Bitte versuche es einfach nochmal. Sorry für die Umstände!`,
     });
   }
 
