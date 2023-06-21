@@ -1,315 +1,315 @@
-const views = require("./views");
-const sheet = require("./sheet");
-const util = require("../general/util");
+const views = require('./views')
+const sheet = require('./sheet')
+const util = require('../general/util')
 
-function setupApp(app) {
-  //******************** Commands ********************//
+function setupApp (app) {
+  //* ******************* Commands ********************//
   // display hours
   app.command(
-    "/arbeitsstunden_anzeigen",
+    '/arbeitsstunden_anzeigen',
     async ({ ack, command, respond, client }) => {
-      await ack();
+      await ack()
 
-      //see if user wanted details
-      let details = command.text.includes("details");
+      // see if user wanted details
+      const details = command.text.includes('details')
 
-      //remove everything but numbers
-      command.text = command.text.replace(/\D/g, "");
+      // remove everything but numbers
+      command.text = command.text.replace(/\D/g, '')
 
-      //if year was filled, validate
-      if (command.text != "") {
-        let currYear = new Date().getFullYear();
+      // if year was filled, validate
+      if (command.text != '') {
+        const currYear = new Date().getFullYear()
         if (command.text < 2022 || command.text > currYear) {
           await respond(
             `Bitte ein Jahr zwischen 2022 und ${currYear} eingeben`
-          );
-          return;
+          )
+          return
         }
       }
 
-      let hoursObj = await sheet.getHoursFromSlackId({
+      const hoursObj = await sheet.getHoursFromSlackId({
         id: command.user_id,
         year: command.text,
-        details: details,
-      });
+        details
+      })
 
       // not registered: start dialog
       if (hoursObj == undefined) {
         await client.views.open(
           await views.getRegisterView(command.trigger_id)
-        );
-        return;
+        )
+        return
       }
 
       // if registered, display
-      let response = {
+      const response = {
         blocks: [
           {
-            type: "section",
+            type: 'section',
             text: {
-              type: "mrkdwn",
+              type: 'mrkdwn',
               text: `Du hast ${
-                command.text != "" ? command.text : "dieses Jahr" //year
+                command.text != '' ? command.text : 'dieses Jahr' // year
               } bereits ${
                 hoursObj.workedHours
               } Arbeitsstunden geleistet. Du musst noch ${
                 hoursObj.targetHours
-              } Stunden leisten.`,
-            },
-          },
-        ],
-      };
+              } Stunden leisten.`
+            }
+          }
+        ]
+      }
 
       if (hoursObj.details.length > 0) {
         response.blocks.push(
           {
-            type: "divider",
+            type: 'divider'
           },
           {
-            type: "section",
+            type: 'section',
             text: {
-              type: "mrkdwn",
-              text: "Datum\t\t\tStunden\tTätigkeit",
-            },
+              type: 'mrkdwn',
+              text: 'Datum\t\t\tStunden\tTätigkeit'
+            }
           },
           {
-            type: "divider",
+            type: 'divider'
           }
-        );
+        )
 
         hoursObj.details.forEach((element) => {
           response.blocks.push({
-            type: "section",
+            type: 'section',
             text: {
-              type: "mrkdwn",
-              text: `*${element.date}*\t${element.hours}\t\t\t\t_${element.description}_`,
-            },
-          });
-        });
+              type: 'mrkdwn',
+              text: `*${element.date}*\t${element.hours}\t\t\t\t_${element.description}_`
+            }
+          })
+        })
       }
 
-      respond(response);
+      respond(response)
     }
-  );
+  )
 
   // Maintain hours
-  app.command("/arbeitsstunden_erfassen", async ({ ack, command, client }) => {
-    await ack();
+  app.command('/arbeitsstunden_erfassen', async ({ ack, command, client }) => {
+    await ack()
 
     // check user is registered
     if (
       (await sheet.getHoursFromSlackId({ id: command.user_id })) == undefined
     ) {
       // not registered: start dialog
-      await client.views.open(await views.getRegisterView(command.trigger_id));
-      return;
+      await client.views.open(await views.getRegisterView(command.trigger_id))
+      return
     }
 
     // registered: start maintenance dialog
     await client.views.open(
       await views.getMaintainHoursView(command.trigger_id)
-    );
-  });
+    )
+  })
 
-  //******************** Actions ********************//
+  //* ******************* Actions ********************//
   app.action(views.homeViewDisplayHours, async ({ ack, client, body }) => {
-    await ack();
+    await ack()
 
-    let year =
+    const year =
       body.view.state.values[views.homeViewInputBlockId][
         views.homeViewYearSelect
-      ].selected_option.value;
+      ].selected_option.value
 
-    let details =
+    const details =
       body.view.state.values[views.homeViewInputBlockId][
         views.homeViewDetailsSelect
-      ].selected_options.length > 0;
+      ].selected_options.length > 0
 
-    let hoursObj = await sheet.getHoursFromSlackId({
+    const hoursObj = await sheet.getHoursFromSlackId({
       id: body.user.id,
-      year: year,
-      details: details,
-    });
+      year,
+      details
+    })
 
     // not registered: start dialog
     if (hoursObj == undefined) {
-      await client.views.open(await views.getRegisterView(body.trigger_id));
-      return;
+      await client.views.open(await views.getRegisterView(body.trigger_id))
+      return
     }
 
-    //build message
-    let message = {
+    // build message
+    const message = {
       channel: body.user.id,
       blocks: [
         {
-          type: "section",
+          type: 'section',
           text: {
-            type: "mrkdwn",
-            text: `Du hast ${year} bereits ${hoursObj.workedHours} Arbeitsstunden geleistet. Du musst noch ${hoursObj.targetHours} Stunden leisten.`,
-          },
-        },
-      ],
-    };
+            type: 'mrkdwn',
+            text: `Du hast ${year} bereits ${hoursObj.workedHours} Arbeitsstunden geleistet. Du musst noch ${hoursObj.targetHours} Stunden leisten.`
+          }
+        }
+      ]
+    }
 
     if (hoursObj.details.length > 0) {
       message.blocks.push(
         {
-          type: "divider",
+          type: 'divider'
         },
         {
-          type: "section",
+          type: 'section',
           text: {
-            type: "mrkdwn",
-            text: "Datum\t\t\tStunden\tTätigkeit",
-          },
+            type: 'mrkdwn',
+            text: 'Datum\t\t\tStunden\tTätigkeit'
+          }
         },
         {
-          type: "divider",
+          type: 'divider'
         }
-      );
+      )
 
       hoursObj.details.forEach((element) => {
         message.blocks.push({
-          type: "section",
+          type: 'section',
           text: {
-            type: "mrkdwn",
-            text: `*${element.date}*\t${element.hours}\t\t\t\t_${element.description}_`,
-          },
-        });
-      });
+            type: 'mrkdwn',
+            text: `*${element.date}*\t${element.hours}\t\t\t\t_${element.description}_`
+          }
+        })
+      })
     }
 
-    await client.chat.postMessage(message);
-  });
+    await client.chat.postMessage(message)
+  })
 
   app.action(views.homeViewMaintainHours, async ({ ack, client, body }) => {
-    await ack();
+    await ack()
 
     // check user is registered
     if ((await sheet.getHoursFromSlackId({ id: body.user.id })) == undefined) {
       // not registered: start dialog
-      await client.views.open(await views.getRegisterView(body.trigger_id));
-      return;
+      await client.views.open(await views.getRegisterView(body.trigger_id))
+      return
     }
 
     // registered: start maintenance dialog
-    await client.views.open(await views.getMaintainHoursView(body.trigger_id));
-  });
+    await client.views.open(await views.getMaintainHoursView(body.trigger_id))
+  })
 
   // handle buttons in Registration approval
   app.action(
-    new RegExp(`^register-(approve)*(reject)*-button$`),
+    new RegExp('^register-(approve)*(reject)*-button$'),
     async ({ ack, action, client, respond, body }) => {
-      await ack();
+      await ack()
 
-      //{ id, slackId, name, approved }
-      let registerObj = JSON.parse(action.value);
-      registerObj.approved = action.action_id.split("-")[1] == "approve";
+      // { id, slackId, name, approved }
+      const registerObj = JSON.parse(action.value)
+      registerObj.approved = action.action_id.split('-')[1] == 'approve'
 
-      //notify requestor
+      // notify requestor
       await client.chat.postMessage(
         views.getUserRegisterEndMessage(registerObj)
-      );
+      )
 
-      //edit approval message to show final result
+      // edit approval message to show final result
       await respond(
         `<@${body.user.id}> hat folgende Registrierung um ${util.formatTime(
           new Date()
         )} Uhr am ${util.formatDate(new Date())} ${
-          registerObj.approved ? "freigegeben" : "abgelehnt"
+          registerObj.approved ? 'freigegeben' : 'abgelehnt'
         }:\n<@${registerObj.slackId}> => ${registerObj.name}`
-      );
+      )
 
-      if (!registerObj.approved) return;
-      //update data in sheet
-      sheet.saveSlackId(registerObj);
+      if (!registerObj.approved) return
+      // update data in sheet
+      sheet.saveSlackId(registerObj)
     }
-  );
+  )
 
   // admin registration
   app.action(
-    "auto-register-submit-button",
+    'auto-register-submit-button',
     async ({ ack, respond, body, action }) => {
-      await ack();
+      await ack()
 
-      let selOpt =
+      const selOpt =
         body.state.values[views.autoregisterInputBlock][
           views.registerActionNameSelect
-        ].selected_option;
+        ].selected_option
 
       if (selOpt === null) {
-        return;
+        return
       }
 
       console.log(
         body.state.values[views.autoregisterInputBlock][
           views.registerActionNameSelect
         ].selected_option
-      );
+      )
 
-      //edit approval message to show final result
+      // edit approval message to show final result
       await respond(
         `<@${body.user.id}> hat folgende Registrierung um ${util.formatTime(
           new Date()
         )} Uhr am ${util.formatDate(new Date())} vorgenommen:\n<@${
           action.value
         }> => ${selOpt.text.text}`
-      );
+      )
 
-      //update data in sheet
-      sheet.saveSlackId({ id: selOpt.value, slackId: action.value });
+      // update data in sheet
+      sheet.saveSlackId({ id: selOpt.value, slackId: action.value })
     }
-  );
+  )
 
   // handle buttons in maintenance approval
   app.action(
-    new RegExp(`^maintain-(approve)*(reject)*-button$`),
+    new RegExp('^maintain-(approve)*(reject)*-button$'),
     async ({ ack, action, client, respond, body }) => {
-      await ack();
+      await ack()
 
-      //{ slackId, title, hours, date }
-      let maintObj = JSON.parse(action.value);
-      maintObj.approved = action.action_id.split("-")[1] == "approve";
+      // { slackId, title, hours, date }
+      const maintObj = JSON.parse(action.value)
+      maintObj.approved = action.action_id.split('-')[1] == 'approve'
 
-      //notify requestor
-      await client.chat.postMessage(views.getUserMaintainEndMessage(maintObj));
+      // notify requestor
+      await client.chat.postMessage(views.getUserMaintainEndMessage(maintObj))
 
-      //edit approval message to show final result
-      let date = new Date(
-        maintObj.date.split("-")[0],
-        maintObj.date.split("-")[1] - 1,
-        maintObj.date.split("-")[2]
-      );
+      // edit approval message to show final result
+      const date = new Date(
+        maintObj.date.split('-')[0],
+        maintObj.date.split('-')[1] - 1,
+        maintObj.date.split('-')[2]
+      )
 
       await respond(
         `<@${body.user.id}> hat folgende Stunden um ${util.formatTime(
           new Date()
         )} Uhr am ${util.formatDate(new Date())} ${
-          maintObj.approved ? "freigegeben" : "abgelehnt"
+          maintObj.approved ? 'freigegeben' : 'abgelehnt'
         }:\n${await sheet.getNameFromSlackId(maintObj)}: "${
           maintObj.title
         }" - ${maintObj.hours} Stunde${
-          maintObj.hours == 1 ? "" : "n"
+          maintObj.hours == 1 ? '' : 'n'
         } am ${util.formatDate(date)}.`
-      );
+      )
 
-      if (!maintObj.approved) return;
+      if (!maintObj.approved) return
 
-      //update data in sheet
-      await sheet.saveHours(maintObj);
+      // update data in sheet
+      await sheet.saveHours(maintObj)
     }
-  );
+  )
 
-  //******************** Options ********************//
+  //* ******************* Options ********************//
   app.options(views.registerActionNameSelect, async ({ ack, options }) => {
-    let users = await sheet.getAllUsers();
+    const users = await sheet.getAllUsers()
 
     if (!users) {
-      await ack();
-      return;
+      await ack()
+      return
     }
 
-    let userOptions = [];
+    const userOptions = []
 
     users
       .filter((element) =>
@@ -318,24 +318,24 @@ function setupApp(app) {
       .forEach((user) => {
         userOptions.push({
           text: {
-            type: "plain_text",
-            text: user.name,
+            type: 'plain_text',
+            text: user.name
           },
-          value: user.id,
-        });
-      });
+          value: user.id
+        })
+      })
 
     await ack({
-      options: userOptions,
-    });
-  });
+      options: userOptions
+    })
+  })
 
-  //******************** View Submissions ********************//
+  //* ******************* View Submissions ********************//
   app.view(views.registerViewName, async ({ body, ack, client }) => {
-    await ack();
+    await ack()
 
-    //register object
-    let obj = {
+    // register object
+    const obj = {
       id: body.view.state.values[views.registerBlockNameSelect][
         views.registerActionNameSelect
       ].selected_option.value,
@@ -344,40 +344,40 @@ function setupApp(app) {
 
       name: body.view.state.values[views.registerBlockNameSelect][
         views.registerActionNameSelect
-      ].selected_option.text.text,
-    };
+      ].selected_option.text.text
+    }
 
-    //register confirmation message
-    await client.chat.postMessage(await views.getRegisterConfirmDialog(obj));
+    // register confirmation message
+    await client.chat.postMessage(await views.getRegisterConfirmDialog(obj))
 
-    //notify user that process has started
-    await client.chat.postMessage(views.getUserRegisterStartMessage(obj));
-  });
+    // notify user that process has started
+    await client.chat.postMessage(views.getUserRegisterStartMessage(obj))
+  })
 
   app.view(views.maintainHoursViewName, async ({ body, ack, client }) => {
-    let year =
+    const year =
       body.view.state.values[views.maintainHoursBlockDate][
         views.maintainHoursActionDate
-      ].selected_date.split("-")[0];
+      ].selected_date.split('-')[0]
 
-    let currYear = new Date().getFullYear;
+    const currYear = new Date().getFullYear
 
     if (year < currYear - 1 || year > currYear + 1) {
       await ack({
-        response_action: "errors",
+        response_action: 'errors',
         errors: {
           [views.maintainHoursBlockDate]: `Du kannst nur Daten zwischen ${
             currYear - 1
-          } und ${currYear + 1} pflegen`,
-        },
-      });
-      return;
+          } und ${currYear + 1} pflegen`
+        }
+      })
+      return
     }
 
-    await ack();
+    await ack()
 
-    //build maintenance object
-    let obj = {
+    // build maintenance object
+    const obj = {
       slackId: body.user.id,
       title:
         body.view.state.values[views.maintainHoursBlockDescription][
@@ -389,27 +389,27 @@ function setupApp(app) {
         ].value,
       date: body.view.state.values[views.maintainHoursBlockDate][
         views.maintainHoursActionDate
-      ].selected_date,
-    };
+      ].selected_date
+    }
 
-    //register confirmation message
-    await client.chat.postMessage(await views.getMaintainConfirmDialog(obj));
+    // register confirmation message
+    await client.chat.postMessage(await views.getMaintainConfirmDialog(obj))
 
-    //notify user that process has started
-    await client.chat.postMessage(views.getUserMaintainStartMessage(obj));
-  });
+    // notify user that process has started
+    await client.chat.postMessage(views.getUserMaintainStartMessage(obj))
+  })
 
-  //******************** Events Submissions ********************//
-  app.event("team_join", async ({ event, client }) => {
-    if (event.user.is_bot) return;
+  //* ******************* Events Submissions ********************//
+  app.event('team_join', async ({ event, client }) => {
+    if (event.user.is_bot) return
 
     await client.chat.postMessage(
       await views.getAutoRegisterMessage(event.user.id)
-    );
-  });
+    )
+  })
 }
 
-//******************** Exports ********************//
+//* ******************* Exports ********************//
 module.exports = {
-  setupApp,
-};
+  setupApp
+}
