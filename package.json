@@ -4,23 +4,25 @@
     "description": "A basic template to spin up a Bolt app for Slack",
     "main": "app.js",
     "scripts": {
-      "start": "node app.js"
+        "start": "node app.js"
     },
     "dependencies": {
-      "@slack/bolt": "^3.8.0",
-      "googleapis": "^107.0.0"
+        "@slack/bolt": "^3.8.0",
+        "googleapis": "^107.0.0"
     },
     "engines": {
-      "node": "11.x"
+        "node": "11.x"
     },
     "repository": {
-      "url": "https://glitch.com/edit/#!/bolt-app-template"
+        "url": "https://glitch.com/edit/#!/bolt-app-template"
     },
     "license": "MIT",
     "keywords": [
-      "node",
-      "glitch",
-      "express"
-    ]
-  }
-  
+        "node",
+        "glitch",
+        "express"
+    ],
+    "devDependencies": {
+        "eslint": "^8.43.0"
+    }
+}
