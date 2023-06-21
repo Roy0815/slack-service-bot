@@ -4,7 +4,8 @@
     "description": "A basic template to spin up a Bolt app for Slack",
     "main": "app.js",
     "scripts": {
-        "start": "node app.js"
+        "start": "node app.js",
+        "lint": "eslint app.js helper/"
     },
     "dependencies": {
         "@slack/bolt": "^3.8.0",
