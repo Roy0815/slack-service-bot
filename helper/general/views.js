@@ -1,5 +1,5 @@
 // imports
-const apps = require('./apps')
+const apps = require('./apps');
 
 //* ******************* Views ********************//
 const homeView = {
@@ -17,28 +17,28 @@ const homeView = {
       }
     ]
   }
-}
+};
 
 const basicMessage = {
   channel: '',
   text: ''
-}
+};
 
 //* ******************* Functions ********************//
 function getHomeView ({ user }) {
-  const view = JSON.parse(JSON.stringify(homeView))
-  view.user_id = user
+  const view = JSON.parse(JSON.stringify(homeView));
+  view.user_id = user;
 
   // add homeviews of apps
   apps.views.forEach((element) => {
     view.view.blocks.push({
       type: 'divider'
-    })
+    });
 
-    view.view.blocks = view.view.blocks.concat(element.getHomeView())
-  })
+    view.view.blocks = view.view.blocks.concat(element.getHomeView());
+  });
 
-  return view
+  return view;
 }
 
 //* ******************* Export ********************//
@@ -46,4 +46,4 @@ module.exports = {
   getHomeView,
 
   basicMessage
-}
+};

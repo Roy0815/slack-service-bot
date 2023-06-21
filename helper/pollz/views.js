@@ -1,46 +1,46 @@
 // local references
-const util = require('../general/util')
+const util = require('../general/util');
 
 //* ******************* Constants ********************//
-const pollViewName = 'pollz-pollView'
+const pollViewName = 'pollz-pollView';
 
 // Creation Modal
-const questionBlockName = 'pollz-questionBlock'
-const questionInputAction = 'pollz-question_input-action'
+const questionBlockName = 'pollz-questionBlock';
+const questionInputAction = 'pollz-question_input-action';
 
-const typeSelectBlockName = 'pollz-typeSelectBlock'
-const typeSelectAction = 'pollz-type_select-action'
+const typeSelectBlockName = 'pollz-typeSelectBlock';
+const typeSelectAction = 'pollz-type_select-action';
 
-const conversationSelectBlockName = 'pollz-conversationSelectBlock'
-const conversationSelectAction = 'pollz-conversations_select-action'
+const conversationSelectBlockName = 'pollz-conversationSelectBlock';
+const conversationSelectAction = 'pollz-conversations_select-action';
 
-const optionsBlockName = 'pollz-optionsBlock'
-const optionsAction = 'pollz-options-action'
-const optionAddAllowed = 'addoptions'
-const optionMultipleSelect = 'multiplechoice'
-const optionAnonym = 'anon'
+const optionsBlockName = 'pollz-optionsBlock';
+const optionsAction = 'pollz-options-action';
+const optionAddAllowed = 'addoptions';
+const optionMultipleSelect = 'multiplechoice';
+const optionAnonym = 'anon';
 
-const newAnswerBlockName = 'pollz-newAnswerBlock'
-const newAnswerInputAction = 'pollz-newAnswerInput-action'
+const newAnswerBlockName = 'pollz-newAnswerBlock';
+const newAnswerInputAction = 'pollz-newAnswerInput-action';
 
-const addAnswerAction = 'pollz-add-answer'
-const deleteSingleAnswerAction = 'pollz-delete-single-answer'
-const deleteAllAnswerAction = 'pollz-delete-all-answers'
+const addAnswerAction = 'pollz-add-answer';
+const deleteSingleAnswerAction = 'pollz-delete-single-answer';
+const deleteAllAnswerAction = 'pollz-delete-all-answers';
 
 // Poll Message
-const messageAddAnswerAction = 'pollz-message-add-answer'
-const messageDeleteAnswersAction = 'pollz-message-delete-answers'
-const messageOverflowAction = 'pollz-message-overflow'
-const messageOverflowShow = 'show'
-const messageOverflowDelete = 'delete'
+const messageAddAnswerAction = 'pollz-message-add-answer';
+const messageDeleteAnswersAction = 'pollz-message-delete-answers';
+const messageOverflowAction = 'pollz-message-overflow';
+const messageOverflowShow = 'show';
+const messageOverflowDelete = 'delete';
 
-const addAnswerViewName = 'pollz-addAnswerView'
-const addAnswerViewTextInput = 'pollz-addAnswerViewTextInput'
+const addAnswerViewName = 'pollz-addAnswerView';
+const addAnswerViewTextInput = 'pollz-addAnswerViewTextInput';
 
-const voteButtonAction = 'pollz-vote'
+const voteButtonAction = 'pollz-vote';
 
 // home view
-const homeViewCommand = 'pollz-home-command'
+const homeViewCommand = 'pollz-home-command';
 
 //* ******************* Views ********************//
 const pollView = {
@@ -238,7 +238,7 @@ const pollView = {
       }
     ]
   }
-}
+};
 
 const answerView = {
   type: 'section',
@@ -257,7 +257,7 @@ const answerView = {
     value: '', // set in method
     action_id: deleteSingleAnswerAction
   }
-}
+};
 
 const pollMessage = {
   channel: '',
@@ -336,7 +336,7 @@ const pollMessage = {
       ]
     }
   ]
-}
+};
 
 const answerBlockMessage = {
   type: 'section',
@@ -354,7 +354,7 @@ const answerBlockMessage = {
     value: '', // set in method, contains answer number and peoples ids (split by -)
     action_id: voteButtonAction
   }
-}
+};
 
 const addAnswerView = {
   trigger_id: '', // set in method
@@ -394,7 +394,7 @@ const addAnswerView = {
       }
     ]
   }
-}
+};
 
 const resultBlockMessage = {
   type: 'context',
@@ -404,7 +404,7 @@ const resultBlockMessage = {
       text: 'Keine Stimmen' // set in method, contains result (count/people)
     }
   ]
-}
+};
 
 const homeView = [
   {
@@ -436,43 +436,43 @@ const homeView = [
       }
     ]
   }
-]
+];
 
 //* ******************* Functions ********************//
 function getPollsView ({ trigger_id, text }) {
-  const view = JSON.parse(JSON.stringify(pollView))
-  view.trigger_id = trigger_id
+  const view = JSON.parse(JSON.stringify(pollView));
+  view.trigger_id = trigger_id;
 
-  if (text != '') view.view.blocks[0].element.initial_value = text
+  if (text != '') view.view.blocks[0].element.initial_value = text;
 
-  return view
+  return view;
 }
 
 function addAnswer ({ id, hash, blocks, state }) {
-  const view = JSON.parse(JSON.stringify(pollView))
+  const view = JSON.parse(JSON.stringify(pollView));
 
-  view.view_id = id
-  view.hash = hash
+  view.view_id = id;
+  view.hash = hash;
 
-  view.view.blocks = blocks
+  view.view.blocks = blocks;
 
-  const newAnswerView = JSON.parse(JSON.stringify(answerView))
+  const newAnswerView = JSON.parse(JSON.stringify(answerView));
 
   newAnswerView.text.text =
-    state.values[newAnswerBlockName][newAnswerInputAction].value
+    state.values[newAnswerBlockName][newAnswerInputAction].value;
 
-  newAnswerView.accessory.value = `${view.view.blocks.length + 1}`
+  newAnswerView.accessory.value = `${view.view.blocks.length + 1}`;
 
-  view.view.blocks.push(newAnswerView)
+  view.view.blocks.push(newAnswerView);
 
-  return view
+  return view;
 }
 
 function deleteAnswer ({ id, hash, blocks }, { value }) {
-  const view = JSON.parse(JSON.stringify(pollView))
+  const view = JSON.parse(JSON.stringify(pollView));
 
-  view.view_id = id
-  view.hash = hash
+  view.view_id = id;
+  view.hash = hash;
 
   if (value == 'all') {
     // delete all
@@ -480,12 +480,12 @@ function deleteAnswer ({ id, hash, blocks }, { value }) {
       (block) =>
         !block.accessory ||
         block.accessory.action_id != deleteSingleAnswerAction
-    )
+    );
   } else {
     // delete selected
     view.view.blocks = blocks.filter(
       (block) => !block.accessory || block.accessory.value != value
-    )
+    );
 
     // adapt values
     view.view.blocks.forEach((block, index) => {
@@ -493,67 +493,67 @@ function deleteAnswer ({ id, hash, blocks }, { value }) {
         block.accessory &&
         block.accessory.action_id == deleteSingleAnswerAction
       ) {
-        block.accessory.value = `${index + 1}`
+        block.accessory.value = `${index + 1}`;
       }
-    })
+    });
   }
 
-  return view
+  return view;
 }
 
 function getPollMessage ({ user, view }) {
-  const retView = JSON.parse(JSON.stringify(pollMessage))
+  const retView = JSON.parse(JSON.stringify(pollMessage));
 
   // set question
   retView.text =
-    view.state.values[questionBlockName][questionInputAction].value
+    view.state.values[questionBlockName][questionInputAction].value;
 
   // set text in Message
-  retView.blocks[0].text.text = `Neue Umfrage von <@${user.id}>\n*${view.state.values[questionBlockName][questionInputAction].value}*`
+  retView.blocks[0].text.text = `Neue Umfrage von <@${user.id}>\n*${view.state.values[questionBlockName][questionInputAction].value}*`;
 
   // set channel
   retView.channel =
     view.state.values[conversationSelectBlockName][
       conversationSelectAction
-    ].selected_conversation
+    ].selected_conversation;
 
   // store admin in overflow button
-  retView.blocks[4].elements[2].options[0].value += `-${user.id}`
+  retView.blocks[4].elements[2].options[0].value += `-${user.id}`;
 
   // -- set options --//
   // anonymous
   let option = view.state.values[optionsBlockName][
     optionsAction
-  ].selected_options.find((option) => option.value == optionAnonym)
+  ].selected_options.find((option) => option.value == optionAnonym);
 
   if (option) {
     // set text
-    retView.blocks[1].elements[0].text = 'Anonym'
+    retView.blocks[1].elements[0].text = 'Anonym';
     // set value to store
-    retView.blocks[4].elements[1].value = optionAnonym
-  } else retView.blocks[1].elements[0].text = 'nicht Anonym'
+    retView.blocks[4].elements[1].value = optionAnonym;
+  } else retView.blocks[1].elements[0].text = 'nicht Anonym';
 
   // multiple select
   option = view.state.values[optionsBlockName][
     optionsAction
-  ].selected_options.find((option) => option.value == optionMultipleSelect)
+  ].selected_options.find((option) => option.value == optionMultipleSelect);
 
   if (option) {
     // set text
-    retView.blocks[1].elements[0].text += ', mehrere Antworten auswählbar'
+    retView.blocks[1].elements[0].text += ', mehrere Antworten auswählbar';
     // set value to store
-    retView.blocks[4].elements[1].value += optionMultipleSelect
-  } else retView.blocks[1].elements[0].text += ', eine Antwort auswählbar'
+    retView.blocks[4].elements[1].value += optionMultipleSelect;
+  } else retView.blocks[1].elements[0].text += ', eine Antwort auswählbar';
 
   // make sure value is not initial
-  if (retView.blocks[4].elements[1].value == '') { retView.blocks[4].elements[1].value = '_' }
+  if (retView.blocks[4].elements[1].value == '') { retView.blocks[4].elements[1].value = '_'; }
 
   // add answers
   option = view.state.values[optionsBlockName][
     optionsAction
-  ].selected_options.find((option) => option.value == optionAddAllowed)
+  ].selected_options.find((option) => option.value == optionAddAllowed);
 
-  if (!option) retView.blocks[4].elements.shift() // remove button if not selected
+  if (!option) retView.blocks[4].elements.shift(); // remove button if not selected
 
   // set answers
   view.blocks
@@ -562,69 +562,69 @@ function getPollMessage ({ user, view }) {
         block.accessory && block.accessory.action_id == deleteSingleAnswerAction
     )
     .forEach((element, index) => {
-      const answerView = JSON.parse(JSON.stringify(answerBlockMessage))
-      answerView.accessory.value = `${index}`
-      answerView.text.text = `*${element.text.text}*`
+      const answerView = JSON.parse(JSON.stringify(answerBlockMessage));
+      answerView.accessory.value = `${index}`;
+      answerView.text.text = `*${element.text.text}*`;
 
-      const resultView = JSON.parse(JSON.stringify(resultBlockMessage))
+      const resultView = JSON.parse(JSON.stringify(resultBlockMessage));
 
-      retView.blocks.splice(3 + index * 2, 0, answerView, resultView)
-    })
+      retView.blocks.splice(3 + index * 2, 0, answerView, resultView);
+    });
 
-  return retView
+  return retView;
 }
 
 function answerOptionsValid ({ view }) {
   const answers = view.blocks.filter(
     (block) =>
       block.accessory && block.accessory.action_id == deleteSingleAnswerAction
-  )
+  );
 
   if (answers.length === 0) {
     // check options
     const addAnswers = view.state.values[optionsBlockName][
       optionsAction
-    ].selected_options.filter((option) => option.value == optionAddAllowed)
+    ].selected_options.filter((option) => option.value == optionAddAllowed);
 
     // add Options not selected: error
     if (addAnswers.length === 0) {
-      return false
+      return false;
     }
   }
 
-  return true
+  return true;
 }
 
 // action = undefined means delete all answers of user
 function vote ({ message, user }, action) {
-  const view = JSON.parse(JSON.stringify(pollMessage))
+  const view = JSON.parse(JSON.stringify(pollMessage));
 
   // take over all information
-  view.text = message.text
-  view.blocks = message.blocks
+  view.text = message.text;
+  view.blocks = message.blocks;
 
   // get options from "delete my answers" button
   const options =
     view.blocks[view.blocks.length - 1].elements[
       view.blocks[view.blocks.length - 1].elements.length - 2
-    ].value
+    ].value;
 
   view.blocks.forEach((block, index) => {
-    if (!block.accessory || !/^\d*/.test(block.accessory.value)) return
+    if (!block.accessory || !/^\d*/.test(block.accessory.value)) return;
 
     // get users that already voted + remove answer number
-    const users = block.accessory.value.split('-')
-    users.shift()
+    const users = block.accessory.value.split('-');
+    users.shift();
 
     // see if user already voted
-    const indexUser = users.indexOf(user.id)
+    const indexUser = users.indexOf(user.id);
 
     // action is "delete all votes"
     if (!action) {
       // user didn't vote
-      if (indexUser == -1) return
+      if (indexUser == -1) return;
       // user did vote: remove
-      users.splice(indexUser, 1)
+      users.splice(indexUser, 1);
     }
 
     // action is "vote"
@@ -634,50 +634,50 @@ function vote ({ message, user }, action) {
       if (
         block.accessory.value != action.value &&
         options.includes(optionMultipleSelect)
-      ) { return }
+      ) { return; }
 
       // user has already voted: remove user
       // no matter if voted block or not
-      if (indexUser != -1) users.splice(indexUser, 1)
+      if (indexUser != -1) users.splice(indexUser, 1);
       // user didn't vote yet and it's voted block: add
-      else if (indexUser == -1 && block.accessory.value == action.value) { users.push(user.id) }
+      else if (indexUser == -1 && block.accessory.value == action.value) { users.push(user.id); }
     }
 
     // reset block
-    block.accessory.value = block.accessory.value.split('-')[0]
-    view.blocks[index + 1].elements[0].text = ''
+    block.accessory.value = block.accessory.value.split('-')[0];
+    view.blocks[index + 1].elements[0].text = '';
 
     users.forEach((user, idx) => {
       // fill value
-      block.accessory.value += `-${user}`
+      block.accessory.value += `-${user}`;
 
       // fill text only if not anonymous
-      if (options.includes(optionAnonym)) return // goes into next iteration
+      if (options.includes(optionAnonym)) return; // goes into next iteration
 
       view.blocks[index + 1].elements[0].text += `${
         idx != 0 ? ', ' : ''
-      }<@${user}>`
-    })
+      }<@${user}>`;
+    });
 
     // add total number of votes
-    if (users.length == 0) { view.blocks[index + 1].elements[0].text += 'Keine Stimmen' } else {
+    if (users.length == 0) { view.blocks[index + 1].elements[0].text += 'Keine Stimmen'; } else {
       view.blocks[index + 1].elements[0].text += `\n${users.length} ${
         users.length == 1 ? 'Stimme' : 'Stimmen'
-      }`
+      }`;
     }
-  })
+  });
 
-  return view
+  return view;
 }
 
 function getAddAnswerView ({ trigger_id, message, channel }) {
-  const view = JSON.parse(JSON.stringify(addAnswerView))
+  const view = JSON.parse(JSON.stringify(addAnswerView));
 
-  view.trigger_id = trigger_id
+  view.trigger_id = trigger_id;
 
-  view.view.private_metadata = `${channel.id}-${message.ts}`
+  view.view.private_metadata = `${channel.id}-${message.ts}`;
 
-  return view
+  return view;
 }
 
 function addAnswerMessage ({ private_metadata, state: { values } }, { blocks }) {
@@ -686,27 +686,27 @@ function addAnswerMessage ({ private_metadata, state: { values } }, { blocks }) 
     channel: private_metadata.split('-')[0],
     ts: private_metadata.split('-')[1],
     blocks
-  }
+  };
 
   // count current answers to get index
-  let idx = 0
+  let idx = 0;
   blocks.forEach((block) => {
-    if (block.accessory && /^\d*/.test(block.accessory.value)) idx += 1
-  })
+    if (block.accessory && /^\d*/.test(block.accessory.value)) idx += 1;
+  });
 
-  const answerView = JSON.parse(JSON.stringify(answerBlockMessage))
-  answerView.accessory.value = `${idx}`
-  answerView.text.text = `*${values[newAnswerBlockName][addAnswerViewTextInput].value}*`
+  const answerView = JSON.parse(JSON.stringify(answerBlockMessage));
+  answerView.accessory.value = `${idx}`;
+  answerView.text.text = `*${values[newAnswerBlockName][addAnswerViewTextInput].value}*`;
 
-  const resultView = JSON.parse(JSON.stringify(resultBlockMessage))
+  const resultView = JSON.parse(JSON.stringify(resultBlockMessage));
 
-  updateMessage.blocks.splice(blocks.length - 2, 0, answerView, resultView)
+  updateMessage.blocks.splice(blocks.length - 2, 0, answerView, resultView);
 
-  return updateMessage
+  return updateMessage;
 }
 
 function getHomeView () {
-  return JSON.parse(JSON.stringify(homeView))
+  return JSON.parse(JSON.stringify(homeView));
 }
 
 // exports
@@ -735,4 +735,4 @@ module.exports = {
   messageOverflowAction,
   messageOverflowDelete,
   addAnswerViewName
-}
+};

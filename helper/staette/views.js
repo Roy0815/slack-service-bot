@@ -1,18 +1,18 @@
 // imports
-const util = require('../general/util')
+const util = require('../general/util');
 
 // constants
-const whoIsThereInputBlockName = 'staette-whoIsThereBlock'
-const whoIsThereTimePickerName = 'staette-whoIsThereTimePicker'
+const whoIsThereInputBlockName = 'staette-whoIsThereBlock';
+const whoIsThereTimePickerName = 'staette-whoIsThereTimePicker';
 
-const messageOverflowAction = 'staette-overflow-action'
-const messageOverflowDelete = 'delete'
+const messageOverflowAction = 'staette-overflow-action';
+const messageOverflowDelete = 'delete';
 
-const sectionUsers = 5
+const sectionUsers = 5;
 
-const homeViewCommand = 'staette-home-command'
-const homeViewInputBlockId = 'staette-home-input-block'
-const homeViewDatePickerAction = 'staette-home-datepicker-action'
+const homeViewCommand = 'staette-home-command';
+const homeViewInputBlockId = 'staette-home-input-block';
+const homeViewDatePickerAction = 'staette-home-datepicker-action';
 
 //* ******************* Views ********************//
 const whoIsThereMessage = {
@@ -95,7 +95,7 @@ const whoIsThereMessage = {
       ]
     }
   ]
-}
+};
 
 const homeView = [
   {
@@ -137,55 +137,55 @@ const homeView = [
       }
     ]
   }
-]
+];
 
 //* ******************* Functions ********************//
 function getWhoIsThereMessage ({ user_id, text }) {
-  const view = JSON.parse(JSON.stringify(whoIsThereMessage))
+  const view = JSON.parse(JSON.stringify(whoIsThereMessage));
 
   // set admin in overflow button
-  view.blocks[3].elements[2].options[0].value += `-${user_id}`
+  view.blocks[3].elements[2].options[0].value += `-${user_id}`;
 
   // get day description
-  const day = text == `${util.formatDate(new Date())}` ? 'heute' : `am ${text}`
+  const day = text == `${util.formatDate(new Date())}` ? 'heute' : `am ${text}`;
 
   // set date
-  view.blocks[0].text.text = `\`${text}\``
+  view.blocks[0].text.text = `\`${text}\``;
 
   // set questions
   view.text =
-    view.blocks[1].text.text = `<@${user_id}> will wissen wer ${day} in der Stätte ist`
+    view.blocks[1].text.text = `<@${user_id}> will wissen wer ${day} in der Stätte ist`;
 
-  view.blocks[2].text.text = `Wann bist du ${day} da?`
+  view.blocks[2].text.text = `Wann bist du ${day} da?`;
 
-  return view
+  return view;
 }
 
 function updateWhoIsThereMessage ({ user, time, xdelete }, { text, blocks }) {
-  const view = JSON.parse(JSON.stringify(whoIsThereMessage))
-  const users = []
+  const view = JSON.parse(JSON.stringify(whoIsThereMessage));
+  const users = [];
 
-  view.blocks = blocks
-  view.text = text
+  view.blocks = blocks;
+  view.text = text;
 
   if (view.blocks[sectionUsers]) {
     // get user list
     view.blocks[sectionUsers].text.text.split('\n').forEach((element) => {
-      const userArr = element.split('\t')
+      const userArr = element.split('\t');
       users.push({
         time: userArr[0],
         user: userArr[1]
-      })
-    })
+      });
+    });
 
     // get index of user
-    const index = users.findIndex((element) => element.user == `<@${user}>`)
+    const index = users.findIndex((element) => element.user == `<@${user}>`);
 
     // remove old element of user
-    if (index != -1) users.splice(index, 1)
+    if (index != -1) users.splice(index, 1);
 
     // reset text
-    view.blocks[sectionUsers].text.text = ''
+    view.blocks[sectionUsers].text.text = '';
   }
 
   // no time = delete: return view now
@@ -193,24 +193,24 @@ function updateWhoIsThereMessage ({ user, time, xdelete }, { text, blocks }) {
     users.forEach((element, index) => {
       view.blocks[sectionUsers].text.text = `${
         view.blocks[sectionUsers].text.text
-      }${index > 0 ? '\n' : ''}${element.time}\t${element.user}`
-    })
+      }${index > 0 ? '\n' : ''}${element.time}\t${element.user}`;
+    });
 
     // if empty, delete section(s)
-    if (users.length == 0 && view.blocks[sectionUsers]) { view.blocks.splice(sectionUsers - 1, 3) }
+    if (users.length == 0 && view.blocks[sectionUsers]) { view.blocks.splice(sectionUsers - 1, 3); }
 
-    return view
+    return view;
   }
 
   // add user
-  users.push({ user: `<@${user}>`, time })
+  users.push({ user: `<@${user}>`, time });
 
   // sort times
   users.sort((a, b) => {
-    if (a.time > b.time) return 1
-    if (a.time < b.time) return -1
-    return 0
-  })
+    if (a.time > b.time) return 1;
+    if (a.time < b.time) return -1;
+    return 0;
+  });
 
   // build view (replace old blocks)
   view.blocks.splice(
@@ -232,19 +232,19 @@ function updateWhoIsThereMessage ({ user, time, xdelete }, { text, blocks }) {
     {
       type: 'divider'
     }
-  )
+  );
 
   users.forEach((element, index) => {
     view.blocks[sectionUsers].text.text = `${
       view.blocks[sectionUsers].text.text
-    }${index > 0 ? '\n' : ''}${element.time}\t${element.user}`
-  })
+    }${index > 0 ? '\n' : ''}${element.time}\t${element.user}`;
+  });
 
-  return view
+  return view;
 }
 
 function getHomeView () {
-  return JSON.parse(JSON.stringify(homeView))
+  return JSON.parse(JSON.stringify(homeView));
 }
 
 // exports
@@ -261,4 +261,4 @@ module.exports = {
   whoIsThereTimePickerName,
   messageOverflowAction,
   messageOverflowDelete
-}
+};

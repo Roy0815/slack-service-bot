@@ -1,18 +1,18 @@
 // References
-const functions = require('./functions')
-const { App } = require('@slack/bolt')
-const util = require('../general/util')
+const functions = require('./functions');
+const { App } = require('@slack/bolt');
+const util = require('../general/util');
 
 // Create Bolt App
 const app = new App({
   token: process.env.SLACK_BOT_TOKEN,
   signingSecret: process.env.SLACK_SIGNING_SECRET
-})
+});
 
 // cleanup old messages
 functions.cleanup(app).then((result) => {
   // log job execution
-  if (!process.env.CRONJOB_LOG_TO_ADMIN) return
+  if (!process.env.CRONJOB_LOG_TO_ADMIN) return;
 
   app.client.files.upload({
     token: process.env.SLACK_BOT_TOKEN,
@@ -25,5 +25,5 @@ functions.cleanup(app).then((result) => {
     }`,
     title: 'Messages',
     content: JSON.stringify(result.messages, null, '\t')
-  })
-})
+  });
+});

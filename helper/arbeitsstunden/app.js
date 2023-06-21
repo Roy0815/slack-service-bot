@@ -1,6 +1,6 @@
-const views = require('./views')
-const sheet = require('./sheet')
-const util = require('../general/util')
+const views = require('./views');
+const sheet = require('./sheet');
+const util = require('../general/util');
 
 function setupApp (app) {
   //* ******************* Commands ********************//
@@ -8,22 +8,22 @@ function setupApp (app) {
   app.command(
     '/arbeitsstunden_anzeigen',
     async ({ ack, command, respond, client }) => {
-      await ack()
+      await ack();
 
       // see if user wanted details
-      const details = command.text.includes('details')
+      const details = command.text.includes('details');
 
       // remove everything but numbers
-      command.text = command.text.replace(/\D/g, '')
+      command.text = command.text.replace(/\D/g, '');
 
       // if year was filled, validate
       if (command.text != '') {
-        const currYear = new Date().getFullYear()
+        const currYear = new Date().getFullYear();
         if (command.text < 2022 || command.text > currYear) {
           await respond(
             `Bitte ein Jahr zwischen 2022 und ${currYear} eingeben`
-          )
-          return
+          );
+          return;
         }
       }
 
@@ -31,14 +31,14 @@ function setupApp (app) {
         id: command.user_id,
         year: command.text,
         details
-      })
+      });
 
       // not registered: start dialog
       if (hoursObj == undefined) {
         await client.views.open(
           await views.getRegisterView(command.trigger_id)
-        )
-        return
+        );
+        return;
       }
 
       // if registered, display
@@ -58,7 +58,7 @@ function setupApp (app) {
             }
           }
         ]
-      }
+      };
 
       if (hoursObj.details.length > 0) {
         response.blocks.push(
@@ -75,7 +75,7 @@ function setupApp (app) {
           {
             type: 'divider'
           }
-        )
+        );
 
         hoursObj.details.forEach((element) => {
           response.blocks.push({
@@ -84,57 +84,57 @@ function setupApp (app) {
               type: 'mrkdwn',
               text: `*${element.date}*\t${element.hours}\t\t\t\t_${element.description}_`
             }
-          })
-        })
+          });
+        });
       }
 
-      respond(response)
+      respond(response);
     }
-  )
+  );
 
   // Maintain hours
   app.command('/arbeitsstunden_erfassen', async ({ ack, command, client }) => {
-    await ack()
+    await ack();
 
     // check user is registered
     if (
       (await sheet.getHoursFromSlackId({ id: command.user_id })) == undefined
     ) {
       // not registered: start dialog
-      await client.views.open(await views.getRegisterView(command.trigger_id))
-      return
+      await client.views.open(await views.getRegisterView(command.trigger_id));
+      return;
     }
 
     // registered: start maintenance dialog
     await client.views.open(
       await views.getMaintainHoursView(command.trigger_id)
-    )
-  })
+    );
+  });
 
   //* ******************* Actions ********************//
   app.action(views.homeViewDisplayHours, async ({ ack, client, body }) => {
-    await ack()
+    await ack();
 
     const year =
       body.view.state.values[views.homeViewInputBlockId][
         views.homeViewYearSelect
-      ].selected_option.value
+      ].selected_option.value;
 
     const details =
       body.view.state.values[views.homeViewInputBlockId][
         views.homeViewDetailsSelect
-      ].selected_options.length > 0
+      ].selected_options.length > 0;
 
     const hoursObj = await sheet.getHoursFromSlackId({
       id: body.user.id,
       year,
       details
-    })
+    });
 
     // not registered: start dialog
     if (hoursObj == undefined) {
-      await client.views.open(await views.getRegisterView(body.trigger_id))
-      return
+      await client.views.open(await views.getRegisterView(body.trigger_id));
+      return;
     }
 
     // build message
@@ -149,7 +149,7 @@ function setupApp (app) {
           }
         }
       ]
-    }
+    };
 
     if (hoursObj.details.length > 0) {
       message.blocks.push(
@@ -166,7 +166,7 @@ function setupApp (app) {
         {
           type: 'divider'
         }
-      )
+      );
 
       hoursObj.details.forEach((element) => {
         message.blocks.push({
@@ -175,41 +175,41 @@ function setupApp (app) {
             type: 'mrkdwn',
             text: `*${element.date}*\t${element.hours}\t\t\t\t_${element.description}_`
           }
-        })
-      })
+        });
+      });
     }
 
-    await client.chat.postMessage(message)
-  })
+    await client.chat.postMessage(message);
+  });
 
   app.action(views.homeViewMaintainHours, async ({ ack, client, body }) => {
-    await ack()
+    await ack();
 
     // check user is registered
     if ((await sheet.getHoursFromSlackId({ id: body.user.id })) == undefined) {
       // not registered: start dialog
-      await client.views.open(await views.getRegisterView(body.trigger_id))
-      return
+      await client.views.open(await views.getRegisterView(body.trigger_id));
+      return;
     }
 
     // registered: start maintenance dialog
-    await client.views.open(await views.getMaintainHoursView(body.trigger_id))
-  })
+    await client.views.open(await views.getMaintainHoursView(body.trigger_id));
+  });
 
   // handle buttons in Registration approval
   app.action(
     new RegExp('^register-(approve)*(reject)*-button$'),
     async ({ ack, action, client, respond, body }) => {
-      await ack()
+      await ack();
 
       // { id, slackId, name, approved }
-      const registerObj = JSON.parse(action.value)
-      registerObj.approved = action.action_id.split('-')[1] == 'approve'
+      const registerObj = JSON.parse(action.value);
+      registerObj.approved = action.action_id.split('-')[1] == 'approve';
 
       // notify requestor
       await client.chat.postMessage(
         views.getUserRegisterEndMessage(registerObj)
-      )
+      );
 
       // edit approval message to show final result
       await respond(
@@ -218,34 +218,34 @@ function setupApp (app) {
         )} Uhr am ${util.formatDate(new Date())} ${
           registerObj.approved ? 'freigegeben' : 'abgelehnt'
         }:\n<@${registerObj.slackId}> => ${registerObj.name}`
-      )
+      );
 
-      if (!registerObj.approved) return
+      if (!registerObj.approved) return;
       // update data in sheet
-      sheet.saveSlackId(registerObj)
+      sheet.saveSlackId(registerObj);
     }
-  )
+  );
 
   // admin registration
   app.action(
     'auto-register-submit-button',
     async ({ ack, respond, body, action }) => {
-      await ack()
+      await ack();
 
       const selOpt =
         body.state.values[views.autoregisterInputBlock][
           views.registerActionNameSelect
-        ].selected_option
+        ].selected_option;
 
       if (selOpt === null) {
-        return
+        return;
       }
 
       console.log(
         body.state.values[views.autoregisterInputBlock][
           views.registerActionNameSelect
         ].selected_option
-      )
+      );
 
       // edit approval message to show final result
       await respond(
@@ -254,32 +254,32 @@ function setupApp (app) {
         )} Uhr am ${util.formatDate(new Date())} vorgenommen:\n<@${
           action.value
         }> => ${selOpt.text.text}`
-      )
+      );
 
       // update data in sheet
-      sheet.saveSlackId({ id: selOpt.value, slackId: action.value })
+      sheet.saveSlackId({ id: selOpt.value, slackId: action.value });
     }
-  )
+  );
 
   // handle buttons in maintenance approval
   app.action(
     new RegExp('^maintain-(approve)*(reject)*-button$'),
     async ({ ack, action, client, respond, body }) => {
-      await ack()
+      await ack();
 
       // { slackId, title, hours, date }
-      const maintObj = JSON.parse(action.value)
-      maintObj.approved = action.action_id.split('-')[1] == 'approve'
+      const maintObj = JSON.parse(action.value);
+      maintObj.approved = action.action_id.split('-')[1] == 'approve';
 
       // notify requestor
-      await client.chat.postMessage(views.getUserMaintainEndMessage(maintObj))
+      await client.chat.postMessage(views.getUserMaintainEndMessage(maintObj));
 
       // edit approval message to show final result
       const date = new Date(
         maintObj.date.split('-')[0],
         maintObj.date.split('-')[1] - 1,
         maintObj.date.split('-')[2]
-      )
+      );
 
       await respond(
         `<@${body.user.id}> hat folgende Stunden um ${util.formatTime(
@@ -291,25 +291,25 @@ function setupApp (app) {
         }" - ${maintObj.hours} Stunde${
           maintObj.hours == 1 ? '' : 'n'
         } am ${util.formatDate(date)}.`
-      )
+      );
 
-      if (!maintObj.approved) return
+      if (!maintObj.approved) return;
 
       // update data in sheet
-      await sheet.saveHours(maintObj)
+      await sheet.saveHours(maintObj);
     }
-  )
+  );
 
   //* ******************* Options ********************//
   app.options(views.registerActionNameSelect, async ({ ack, options }) => {
-    const users = await sheet.getAllUsers()
+    const users = await sheet.getAllUsers();
 
     if (!users) {
-      await ack()
-      return
+      await ack();
+      return;
     }
 
-    const userOptions = []
+    const userOptions = [];
 
     users
       .filter((element) =>
@@ -322,17 +322,17 @@ function setupApp (app) {
             text: user.name
           },
           value: user.id
-        })
-      })
+        });
+      });
 
     await ack({
       options: userOptions
-    })
-  })
+    });
+  });
 
   //* ******************* View Submissions ********************//
   app.view(views.registerViewName, async ({ body, ack, client }) => {
-    await ack()
+    await ack();
 
     // register object
     const obj = {
@@ -345,22 +345,22 @@ function setupApp (app) {
       name: body.view.state.values[views.registerBlockNameSelect][
         views.registerActionNameSelect
       ].selected_option.text.text
-    }
+    };
 
     // register confirmation message
-    await client.chat.postMessage(await views.getRegisterConfirmDialog(obj))
+    await client.chat.postMessage(await views.getRegisterConfirmDialog(obj));
 
     // notify user that process has started
-    await client.chat.postMessage(views.getUserRegisterStartMessage(obj))
-  })
+    await client.chat.postMessage(views.getUserRegisterStartMessage(obj));
+  });
 
   app.view(views.maintainHoursViewName, async ({ body, ack, client }) => {
     const year =
       body.view.state.values[views.maintainHoursBlockDate][
         views.maintainHoursActionDate
-      ].selected_date.split('-')[0]
+      ].selected_date.split('-')[0];
 
-    const currYear = new Date().getFullYear
+    const currYear = new Date().getFullYear;
 
     if (year < currYear - 1 || year > currYear + 1) {
       await ack({
@@ -370,11 +370,11 @@ function setupApp (app) {
             currYear - 1
           } und ${currYear + 1} pflegen`
         }
-      })
-      return
+      });
+      return;
     }
 
-    await ack()
+    await ack();
 
     // build maintenance object
     const obj = {
@@ -390,26 +390,26 @@ function setupApp (app) {
       date: body.view.state.values[views.maintainHoursBlockDate][
         views.maintainHoursActionDate
       ].selected_date
-    }
+    };
 
     // register confirmation message
-    await client.chat.postMessage(await views.getMaintainConfirmDialog(obj))
+    await client.chat.postMessage(await views.getMaintainConfirmDialog(obj));
 
     // notify user that process has started
-    await client.chat.postMessage(views.getUserMaintainStartMessage(obj))
-  })
+    await client.chat.postMessage(views.getUserMaintainStartMessage(obj));
+  });
 
   //* ******************* Events Submissions ********************//
   app.event('team_join', async ({ event, client }) => {
-    if (event.user.is_bot) return
+    if (event.user.is_bot) return;
 
     await client.chat.postMessage(
       await views.getAutoRegisterMessage(event.user.id)
-    )
-  })
+    );
+  });
 }
 
 //* ******************* Exports ********************//
 module.exports = {
   setupApp
-}
+};
