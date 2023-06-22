@@ -22,6 +22,7 @@ app.event('app_home_opened', async ({ event, client }) => {
 });
 
 // handle remaining actions
+// eslint-disable-next-line prefer-regex-literals
 app.action(new RegExp('.*'), async ({ ack }) => {
   try {
     await ack();
@@ -31,8 +32,8 @@ app.action(new RegExp('.*'), async ({ ack }) => {
 //* ******************* Error notifies Admin ********************//
 app.error(async ({ error, context, body }) => {
   // catch server reponse time: notify user
-  if (body.command && error.data.error == 'expired_trigger_id') {
-    await client.chat.postMessage({
+  if (body.command && error.data.error === 'expired_trigger_id') {
+    await app.client.chat.postMessage({
       channel: body.user_id,
       text: `Deine Aktion ${body.command} konnte leider vom Server nicht rechtzeitig verarbeitet werden. Bitte versuche es einfach nochmal. Sorry für die Umstände!`
     });
