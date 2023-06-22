@@ -1,76 +1,76 @@
-const { google } = require("googleapis");
+const { google } = require('googleapis');
 
-//******************** Private functions ********************//
-async function auth() {
+//* ******************* Private functions ********************//
+async function auth () {
   const auth = await google.auth.getClient({
-    scopes: ["https://www.googleapis.com/auth/spreadsheets"],
+    scopes: ['https://www.googleapis.com/auth/spreadsheets']
   });
-  return google.sheets({ version: "v4", auth });
+  return google.sheets({ version: 'v4', auth });
 }
 
-//******************** Public functions ********************//
+//* ******************* Public functions ********************//
 // gets an array of all cells
-async function getCells(sheet) {
+async function getCells (sheet) {
   const sheets = await auth();
   const request = {
     spreadsheetId: process.env.SHEET_ID,
-    range: sheet,
+    range: sheet
   };
 
   return (await sheets.spreadsheets.values.get(request)).data.values;
 }
 
-async function updateCell({ range, value }) {
+async function updateCell ({ range, value }) {
   const sheets = await auth();
 
-  //Value needs to be an array holding arrays with 1 value each
+  // Value needs to be an array holding arrays with 1 value each
   const request = {
     spreadsheetId: process.env.SHEET_ID,
-    range: range,
-    valueInputOption: "USER_ENTERED",
-    resource: { range: range, values: value },
+    range,
+    valueInputOption: 'USER_ENTERED',
+    resource: { range, values: value }
   };
 
   await sheets.spreadsheets.values.update(request);
 }
 
-async function clearCell({ range }) {
+async function clearCell ({ range }) {
   const sheets = await auth();
 
   const request = {
     spreadsheetId: process.env.SHEET_ID,
-    range: range,
+    range
   };
 
   await sheets.spreadsheets.values.clear(request);
 }
 
-async function appendRow({ range, values }) {
+async function appendRow ({ range, values }) {
   const sheets = await auth();
 
-  //Value needs to be an array holding arrays with 1 value each
+  // Value needs to be an array holding arrays with 1 value each
   const request = {
     spreadsheetId: process.env.SHEET_ID,
-    range: range,
-    valueInputOption: "USER_ENTERED",
-    resource: { range: range, values: values, majorDimension: "COLUMNS" },
+    range,
+    valueInputOption: 'USER_ENTERED',
+    resource: { range, values, majorDimension: 'COLUMNS' }
   };
 
   await sheets.spreadsheets.values.append(request);
 }
 
 // gets the sheets in a spreadsheet
-async function getSheets() {
+async function getSheets () {
   const sheets = await auth();
   const request = {
-    spreadsheetId: process.env.SHEET_ID,
+    spreadsheetId: process.env.SHEET_ID
   };
   const response = (await sheets.spreadsheets.get(request)).data.sheets;
   return response;
 }
 
 // creates a copy of a sheet
-async function copySheet(sheetName) {
+async function copySheet (sheetName) {
   const sheets = await auth();
   const sheetID = await getSheetID(sheetName);
   const request = {
@@ -78,23 +78,23 @@ async function copySheet(sheetName) {
     sheetId: sheetID,
     resource: {
       // The ID of the spreadsheet to copy the sheet to.
-      destinationSpreadsheetId: process.env.SHEET_ID,
-    },
+      destinationSpreadsheetId: process.env.SHEET_ID
+    }
   };
 
-  //return new name
+  // return new name
   return (await sheets.spreadsheets.sheets.copyTo(request)).data.title;
 }
 
 // returns sheetID
-async function getSheetID(sheetName) {
+async function getSheetID (sheetName) {
   const sheetArray = await getSheets();
   const sheet = await sheetArray.find((s) => s.properties.title == sheetName);
   return sheet.properties.sheetId;
 }
 
 // renames a sheet
-async function renameSheet(oldName, newName) {
+async function renameSheet (oldName, newName) {
   const sheets = await auth();
   const sheetID = await getSheetID(oldName);
 
@@ -103,10 +103,10 @@ async function renameSheet(oldName, newName) {
     updateSheetProperties: {
       properties: {
         sheetId: sheetID,
-        title: newName,
+        title: newName
       },
-      fields: "title",
-    },
+      fields: 'title'
+    }
   });
 
   const spreadsheetId = process.env.SHEET_ID;
@@ -114,11 +114,11 @@ async function renameSheet(oldName, newName) {
 
   await sheets.spreadsheets.batchUpdate({
     spreadsheetId,
-    resource: batchUpdateRequest,
+    resource: batchUpdateRequest
   });
 }
 
-//******************** Exports ********************//
+//* ******************* Exports ********************//
 module.exports = {
   getCells,
   updateCell,
@@ -127,5 +127,5 @@ module.exports = {
   getSheets,
   copySheet,
   getSheetID,
-  renameSheet,
+  renameSheet
 };

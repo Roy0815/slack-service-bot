@@ -1,38 +1,38 @@
-//imports
-const apps = require("./apps");
+// imports
+const apps = require('./apps');
 
-//******************** Views ********************//
+//* ******************* Views ********************//
 const homeView = {
   // Use the user ID associated with the event
-  user_id: "",
+  user_id: '',
   view: {
-    type: "home",
+    type: 'home',
     blocks: [
       {
-        type: "section",
+        type: 'section',
         text: {
-          type: "mrkdwn",
-          text: "Hallo 👋 Ich bin der Schwerathletik Mannheim Service-Bot.\nIch habe viele nützliche Funktionen:",
-        },
-      },
-    ],
-  },
+          type: 'mrkdwn',
+          text: 'Hallo 👋 Ich bin der Schwerathletik Mannheim Service-Bot.\nIch habe viele nützliche Funktionen:'
+        }
+      }
+    ]
+  }
 };
 
 const basicMessage = {
-  channel: "",
-  text: "",
+  channel: '',
+  text: ''
 };
 
-//******************** Functions ********************//
-function getHomeView({ user }) {
-  let view = JSON.parse(JSON.stringify(homeView));
+//* ******************* Functions ********************//
+function getHomeView ({ user }) {
+  const view = JSON.parse(JSON.stringify(homeView));
   view.user_id = user;
 
-  //add homeviews of apps
+  // add homeviews of apps
   apps.views.forEach((element) => {
     view.view.blocks.push({
-      type: "divider",
+      type: 'divider'
     });
 
     view.view.blocks = view.view.blocks.concat(element.getHomeView());
@@ -41,9 +41,9 @@ function getHomeView({ user }) {
   return view;
 }
 
-//******************** Export ********************//
+//* ******************* Export ********************//
 module.exports = {
   getHomeView,
 
-  basicMessage,
+  basicMessage
 };

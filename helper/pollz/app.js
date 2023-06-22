@@ -1,22 +1,22 @@
-//imports
-const views = require("./views");
+// imports
+const views = require('./views');
 
-function setupApp(app) {
-  //******************** Commands ********************//
-  app.command(`/umfrage`, async ({ command, ack, client }) => {
+function setupApp (app) {
+  //* ******************* Commands ********************//
+  app.command('/umfrage', async ({ command, ack, client }) => {
     await ack();
 
-    //open modal
+    // open modal
     await client.views.open(views.getPollsView(command));
   });
 
-  //******************** Actions ********************//
+  //* ******************* Actions ********************//
   app.action(views.homeViewCommand, async ({ ack, client, body }) => {
     await ack();
 
-    //open modal
+    // open modal
     await client.views.open(
-      views.getPollsView({ trigger_id: body.trigger_id, text: "" })
+      views.getPollsView({ trigger_id: body.trigger_id, text: '' })
     );
   });
 
@@ -27,8 +27,7 @@ function setupApp(app) {
       body.view.state.values[views.newAnswerBlockName][
         views.newAnswerInputAction
       ].value == null
-    )
-      return;
+    ) { return; }
 
     await client.views.update(views.addAnswer(body.view));
   });
@@ -66,15 +65,15 @@ function setupApp(app) {
 
       if (
         !action.selected_option ||
-        action.selected_option.value.split("-")[0] !=
+        action.selected_option.value.split('-')[0] !=
           views.messageOverflowDelete ||
-        action.selected_option.value.split("-")[1] != body.user.id
+        action.selected_option.value.split('-')[1] != body.user.id
       ) {
         await client.chat.postEphemeral({
           token: process.env.SLACK_BOT_TOKEN,
           channel: body.channel.id,
-          text: "Du bist nicht der Fragesteller",
-          user: body.user.id,
+          text: 'Du bist nicht der Fragesteller',
+          user: body.user.id
         });
         return;
       }
@@ -89,43 +88,43 @@ function setupApp(app) {
     client.views.open(views.getAddAnswerView(body));
   });
 
-  //******************** View Submissions ********************//
+  //* ******************* View Submissions ********************//
   app.view(views.pollViewName, async ({ body, ack, client }) => {
-    //check if answers exist if no adding is allowed
+    // check if answers exist if no adding is allowed
     if (!views.answerOptionsValid(body)) {
       await ack({
-        response_action: "errors",
+        response_action: 'errors',
         errors: {
           [views.newAnswerBlockName]:
-            "Bitte Antwortmöglichkeiten eingeben oder hinzufügen erlauben",
-        },
+            'Bitte Antwortmöglichkeiten eingeben oder hinzufügen erlauben'
+        }
       });
       return;
     }
 
     await ack();
 
-    //send poll
+    // send poll
     await client.chat.postMessage(views.getPollMessage(body));
   });
 
   app.view(views.addAnswerViewName, async ({ view, ack, client }) => {
     await ack();
 
-    //get source message
-    let result = await client.conversations.history({
+    // get source message
+    const result = await client.conversations.history({
       token: process.env.SLACK_BOT_TOKEN,
-      channel: view.private_metadata.split("-")[0],
-      latest: view.private_metadata.split("-")[1],
+      channel: view.private_metadata.split('-')[0],
+      latest: view.private_metadata.split('-')[1],
       inclusive: true,
-      limit: 1,
+      limit: 1
     });
 
     await client.chat.update(views.addAnswerMessage(view, result.messages[0]));
   });
 }
 
-//******************** Exports ********************//
+//* ******************* Exports ********************//
 module.exports = {
-  setupApp,
+  setupApp
 };

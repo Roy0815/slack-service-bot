@@ -1,31 +1,31 @@
-//imports
-const util = require("../general/util");
-const views = require("./views");
-const functions = require("./functions");
+// imports
+const util = require('../general/util');
+const views = require('./views');
+const functions = require('./functions');
 
-function setupApp(app) {
-  //******************** Commands ********************//
-  app.command(`/weristda`, async ({ command, ack, client, respond }) => {
+function setupApp (app) {
+  //* ******************* Commands ********************//
+  app.command('/weristda', async ({ command, ack, client, respond }) => {
     await ack();
 
-    //Datum validieren falls eingegeben
-    if (command.text == "") command.text = util.formatDate(new Date());
+    // Datum validieren falls eingegeben
+    if (command.text == '') command.text = util.formatDate(new Date());
     else {
-      let dateArr = command.text.split(".");
+      const dateArr = command.text.split('.');
 
-      let date = new Date(dateArr[2], dateArr[1] - 1, dateArr[0]);
+      const date = new Date(dateArr[2], dateArr[1] - 1, dateArr[0]);
 
       if (
         dateArr.length != 3 ||
         date.getFullYear() == NaN ||
         !/^[0-3]\d\.[0-1]\d\.20[2-9]\d$/.test(command.text)
       ) {
-        respond("Bitte ein gültiges Datum im Format DD.MM.YYYY eingeben");
+        respond('Bitte ein gültiges Datum im Format DD.MM.YYYY eingeben');
         return;
       }
 
       if (date < new Date()) {
-        respond("Bitte ein Datum >= heute angeben");
+        respond('Bitte ein Datum >= heute angeben');
         return;
       }
     }
@@ -40,7 +40,7 @@ function setupApp(app) {
     await functions.sortMessages({ client, date: command.text });
   });
 
-  //******************** Actions ********************//
+  //* ******************* Actions ********************//
   app.action(views.homeViewCommand, async ({ ack, body, client }) => {
     await ack();
 
@@ -51,9 +51,9 @@ function setupApp(app) {
 
     if (date != null) {
       date = new Date(
-        date.split("-")[0],
-        date.split("-")[1] - 1,
-        date.split("-")[2]
+        date.split('-')[0],
+        date.split('-')[1] - 1,
+        date.split('-')[2]
       );
 
       if (date < new Date()) {
@@ -61,7 +61,7 @@ function setupApp(app) {
           channel: body.user.id,
           text: `*Stätte Abfrage*\nDatum ${util.formatDate(
             date
-          )} liegt in der Vergangenheit. Bitte ein Datum >= heute angeben`,
+          )} liegt in der Vergangenheit. Bitte ein Datum >= heute angeben`
         });
         return;
       }
@@ -72,7 +72,7 @@ function setupApp(app) {
     if (!(await functions.dateIsUnique({ client, date }))) {
       client.chat.postMessage({
         channel: body.user.id,
-        text: `*Stätte Abfrage*\nFür das Datum ${date} existiert bereits eine Abfrage`,
+        text: `*Stätte Abfrage*\nFür das Datum ${date} existiert bereits eine Abfrage`
       });
       return;
     }
@@ -85,7 +85,7 @@ function setupApp(app) {
   });
 
   app.action(
-    new RegExp(`staette-whoisthere-(update)*(delete)*`),
+    new RegExp('staette-whoisthere-(update)*(delete)*'),
     async ({ ack, action, respond, body }) => {
       await ack();
       await respond(
@@ -95,7 +95,7 @@ function setupApp(app) {
             time: body.state.values[views.whoIsThereInputBlockName][
               views.whoIsThereTimePickerName
             ].selected_time,
-            xdelete: action.value == "delete" ? true : false,
+            xdelete: action.value == 'delete'
           },
           body.message
         )
@@ -110,15 +110,15 @@ function setupApp(app) {
 
       if (
         !action.selected_option ||
-        action.selected_option.value.split("-")[0] !=
+        action.selected_option.value.split('-')[0] !=
           views.messageOverflowDelete ||
-        action.selected_option.value.split("-")[1] != body.user.id
+        action.selected_option.value.split('-')[1] != body.user.id
       ) {
         await client.chat.postEphemeral({
           token: process.env.SLACK_BOT_TOKEN,
           channel: body.channel.id,
-          text: "Du bist nicht der Fragesteller",
-          user: body.user.id,
+          text: 'Du bist nicht der Fragesteller',
+          user: body.user.id
         });
         return;
       }
@@ -128,7 +128,7 @@ function setupApp(app) {
   );
 }
 
-//******************** Exports ********************//
+//* ******************* Exports ********************//
 module.exports = {
-  setupApp,
+  setupApp
 };
