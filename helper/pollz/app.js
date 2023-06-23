@@ -65,9 +65,9 @@ function setupApp (app) {
 
       if (
         !action.selected_option ||
-        action.selected_option.value.split('-')[0] !=
+        action.selected_option.value.split('-')[0] !==
           views.messageOverflowDelete ||
-        action.selected_option.value.split('-')[1] != body.user.id
+        action.selected_option.value.split('-')[1] !== body.user.id
       ) {
         await client.chat.postEphemeral({
           token: process.env.SLACK_BOT_TOKEN,

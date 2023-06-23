@@ -23,7 +23,7 @@ const adminChannelColumn = 15;
 //* ******************* Private functions ********************//
 async function getUserFromSlackId (id) {
   const data = await sheet.getCells(sheetAllgDaten);
-  return data.find((element) => element[slackIdColumn - 1] == id);
+  return data.find((element) => element[slackIdColumn - 1] === id);
 }
 
 async function copySheetToNewYear (nameBase, year) {
@@ -40,7 +40,7 @@ async function copySheetToNewYear (nameBase, year) {
 
   await sheet.renameSheet(copiedName, newName);
 
-  if (nameBase == sheetStundenSumme) {
+  if (nameBase === sheetStundenSumme) {
     sheet.updateCell({
       range: `'${newName}'!${general.convertNumberToColumn(yearColumn)}1`,
       value: [[currYear]]
@@ -48,7 +48,7 @@ async function copySheetToNewYear (nameBase, year) {
     return;
   }
 
-  if (nameBase == sheetStunden) {
+  if (nameBase === sheetStunden) {
     // clear function
     sheet.clearCell({
       range: `'${newName}'!$A2:D`
@@ -78,9 +78,9 @@ function getSheetNameYear (name, year) {
 
 async function getHoursFromSlackId ({ id, year, details }) {
   const user = await getUserFromSlackId(id);
-  if (user == undefined) return undefined;
+  if (user === undefined) return undefined;
 
-  if (year == undefined || year == '') year = new Date().getFullYear();
+  if (year === undefined || year === '') year = new Date().getFullYear();
 
   await checkYearSheetsExists(year);
 
@@ -102,7 +102,7 @@ async function getHoursFromSlackId ({ id, year, details }) {
     );
     const userDetails = dataDetails.filter(
       (row) =>
-        row[nameColumn - 1] ==
+        row[nameColumn - 1] ===
         `${user[firstNameColumn - 1]} ${user[lastNameColumn - 1]}`
     );
 
@@ -127,10 +127,10 @@ async function getAllUsers () {
 
   for (const user of array) {
     // firstname and lastname empty: skip
-    if (user[firstNameColumn - 1] == '' && user[lastNameColumn - 1] == '') { continue; }
+    if (user[firstNameColumn - 1] === '' && user[lastNameColumn - 1] === '') { continue; }
 
     // if leave date empty: active
-    if (user[leaveDateColumn - 1] == '') {
+    if (user[leaveDateColumn - 1] === '') {
       activeUsers.push({
         id: user[idColumn - 1],
         name: `${user[firstNameColumn - 1]} ${user[lastNameColumn - 1]}`
@@ -163,7 +163,7 @@ async function getAdminChannel () {
 async function saveSlackId ({ id, slackId }) {
   // find line with user
   const data = await sheet.getCells(sheetAllgDaten);
-  const index = data.findIndex((element) => element[idColumn - 1] == id) + 1;
+  const index = data.findIndex((element) => element[idColumn - 1] === id) + 1;
 
   sheet.updateCell({
     range: `'${sheetAllgDaten}'!${general.convertNumberToColumn(
@@ -190,7 +190,7 @@ async function saveHours ({ slackId, title, hours, date }) {
 
 async function getNameFromSlackId ({ slackId }) {
   const user = await getUserFromSlackId(slackId);
-  if (user == undefined) return undefined;
+  if (user === undefined) return undefined;
 
   return `${user[firstNameColumn - 1]} ${user[lastNameColumn - 1]}`;
 }

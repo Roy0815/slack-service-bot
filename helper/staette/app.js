@@ -9,15 +9,15 @@ function setupApp (app) {
     await ack();
 
     // Datum validieren falls eingegeben
-    if (command.text == '') command.text = util.formatDate(new Date());
+    if (command.text === '') command.text = util.formatDate(new Date());
     else {
       const dateArr = command.text.split('.');
 
       const date = new Date(dateArr[2], dateArr[1] - 1, dateArr[0]);
 
       if (
-        dateArr.length != 3 ||
-        date.getFullYear() == NaN ||
+        dateArr.length !== 3 ||
+        isNaN(date.getFullYear()) ||
         !/^[0-3]\d\.[0-1]\d\.20[2-9]\d$/.test(command.text)
       ) {
         respond('Bitte ein gültiges Datum im Format DD.MM.YYYY eingeben');
@@ -85,6 +85,7 @@ function setupApp (app) {
   });
 
   app.action(
+    // eslint-disable-next-line prefer-regex-literals
     new RegExp('staette-whoisthere-(update)*(delete)*'),
     async ({ ack, action, respond, body }) => {
       await ack();
@@ -95,7 +96,7 @@ function setupApp (app) {
             time: body.state.values[views.whoIsThereInputBlockName][
               views.whoIsThereTimePickerName
             ].selected_time,
-            xdelete: action.value == 'delete'
+            xdelete: action.value === 'delete'
           },
           body.message
         )
@@ -110,9 +111,9 @@ function setupApp (app) {
 
       if (
         !action.selected_option ||
-        action.selected_option.value.split('-')[0] !=
+        action.selected_option.value.split('-')[0] !==
           views.messageOverflowDelete ||
-        action.selected_option.value.split('-')[1] != body.user.id
+        action.selected_option.value.split('-')[1] !== body.user.id
       ) {
         await client.chat.postEphemeral({
           token: process.env.SLACK_BOT_TOKEN,

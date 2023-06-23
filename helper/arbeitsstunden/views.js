@@ -179,31 +179,6 @@ const basicConfirmDialogView = {
   ]
 };
 
-const newUserJoinedMessage = {
-  channel: '',
-  text: '', // set in method
-  blocks: [
-    {
-      type: 'input',
-      element: {
-        type: 'external_select',
-        placeholder: {
-          type: 'plain_text',
-          text: 'Name auswählen',
-          emoji: true
-        },
-        action_id: 'user_options',
-        min_query_length: 0
-      },
-      label: {
-        type: 'plain_text',
-        text: '', // set in method
-        emoji: true
-      }
-    }
-  ]
-};
-
 const homeView = [
   {
     type: 'header',
@@ -384,7 +359,7 @@ async function getMaintainConfirmDialog (entity) {
     entity.slackId
   }> möchte folgenden Arbeitseinsatz erfassen:\n${entity.title}: ${
     entity.hours
-  } Stunde${entity.hours == 1 ? '' : 'n'} am ${util.formatDate(dateObj)}`;
+  } Stunde${entity.hours === 1 ? '' : 'n'} am ${util.formatDate(dateObj)}`;
 
   view.blocks[1].elements[0].value = JSON.stringify(entity);
   view.blocks[1].elements[0].action_id = 'maintain-approve-button';

@@ -89,7 +89,7 @@ async function copySheet (sheetName) {
 // returns sheetID
 async function getSheetID (sheetName) {
   const sheetArray = await getSheets();
-  const sheet = await sheetArray.find((s) => s.properties.title == sheetName);
+  const sheet = await sheetArray.find((s) => s.properties.title === sheetName);
   return sheet.properties.sheetId;
 }
 
