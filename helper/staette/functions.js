@@ -16,7 +16,7 @@ async function cleanup ({ client }) {
 
   const filtered = result.messages.filter(
     (msg) =>
-      msg.bot_id == botId && // messages from this user
+      msg.bot_id === botId && // messages from this user
       msg.blocks &&
       msg.blocks.length > 0 &&
       msg.blocks[0].text &&
@@ -69,12 +69,12 @@ async function sortMessages ({ client, date }) {
 
   const filtered = result.messages.filter(
     (msg) =>
-      msg.bot_id == botId && // messages from this user
+      msg.bot_id === botId && // messages from this user
       msg.blocks &&
       msg.blocks.length > 0 &&
       msg.blocks[0].text &&
       /^`[0-3]\d\.[0-1]\d\.20[2-9]\d`$/.test(msg.blocks[0].text.text) && // messages with date
-      msg.blocks[0].text.text != `\`${date}\`` // not current date
+      msg.blocks[0].text.text !== `\`${date}\`` // not current date
   );
 
   // get messages with date later than current message
@@ -134,11 +134,11 @@ async function dateIsUnique ({ client, date }) {
 
   const filtered = result.messages.filter(
     (msg) =>
-      msg.bot_id == botId && // messages from this user
+      msg.bot_id === botId && // messages from this user
       msg.blocks &&
       msg.blocks.length > 0 &&
       msg.blocks[0].text &&
-      msg.blocks[0].text.text == `\`${date}\`` // current date
+      msg.blocks[0].text.text === `\`${date}\`` // current date
   );
 
   return !(filtered.length > 0);

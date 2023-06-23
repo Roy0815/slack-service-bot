@@ -140,20 +140,23 @@ const homeView = [
 ];
 
 //* ******************* Functions ********************//
+// eslint-disable-next-line camelcase
 function getWhoIsThereMessage ({ user_id, text }) {
   const view = JSON.parse(JSON.stringify(whoIsThereMessage));
 
   // set admin in overflow button
+  // eslint-disable-next-line camelcase
   view.blocks[3].elements[2].options[0].value += `-${user_id}`;
 
   // get day description
-  const day = text == `${util.formatDate(new Date())}` ? 'heute' : `am ${text}`;
+  const day = text === `${util.formatDate(new Date())}` ? 'heute' : `am ${text}`;
 
   // set date
   view.blocks[0].text.text = `\`${text}\``;
 
   // set questions
   view.text =
+  // eslint-disable-next-line camelcase
     view.blocks[1].text.text = `<@${user_id}> will wissen wer ${day} in der Stätte ist`;
 
   view.blocks[2].text.text = `Wann bist du ${day} da?`;
@@ -179,10 +182,10 @@ function updateWhoIsThereMessage ({ user, time, xdelete }, { text, blocks }) {
     });
 
     // get index of user
-    const index = users.findIndex((element) => element.user == `<@${user}>`);
+    const index = users.findIndex((element) => element.user === `<@${user}>`);
 
     // remove old element of user
-    if (index != -1) users.splice(index, 1);
+    if (index !== -1) users.splice(index, 1);
 
     // reset text
     view.blocks[sectionUsers].text.text = '';
@@ -197,7 +200,7 @@ function updateWhoIsThereMessage ({ user, time, xdelete }, { text, blocks }) {
     });
 
     // if empty, delete section(s)
-    if (users.length == 0 && view.blocks[sectionUsers]) { view.blocks.splice(sectionUsers - 1, 3); }
+    if (users.length === 0 && view.blocks[sectionUsers]) { view.blocks.splice(sectionUsers - 1, 3); }
 
     return view;
   }

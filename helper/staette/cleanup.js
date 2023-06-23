@@ -21,7 +21,7 @@ functions.cleanup(app).then((result) => {
     initial_comment: `Job ran at ${util.formatDate(
       new Date()
     )} ${util.formatTime(new Date())} and deleted ${result.count} Message${
-      result.count == 1 ? '' : 's'
+      result.count === 1 ? '' : 's'
     }`,
     title: 'Messages',
     content: JSON.stringify(result.messages, null, '\t')

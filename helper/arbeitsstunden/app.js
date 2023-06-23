@@ -17,7 +17,7 @@ function setupApp (app) {
       command.text = command.text.replace(/\D/g, '');
 
       // if year was filled, validate
-      if (command.text != '') {
+      if (command.text !== '') {
         const currYear = new Date().getFullYear();
         if (command.text < 2022 || command.text > currYear) {
           await respond(
@@ -34,7 +34,7 @@ function setupApp (app) {
       });
 
       // not registered: start dialog
-      if (hoursObj == undefined) {
+      if (hoursObj === undefined) {
         await client.views.open(
           await views.getRegisterView(command.trigger_id)
         );
@@ -49,7 +49,7 @@ function setupApp (app) {
             text: {
               type: 'mrkdwn',
               text: `Du hast ${
-                command.text != '' ? command.text : 'dieses Jahr' // year
+                command.text !== '' ? command.text : 'dieses Jahr' // year
               } bereits ${
                 hoursObj.workedHours
               } Arbeitsstunden geleistet. Du musst noch ${
@@ -98,7 +98,7 @@ function setupApp (app) {
 
     // check user is registered
     if (
-      (await sheet.getHoursFromSlackId({ id: command.user_id })) == undefined
+      (await sheet.getHoursFromSlackId({ id: command.user_id })) === undefined
     ) {
       // not registered: start dialog
       await client.views.open(await views.getRegisterView(command.trigger_id));
@@ -132,7 +132,7 @@ function setupApp (app) {
     });
 
     // not registered: start dialog
-    if (hoursObj == undefined) {
+    if (hoursObj === undefined) {
       await client.views.open(await views.getRegisterView(body.trigger_id));
       return;
     }
@@ -186,7 +186,7 @@ function setupApp (app) {
     await ack();
 
     // check user is registered
-    if ((await sheet.getHoursFromSlackId({ id: body.user.id })) == undefined) {
+    if ((await sheet.getHoursFromSlackId({ id: body.user.id })) === undefined) {
       // not registered: start dialog
       await client.views.open(await views.getRegisterView(body.trigger_id));
       return;
@@ -198,13 +198,14 @@ function setupApp (app) {
 
   // handle buttons in Registration approval
   app.action(
+    // eslint-disable-next-line prefer-regex-literals
     new RegExp('^register-(approve)*(reject)*-button$'),
     async ({ ack, action, client, respond, body }) => {
       await ack();
 
       // { id, slackId, name, approved }
       const registerObj = JSON.parse(action.value);
-      registerObj.approved = action.action_id.split('-')[1] == 'approve';
+      registerObj.approved = action.action_id.split('-')[1] === 'approve';
 
       // notify requestor
       await client.chat.postMessage(
@@ -263,13 +264,14 @@ function setupApp (app) {
 
   // handle buttons in maintenance approval
   app.action(
+    // eslint-disable-next-line prefer-regex-literals
     new RegExp('^maintain-(approve)*(reject)*-button$'),
     async ({ ack, action, client, respond, body }) => {
       await ack();
 
       // { slackId, title, hours, date }
       const maintObj = JSON.parse(action.value);
-      maintObj.approved = action.action_id.split('-')[1] == 'approve';
+      maintObj.approved = action.action_id.split('-')[1] === 'approve';
 
       // notify requestor
       await client.chat.postMessage(views.getUserMaintainEndMessage(maintObj));
@@ -289,7 +291,7 @@ function setupApp (app) {
         }:\n${await sheet.getNameFromSlackId(maintObj)}: "${
           maintObj.title
         }" - ${maintObj.hours} Stunde${
-          maintObj.hours == 1 ? '' : 'n'
+          maintObj.hours === 1 ? '' : 'n'
         } am ${util.formatDate(date)}.`
       );
 

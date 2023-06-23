@@ -1,15 +1,9 @@
-// local references
-const util = require('../general/util');
-
 //* ******************* Constants ********************//
 const pollViewName = 'pollz-pollView';
 
 // Creation Modal
 const questionBlockName = 'pollz-questionBlock';
 const questionInputAction = 'pollz-question_input-action';
-
-const typeSelectBlockName = 'pollz-typeSelectBlock';
-const typeSelectAction = 'pollz-type_select-action';
 
 const conversationSelectBlockName = 'pollz-conversationSelectBlock';
 const conversationSelectAction = 'pollz-conversations_select-action';
@@ -31,7 +25,6 @@ const deleteAllAnswerAction = 'pollz-delete-all-answers';
 const messageAddAnswerAction = 'pollz-message-add-answer';
 const messageDeleteAnswersAction = 'pollz-message-delete-answers';
 const messageOverflowAction = 'pollz-message-overflow';
-const messageOverflowShow = 'show';
 const messageOverflowDelete = 'delete';
 
 const addAnswerViewName = 'pollz-addAnswerView';
@@ -58,7 +51,6 @@ const pollView = {
       text: 'Abschicken',
       emoji: true
     },
-    type: 'modal',
     close: {
       type: 'plain_text',
       text: 'Abbrechen',
@@ -370,7 +362,6 @@ const addAnswerView = {
       type: 'plain_text',
       text: 'Hinzufügen'
     },
-    type: 'modal',
     close: {
       type: 'plain_text',
       text: 'Abbrechen'
@@ -439,11 +430,13 @@ const homeView = [
 ];
 
 //* ******************* Functions ********************//
+// eslint-disable-next-line camelcase
 function getPollsView ({ trigger_id, text }) {
   const view = JSON.parse(JSON.stringify(pollView));
+  // eslint-disable-next-line camelcase
   view.trigger_id = trigger_id;
 
-  if (text != '') view.view.blocks[0].element.initial_value = text;
+  if (text !== '') view.view.blocks[0].element.initial_value = text;
 
   return view;
 }
@@ -474,24 +467,24 @@ function deleteAnswer ({ id, hash, blocks }, { value }) {
   view.view_id = id;
   view.hash = hash;
 
-  if (value == 'all') {
+  if (value === 'all') {
     // delete all
     view.view.blocks = blocks.filter(
       (block) =>
         !block.accessory ||
-        block.accessory.action_id != deleteSingleAnswerAction
+        block.accessory.action_id !== deleteSingleAnswerAction
     );
   } else {
     // delete selected
     view.view.blocks = blocks.filter(
-      (block) => !block.accessory || block.accessory.value != value
+      (block) => !block.accessory || block.accessory.value !== value
     );
 
     // adapt values
     view.view.blocks.forEach((block, index) => {
       if (
         block.accessory &&
-        block.accessory.action_id == deleteSingleAnswerAction
+        block.accessory.action_id === deleteSingleAnswerAction
       ) {
         block.accessory.value = `${index + 1}`;
       }
@@ -524,7 +517,7 @@ function getPollMessage ({ user, view }) {
   // anonymous
   let option = view.state.values[optionsBlockName][
     optionsAction
-  ].selected_options.find((option) => option.value == optionAnonym);
+  ].selected_options.find((option) => option.value === optionAnonym);
 
   if (option) {
     // set text
@@ -536,7 +529,7 @@ function getPollMessage ({ user, view }) {
   // multiple select
   option = view.state.values[optionsBlockName][
     optionsAction
-  ].selected_options.find((option) => option.value == optionMultipleSelect);
+  ].selected_options.find((option) => option.value === optionMultipleSelect);
 
   if (option) {
     // set text
@@ -546,12 +539,12 @@ function getPollMessage ({ user, view }) {
   } else retView.blocks[1].elements[0].text += ', eine Antwort auswählbar';
 
   // make sure value is not initial
-  if (retView.blocks[4].elements[1].value == '') { retView.blocks[4].elements[1].value = '_'; }
+  if (retView.blocks[4].elements[1].value === '') { retView.blocks[4].elements[1].value = '_'; }
 
   // add answers
   option = view.state.values[optionsBlockName][
     optionsAction
-  ].selected_options.find((option) => option.value == optionAddAllowed);
+  ].selected_options.find((option) => option.value === optionAddAllowed);
 
   if (!option) retView.blocks[4].elements.shift(); // remove button if not selected
 
@@ -559,7 +552,7 @@ function getPollMessage ({ user, view }) {
   view.blocks
     .filter(
       (block) =>
-        block.accessory && block.accessory.action_id == deleteSingleAnswerAction
+        block.accessory && block.accessory.action_id === deleteSingleAnswerAction
     )
     .forEach((element, index) => {
       const answerView = JSON.parse(JSON.stringify(answerBlockMessage));
@@ -577,14 +570,14 @@ function getPollMessage ({ user, view }) {
 function answerOptionsValid ({ view }) {
   const answers = view.blocks.filter(
     (block) =>
-      block.accessory && block.accessory.action_id == deleteSingleAnswerAction
+      block.accessory && block.accessory.action_id === deleteSingleAnswerAction
   );
 
   if (answers.length === 0) {
     // check options
     const addAnswers = view.state.values[optionsBlockName][
       optionsAction
-    ].selected_options.filter((option) => option.value == optionAddAllowed);
+    ].selected_options.filter((option) => option.value === optionAddAllowed);
 
     // add Options not selected: error
     if (addAnswers.length === 0) {
@@ -622,7 +615,7 @@ function vote ({ message, user }, action) {
     // action is "delete all votes"
     if (!action) {
       // user didn't vote
-      if (indexUser == -1) return;
+      if (indexUser === -1) return;
       // user did vote: remove
       users.splice(indexUser, 1);
     }
@@ -632,15 +625,15 @@ function vote ({ message, user }, action) {
       // check if the current block was voted on,
       // or if "single select" is enabled (all other blocks are cleared from user)
       if (
-        block.accessory.value != action.value &&
+        block.accessory.value !== action.value &&
         options.includes(optionMultipleSelect)
       ) { return; }
 
       // user has already voted: remove user
       // no matter if voted block or not
-      if (indexUser != -1) users.splice(indexUser, 1);
+      if (indexUser !== -1) users.splice(indexUser, 1);
       // user didn't vote yet and it's voted block: add
-      else if (indexUser == -1 && block.accessory.value == action.value) { users.push(user.id); }
+      else if (indexUser === -1 && block.accessory.value === action.value) { users.push(user.id); }
     }
 
     // reset block
@@ -655,14 +648,14 @@ function vote ({ message, user }, action) {
       if (options.includes(optionAnonym)) return; // goes into next iteration
 
       view.blocks[index + 1].elements[0].text += `${
-        idx != 0 ? ', ' : ''
+        idx !== 0 ? ', ' : ''
       }<@${user}>`;
     });
 
     // add total number of votes
-    if (users.length == 0) { view.blocks[index + 1].elements[0].text += 'Keine Stimmen'; } else {
+    if (users.length === 0) { view.blocks[index + 1].elements[0].text += 'Keine Stimmen'; } else {
       view.blocks[index + 1].elements[0].text += `\n${users.length} ${
-        users.length == 1 ? 'Stimme' : 'Stimmen'
+        users.length === 1 ? 'Stimme' : 'Stimmen'
       }`;
     }
   });
@@ -670,9 +663,11 @@ function vote ({ message, user }, action) {
   return view;
 }
 
+// eslint-disable-next-line camelcase
 function getAddAnswerView ({ trigger_id, message, channel }) {
   const view = JSON.parse(JSON.stringify(addAnswerView));
 
+  // eslint-disable-next-line camelcase
   view.trigger_id = trigger_id;
 
   view.view.private_metadata = `${channel.id}-${message.ts}`;
@@ -680,10 +675,13 @@ function getAddAnswerView ({ trigger_id, message, channel }) {
   return view;
 }
 
+// eslint-disable-next-line camelcase
 function addAnswerMessage ({ private_metadata, state: { values } }, { blocks }) {
   const updateMessage = {
     token: process.env.SLACK_BOT_TOKEN,
+    // eslint-disable-next-line camelcase
     channel: private_metadata.split('-')[0],
+    // eslint-disable-next-line camelcase
     ts: private_metadata.split('-')[1],
     blocks
   };
