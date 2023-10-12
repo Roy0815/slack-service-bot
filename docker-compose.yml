@@ -2,9 +2,9 @@
 version: "3.9"
 
 services:
-  slack-arbeitsstunden-bot:
-    image: roylotzwik/slack-arbeitsstunden-bot:latest
-    container_name: slack-arbeitsstunden-bot
+  slack-service-bot:
+    image: roylotzwik/slack-service-bot:latest
+    container_name: slack-service-bot
     volumes:
       - ./volume:/var/lib/files
     restart: always
