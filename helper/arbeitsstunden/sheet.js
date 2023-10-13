@@ -6,7 +6,7 @@ const idColumn = 1;
 const firstNameColumn = 2;
 const lastNameColumn = 3;
 const leaveDateColumn = 5;
-const slackIdColumn = 15;
+const slackIdColumn = 16;
 
 const sheetStunden = 'Arbeitseinsätze';
 const dateColumn = 1;
