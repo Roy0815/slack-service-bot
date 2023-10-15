@@ -431,7 +431,7 @@ const homeView = [
 
 //* ******************* Functions ********************//
 // eslint-disable-next-line camelcase
-function getPollsView ({ trigger_id, text }) {
+function getPollsView({ trigger_id, text }) {
   const view = JSON.parse(JSON.stringify(pollView));
   // eslint-disable-next-line camelcase
   view.trigger_id = trigger_id;
@@ -441,7 +441,7 @@ function getPollsView ({ trigger_id, text }) {
   return view;
 }
 
-function addAnswer ({ id, hash, blocks, state }) {
+function addAnswer({ id, hash, blocks, state }) {
   const view = JSON.parse(JSON.stringify(pollView));
 
   view.view_id = id;
@@ -461,7 +461,7 @@ function addAnswer ({ id, hash, blocks, state }) {
   return view;
 }
 
-function deleteAnswer ({ id, hash, blocks }, { value }) {
+function deleteAnswer({ id, hash, blocks }, { value }) {
   const view = JSON.parse(JSON.stringify(pollView));
 
   view.view_id = id;
@@ -494,7 +494,7 @@ function deleteAnswer ({ id, hash, blocks }, { value }) {
   return view;
 }
 
-function getPollMessage ({ user, view }) {
+function getPollMessage({ user, view }) {
   const retView = JSON.parse(JSON.stringify(pollMessage));
 
   // set question
@@ -539,7 +539,9 @@ function getPollMessage ({ user, view }) {
   } else retView.blocks[1].elements[0].text += ', eine Antwort auswählbar';
 
   // make sure value is not initial
-  if (retView.blocks[4].elements[1].value === '') { retView.blocks[4].elements[1].value = '_'; }
+  if (retView.blocks[4].elements[1].value === '') {
+    retView.blocks[4].elements[1].value = '_';
+  }
 
   // add answers
   option = view.state.values[optionsBlockName][
@@ -552,7 +554,8 @@ function getPollMessage ({ user, view }) {
   view.blocks
     .filter(
       (block) =>
-        block.accessory && block.accessory.action_id === deleteSingleAnswerAction
+        block.accessory &&
+        block.accessory.action_id === deleteSingleAnswerAction
     )
     .forEach((element, index) => {
       const answerView = JSON.parse(JSON.stringify(answerBlockMessage));
@@ -567,7 +570,7 @@ function getPollMessage ({ user, view }) {
   return retView;
 }
 
-function answerOptionsValid ({ view }) {
+function answerOptionsValid({ view }) {
   const answers = view.blocks.filter(
     (block) =>
       block.accessory && block.accessory.action_id === deleteSingleAnswerAction
@@ -589,7 +592,7 @@ function answerOptionsValid ({ view }) {
 }
 
 // action = undefined means delete all answers of user
-function vote ({ message, user }, action) {
+function vote({ message, user }, action) {
   const view = JSON.parse(JSON.stringify(pollMessage));
 
   // take over all information
@@ -627,13 +630,17 @@ function vote ({ message, user }, action) {
       if (
         block.accessory.value !== action.value &&
         options.includes(optionMultipleSelect)
-      ) { return; }
+      ) {
+        return;
+      }
 
       // user has already voted: remove user
       // no matter if voted block or not
       if (indexUser !== -1) users.splice(indexUser, 1);
       // user didn't vote yet and it's voted block: add
-      else if (indexUser === -1 && block.accessory.value === action.value) { users.push(user.id); }
+      else if (indexUser === -1 && block.accessory.value === action.value) {
+        users.push(user.id);
+      }
     }
 
     // reset block
@@ -653,7 +660,9 @@ function vote ({ message, user }, action) {
     });
 
     // add total number of votes
-    if (users.length === 0) { view.blocks[index + 1].elements[0].text += 'Keine Stimmen'; } else {
+    if (users.length === 0) {
+      view.blocks[index + 1].elements[0].text += 'Keine Stimmen';
+    } else {
       view.blocks[index + 1].elements[0].text += `\n${users.length} ${
         users.length === 1 ? 'Stimme' : 'Stimmen'
       }`;
@@ -664,7 +673,7 @@ function vote ({ message, user }, action) {
 }
 
 // eslint-disable-next-line camelcase
-function getAddAnswerView ({ trigger_id, message, channel }) {
+function getAddAnswerView({ trigger_id, message, channel }) {
   const view = JSON.parse(JSON.stringify(addAnswerView));
 
   // eslint-disable-next-line camelcase
@@ -676,7 +685,7 @@ function getAddAnswerView ({ trigger_id, message, channel }) {
 }
 
 // eslint-disable-next-line camelcase
-function addAnswerMessage ({ private_metadata, state: { values } }, { blocks }) {
+function addAnswerMessage({ private_metadata, state: { values } }, { blocks }) {
   const updateMessage = {
     token: process.env.SLACK_BOT_TOKEN,
     // eslint-disable-next-line camelcase
@@ -703,7 +712,7 @@ function addAnswerMessage ({ private_metadata, state: { values } }, { blocks }) 
   return updateMessage;
 }
 
-function getHomeView () {
+function getHomeView() {
   return JSON.parse(JSON.stringify(homeView));
 }
 

@@ -2,7 +2,7 @@ const views = require('./views');
 const sheet = require('./sheet');
 const util = require('../general/util');
 
-function setupApp (app) {
+function setupApp(app) {
   //* ******************* Commands ********************//
   // display hours
   app.command(

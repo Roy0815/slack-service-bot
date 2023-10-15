@@ -25,7 +25,7 @@ const basicMessage = {
 };
 
 //* ******************* Functions ********************//
-function getHomeView ({ user }) {
+function getHomeView({ user }) {
   const view = JSON.parse(JSON.stringify(homeView));
   view.user_id = user;
 

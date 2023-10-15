@@ -1,7 +1,7 @@
 // imports
 const views = require('./views');
 
-function setupApp (app) {
+function setupApp(app) {
   //* ******************* Commands ********************//
   app.command('/umfrage', async ({ command, ack, client }) => {
     await ack();
@@ -27,7 +27,9 @@ function setupApp (app) {
       body.view.state.values[views.newAnswerBlockName][
         views.newAnswerInputAction
       ].value == null
-    ) { return; }
+    ) {
+      return;
+    }
 
     await client.views.update(views.addAnswer(body.view));
   });

@@ -1,7 +1,7 @@
 const { google } = require('googleapis');
 
 //* ******************* Private functions ********************//
-async function auth () {
+async function auth() {
   const auth = await google.auth.getClient({
     scopes: ['https://www.googleapis.com/auth/spreadsheets']
   });
@@ -10,7 +10,7 @@ async function auth () {
 
 //* ******************* Public functions ********************//
 // gets an array of all cells
-async function getCells (sheet) {
+async function getCells(sheet) {
   const sheets = await auth();
   const request = {
     spreadsheetId: process.env.SHEET_ID,
@@ -20,7 +20,7 @@ async function getCells (sheet) {
   return (await sheets.spreadsheets.values.get(request)).data.values;
 }
 
-async function updateCell ({ range, value }) {
+async function updateCell({ range, value }) {
   const sheets = await auth();
 
   // Value needs to be an array holding arrays with 1 value each
@@ -34,7 +34,7 @@ async function updateCell ({ range, value }) {
   await sheets.spreadsheets.values.update(request);
 }
 
-async function clearCell ({ range }) {
+async function clearCell({ range }) {
   const sheets = await auth();
 
   const request = {
@@ -45,7 +45,7 @@ async function clearCell ({ range }) {
   await sheets.spreadsheets.values.clear(request);
 }
 
-async function appendRow ({ range, values }) {
+async function appendRow({ range, values }) {
   const sheets = await auth();
 
   // Value needs to be an array holding arrays with 1 value each
@@ -60,7 +60,7 @@ async function appendRow ({ range, values }) {
 }
 
 // gets the sheets in a spreadsheet
-async function getSheets () {
+async function getSheets() {
   const sheets = await auth();
   const request = {
     spreadsheetId: process.env.SHEET_ID
@@ -70,7 +70,7 @@ async function getSheets () {
 }
 
 // creates a copy of a sheet
-async function copySheet (sheetName) {
+async function copySheet(sheetName) {
   const sheets = await auth();
   const sheetID = await getSheetID(sheetName);
   const request = {
@@ -87,14 +87,14 @@ async function copySheet (sheetName) {
 }
 
 // returns sheetID
-async function getSheetID (sheetName) {
+async function getSheetID(sheetName) {
   const sheetArray = await getSheets();
   const sheet = await sheetArray.find((s) => s.properties.title === sheetName);
   return sheet.properties.sheetId;
 }
 
 // renames a sheet
-async function renameSheet (oldName, newName) {
+async function renameSheet(oldName, newName) {
   const sheets = await auth();
   const sheetID = await getSheetID(oldName);
 
