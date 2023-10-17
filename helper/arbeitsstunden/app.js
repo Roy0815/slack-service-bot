@@ -1,7 +1,17 @@
+// @todo object definitions
+// Require the Bolt package (github.com/slackapi/bolt)
+const { App } = require('@slack/bolt');
+
+// local imports
 const views = require('./views');
 const sheet = require('./sheet');
 const util = require('../general/util');
+const types = require('./types');
 
+/**
+ *
+ * @param {App} app
+ */
 function setupApp(app) {
   //* ******************* Commands ********************//
   // display hours
@@ -19,7 +29,7 @@ function setupApp(app) {
       // if year was filled, validate
       if (command.text !== '') {
         const currYear = new Date().getFullYear();
-        if (command.text < 2022 || command.text > currYear) {
+        if (Number(command.text) < 2022 || Number(command.text) > currYear) {
           await respond(
             `Bitte ein Jahr zwischen 2022 und ${currYear} eingeben`
           );
@@ -29,7 +39,7 @@ function setupApp(app) {
 
       const hoursObj = await sheet.getHoursFromSlackId({
         id: command.user_id,
-        year: command.text,
+        year: Number(command.text),
         details
       });
 
@@ -42,6 +52,7 @@ function setupApp(app) {
       }
 
       // if registered, display
+      /** @type {import("@slack/bolt").RespondArguments} */
       const response = {
         blocks: [
           {
@@ -97,47 +108,48 @@ function setupApp(app) {
     await ack();
 
     // check user is registered
-    if (
-      (await sheet.getHoursFromSlackId({ id: command.user_id })) === undefined
-    ) {
+    if ((await sheet.getUserFromSlackId(command.user_id)) === undefined) {
       // not registered: start dialog
       await client.views.open(await views.getRegisterView(command.trigger_id));
       return;
     }
 
     // registered: start maintenance dialog
-    await client.views.open(
-      await views.getMaintainHoursView(command.trigger_id)
-    );
+    await client.views.open(views.getMaintainHoursView(command.trigger_id));
   });
 
   //* ******************* Actions ********************//
   app.action(views.homeViewDisplayHours, async ({ ack, client, body }) => {
     await ack();
 
+    const blckAction = /** @type {import("@slack/bolt").BlockAction} */ (body);
+
     const year =
-      body.view.state.values[views.homeViewInputBlockId][
+      blckAction.view.state.values[views.homeViewInputBlockId][
         views.homeViewYearSelect
       ].selected_option.value;
 
     const details =
-      body.view.state.values[views.homeViewInputBlockId][
+      blckAction.view.state.values[views.homeViewInputBlockId][
         views.homeViewDetailsSelect
       ].selected_options.length > 0;
 
     const hoursObj = await sheet.getHoursFromSlackId({
       id: body.user.id,
-      year,
+      year: Number(year),
       details
     });
 
     // not registered: start dialog
     if (hoursObj === undefined) {
-      await client.views.open(await views.getRegisterView(body.trigger_id));
+      await client.views.open(
+        await views.getRegisterView(blckAction.trigger_id)
+      );
       return;
     }
 
     // build message
+    /** @type {import("@slack/web-api").ChatPostMessageArguments} */
     const message = {
       channel: body.user.id,
       blocks: [
@@ -185,15 +197,21 @@ function setupApp(app) {
   app.action(views.homeViewMaintainHours, async ({ ack, client, body }) => {
     await ack();
 
+    const blckAction = /** @type {import("@slack/bolt").BlockAction} */ (body);
+
     // check user is registered
     if ((await sheet.getHoursFromSlackId({ id: body.user.id })) === undefined) {
       // not registered: start dialog
-      await client.views.open(await views.getRegisterView(body.trigger_id));
+
+      await client.views.open(
+        await views.getRegisterView(blckAction.trigger_id)
+      );
       return;
     }
 
     // registered: start maintenance dialog
-    await client.views.open(await views.getMaintainHoursView(body.trigger_id));
+
+    await client.views.open(views.getMaintainHoursView(blckAction.trigger_id));
   });
 
   // handle buttons in Registration approval
@@ -203,9 +221,14 @@ function setupApp(app) {
     async ({ ack, action, client, respond, body }) => {
       await ack();
 
-      // { id, slackId, name, approved }
-      const registerObj = JSON.parse(action.value);
-      registerObj.approved = action.action_id.split('-')[1] === 'approve';
+      const btnAction = /** @type {import("@slack/bolt").ButtonAction} */ (
+        action
+      );
+
+      /** @type {types.registerObjectFinalizer} */
+      const registerObj = JSON.parse(btnAction.value);
+
+      registerObj.approved = btnAction.action_id.split('-')[1] === 'approve';
 
       // notify requestor
       await client.chat.postMessage(
@@ -233,8 +256,16 @@ function setupApp(app) {
     async ({ ack, respond, body, action }) => {
       await ack();
 
+      const blckAction = /** @type {import("@slack/bolt").BlockAction} */ (
+        body
+      );
+
+      const btnAction = /** @type {import("@slack/bolt").ButtonAction} */ (
+        action
+      );
+
       const selOpt =
-        body.state.values[views.autoregisterInputBlock][
+        blckAction.state.values[views.autoregisterInputBlock][
           views.registerActionNameSelect
         ].selected_option;
 
@@ -243,22 +274,25 @@ function setupApp(app) {
       }
 
       console.log(
-        body.state.values[views.autoregisterInputBlock][
+        blckAction.state.values[views.autoregisterInputBlock][
           views.registerActionNameSelect
         ].selected_option
       );
 
       // edit approval message to show final result
       await respond(
-        `<@${body.user.id}> hat folgende Registrierung um ${util.formatTime(
+        `<@${
+          blckAction.user.id
+        }> hat folgende Registrierung um ${util.formatTime(
           new Date()
         )} Uhr am ${util.formatDate(new Date())} vorgenommen:\n<@${
-          action.value
+          btnAction.value
         }> => ${selOpt.text.text}`
       );
 
       // update data in sheet
-      sheet.saveSlackId({ id: selOpt.value, slackId: action.value });
+
+      sheet.saveSlackId({ id: Number(selOpt.value), slackId: btnAction.value });
     }
   );
 
@@ -269,19 +303,21 @@ function setupApp(app) {
     async ({ ack, action, client, respond, body }) => {
       await ack();
 
-      // { slackId, title, hours, date }
-      const maintObj = JSON.parse(action.value);
-      maintObj.approved = action.action_id.split('-')[1] === 'approve';
+      const btnAction = /** @type {import("@slack/bolt").ButtonAction} */ (
+        action
+      );
+
+      /** @type {types.hoursMaintFinalizer} */
+      const maintObj = JSON.parse(btnAction.value);
+
+      maintObj.approved = btnAction.action_id.split('-')[1] === 'approve';
 
       // notify requestor
       await client.chat.postMessage(views.getUserMaintainEndMessage(maintObj));
 
       // edit approval message to show final result
-      const date = new Date(
-        maintObj.date.split('-')[0],
-        maintObj.date.split('-')[1] - 1,
-        maintObj.date.split('-')[2]
-      );
+      const [year, month, day] = maintObj.date.split('-');
+      const date = new Date(Number(year), Number(month) - 1, Number(day));
 
       await respond(
         `<@${body.user.id}> hat folgende Stunden um ${util.formatTime(
@@ -289,7 +325,7 @@ function setupApp(app) {
         )} Uhr am ${util.formatDate(new Date())} ${
           maintObj.approved ? 'freigegeben' : 'abgelehnt'
         }:\n${await sheet.getNameFromSlackId(maintObj)}: "${
-          maintObj.title
+          maintObj.description
         }" - ${maintObj.hours} Stunde${
           maintObj.hours === 1 ? '' : 'n'
         } am ${util.formatDate(date)}.`
@@ -314,14 +350,16 @@ function setupApp(app) {
     const userOptions = [];
 
     users
-      .filter((element) =>
-        element.name.toLowerCase().includes(options.value.toLowerCase())
+      .filter((user) =>
+        `${user.firstname.toLowerCase()} ${user.lastname.toLowerCase()}`.includes(
+          options.value.toLowerCase()
+        )
       )
       .forEach((user) => {
         userOptions.push({
           text: {
             type: 'plain_text',
-            text: user.name
+            text: `${user.firstname} ${user.lastname}`
           },
           value: user.id
         });
@@ -336,11 +374,20 @@ function setupApp(app) {
   app.view(views.registerViewName, async ({ body, ack, client }) => {
     await ack();
 
-    // register object
-    const obj = {
-      id: body.view.state.values[views.registerBlockNameSelect][
+    if (
+      !body.view.state.values[views.registerBlockNameSelect][
         views.registerActionNameSelect
-      ].selected_option.value,
+      ].selected_option
+    )
+      return;
+
+    /** @type {types.registerObj} */
+    const obj = {
+      id: Number(
+        body.view.state.values[views.registerBlockNameSelect][
+          views.registerActionNameSelect
+        ].selected_option.value
+      ),
 
       slackId: body.user.id,
 
@@ -357,12 +404,13 @@ function setupApp(app) {
   });
 
   app.view(views.maintainHoursViewName, async ({ body, ack, client }) => {
-    const year =
+    const year = Number(
       body.view.state.values[views.maintainHoursBlockDate][
         views.maintainHoursActionDate
-      ].selected_date.split('-')[0];
+      ].selected_date.split('-')[0]
+    );
 
-    const currYear = new Date().getFullYear;
+    const currYear = new Date().getFullYear();
 
     if (year < currYear - 1 || year > currYear + 1) {
       await ack({
@@ -379,16 +427,18 @@ function setupApp(app) {
     await ack();
 
     // build maintenance object
+    /** @type {types.hoursObjMaint} */
     const obj = {
       slackId: body.user.id,
-      title:
+      description:
         body.view.state.values[views.maintainHoursBlockDescription][
           views.maintainHoursActionDescription
         ].value,
-      hours:
+      hours: Number(
         body.view.state.values[views.maintainHoursBlockHours][
           views.maintainHoursActionHours
-        ].value,
+        ].value
+      ),
       date: body.view.state.values[views.maintainHoursBlockDate][
         views.maintainHoursActionDate
       ].selected_date
@@ -403,7 +453,8 @@ function setupApp(app) {
 
   //* ******************* Events Submissions ********************//
   app.event('team_join', async ({ event, client }) => {
-    if (event.user.is_bot) return;
+    // log in case of bot user analysis
+    console.log(event);
 
     await client.chat.postMessage(
       await views.getAutoRegisterMessage(event.user.id)

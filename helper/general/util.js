@@ -20,9 +20,14 @@ function convertNumberToColumn(number) {
   return column;
 }
 
+function deepCopy(source) {
+  return JSON.parse(JSON.stringify(source));
+}
+
 // exports
 module.exports = {
   formatTime,
   formatDate,
-  convertNumberToColumn
+  convertNumberToColumn,
+  deepCopy
 };
