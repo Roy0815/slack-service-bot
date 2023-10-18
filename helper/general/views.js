@@ -1,7 +1,9 @@
 // imports
+const util = require('./util');
 const apps = require('./apps');
 
 //* ******************* Views ********************//
+/** @type {import("@slack/web-api").ViewsPublishArguments} */
 const homeView = {
   // Use the user ID associated with the event
   user_id: '',
@@ -19,14 +21,16 @@ const homeView = {
   }
 };
 
-const basicMessage = {
-  channel: '',
-  text: ''
-};
-
 //* ******************* Functions ********************//
+/**
+ *
+ * @param {import("@slack/bolt").AppHomeOpenedEvent} event
+ * @returns {import("@slack/web-api").ViewsPublishArguments}
+ */
 function getHomeView({ user }) {
-  const view = JSON.parse(JSON.stringify(homeView));
+  /** @type {import("@slack/web-api").ViewsPublishArguments} */
+  const view = util.deepCopy(homeView);
+
   view.user_id = user;
 
   // add homeviews of apps
@@ -43,7 +47,5 @@ function getHomeView({ user }) {
 
 //* ******************* Export ********************//
 module.exports = {
-  getHomeView,
-
-  basicMessage
+  getHomeView
 };

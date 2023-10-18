@@ -88,7 +88,7 @@ async function copySheetToNewYear(nameBase, year) {
       range: `'${newName}'!${general.convertNumberToColumn(
         stundenSummeColumns.year
       )}1`,
-      value: [[currYear]]
+      values: [[currYear]]
     });
     return;
   }
@@ -301,7 +301,7 @@ async function saveSlackId({ id, slackId }) {
     range: `'${sheetNames.allgDaten}'!${general.convertNumberToColumn(
       allgDatenColumns.slackId
     )}${index}`,
-    value: [[slackId]]
+    values: [[slackId]]
   });
 }
 
