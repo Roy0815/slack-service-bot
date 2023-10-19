@@ -1,6 +1,3 @@
-// Require the Bolt package (github.com/slackapi/bolt)
-const { App } = require('@slack/bolt');
-
 // local imports
 const views = require('./views');
 const sheet = require('./sheet');
@@ -9,7 +6,7 @@ const types = require('./types');
 
 /**
  *
- * @param {App} app
+ * @param {import("@slack/bolt").App} app
  */
 function setupApp(app) {
   //* ******************* Commands ********************//
