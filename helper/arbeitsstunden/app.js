@@ -1,4 +1,3 @@
-// @todo object definitions
 // Require the Bolt package (github.com/slackapi/bolt)
 const { App } = require('@slack/bolt');
 
