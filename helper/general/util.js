@@ -22,7 +22,7 @@ export function formatDate(date) {
 }
 
 /**
- *
+ * Convert number to column letters
  * @param {number} number
  * @returns {string} column letter(s)
  */
@@ -36,8 +36,8 @@ export function convertNumberToColumn(number) {
 }
 
 /**
- * Deep copy an object
- * @template {Object<string,any>} T
+ * Deep copy of an object
+ * @template {{[key: string]: any}} T
  * @param {T} source
  * @returns {T} target
  */
