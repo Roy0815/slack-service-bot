@@ -37,8 +37,9 @@ export function convertNumberToColumn(number) {
 
 /**
  * Deep copy an object
- * @param {object} source
- * @returns {object}
+ * @template {Object<string,any>} T
+ * @param {T} source
+ * @returns {T} target
  */
 export function deepCopy(source) {
   return JSON.parse(JSON.stringify(source));

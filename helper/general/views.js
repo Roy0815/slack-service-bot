@@ -28,7 +28,6 @@ const homeView = {
  * @returns {import("@slack/web-api").ViewsPublishArguments}
  */
 function getHomeView({ user }) {
-  /** @type {import("@slack/web-api").ViewsPublishArguments} */
   const view = util.deepCopy(homeView);
 
   view.user_id = user;

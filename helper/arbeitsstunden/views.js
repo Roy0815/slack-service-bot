@@ -68,6 +68,7 @@ const registerView = {
   }
 };
 
+/** @type {import('@slack/web-api').ViewsOpenArguments} */
 const maintainHoursView = {
   trigger_id: '',
   view: {
@@ -264,7 +265,6 @@ const homeView = [
  * @returns {Promise<import("@slack/web-api").ViewsOpenArguments>}
  */
 async function getRegisterView(triggerId) {
-  /** @type {import("@slack/web-api").ViewsOpenArguments} */
   const view = util.deepCopy(registerView);
   view.trigger_id = triggerId;
 
@@ -292,7 +292,6 @@ async function getRegisterView(triggerId) {
  * @returns {Promise<import("@slack/web-api").ChatPostMessageArguments>}
  */
 async function getAutoRegisterMessage(slackId) {
-  /** @type {import("@slack/web-api").ChatPostMessageArguments} */
   const view = util.deepCopy(basicConfirmDialogView);
   view.channel = await sheet.getAdminChannel();
 
@@ -336,7 +335,6 @@ async function getAutoRegisterMessage(slackId) {
  * @returns {Promise<import("@slack/web-api").ChatPostMessageArguments>}
  */
 async function getRegisterConfirmDialog(registerObj) {
-  /** @type {import("@slack/web-api").ChatPostMessageArguments} */
   const view = util.deepCopy(basicConfirmDialogView);
   view.channel = await sheet.getAdminChannel();
 
@@ -398,7 +396,6 @@ function getUserRegisterEndMessage({ slackId, name, approved }) {
  * @returns {import("@slack/web-api").ViewsOpenArguments}
  */
 function getMaintainHoursView(triggerId) {
-  /** @type {import("@slack/web-api").ViewsOpenArguments} */
   const view = util.deepCopy(maintainHoursView);
   view.trigger_id = triggerId;
 
@@ -411,7 +408,6 @@ function getMaintainHoursView(triggerId) {
  * @returns {Promise<import("@slack/web-api").ChatPostMessageArguments>}
  */
 async function getMaintainConfirmDialog(hoursObjMaint) {
-  /** @type {import("@slack/web-api").ChatPostMessageArguments} */
   const view = util.deepCopy(basicConfirmDialogView);
 
   const [year, month, day] = hoursObjMaint.date.split('-');
@@ -490,7 +486,6 @@ function getUserMaintainEndMessage(hoursMaintFinalizer) {
  * @returns {import("@slack/bolt").KnownBlock[]}
  */
 function getHomeView() {
-  /** @type {import("@slack/bolt").KnownBlock[]} */
   const view = util.deepCopy(homeView);
 
   // add year options
