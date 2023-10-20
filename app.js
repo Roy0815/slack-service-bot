@@ -13,7 +13,7 @@ const app = new App({
 });
 
 //* ******************* Setup listeners ********************//
-apps.apps.forEach((element) => {
+apps.forEach((element) => {
   element.setupApp(app);
 });
 

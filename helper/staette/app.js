@@ -3,8 +3,10 @@ import * as util from '../general/util';
 import * as views from './views';
 import * as functions from './functions';
 
+/** @type {import('../general/types').appComponent} */
+export const staetteApp = { setupApp, getHomeView: views.getHomeView };
+
 /**
- *
  * @param {import("@slack/bolt").App} app
  */
 export function setupApp(app) {

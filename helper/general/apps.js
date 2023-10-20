@@ -1,15 +1,6 @@
-import * as asApp from '../arbeitsstunden/app';
-import * as asView from '../arbeitsstunden/views';
+import { asApp } from '../arbeitsstunden/app';
+import { staetteApp } from '../staette/app';
+import { pollzApp } from '../pollz/app';
 
-import * as staetteApp from '../staette/app';
-import * as staetteView from '../staette/views';
-
-import * as pollzApp from '../pollz/app';
-import * as pollzView from '../pollz/views';
-
-export const apps = {
-  // all of the apps have to contain a function "setupApp" that takes in the bolt app
-  apps: [asApp, staetteApp, pollzApp],
-  // all of the views have to contain a function "getHomeView" that returns the blocks of their respective home view
-  views: [asView, staetteView, pollzView]
-};
+/** @type {import('./types').appComponent[]} */
+export const apps = [asApp, staetteApp, pollzApp];

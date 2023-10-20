@@ -1,11 +1,13 @@
 // local imports
 import * as views from './views';
 
+/** @type {import('../general/types').appComponent} */
+export const pollzApp = { setupApp, getHomeView: views.getHomeView };
+
 /**
- *
  * @param {import("@slack/bolt").App} app
  */
-export function setupApp(app) {
+function setupApp(app) {
   //* ******************* Commands ********************//
   app.command('/umfrage', async ({ command, ack, client }) => {
     await ack();

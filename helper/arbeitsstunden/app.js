@@ -4,11 +4,13 @@ import * as sheet from './sheet';
 import * as util from '../general/util';
 import * as types from './types';
 
+/** @type {import('../general/types').appComponent} */
+export const asApp = { setupApp, getHomeView: views.getHomeView };
+
 /**
- *
  * @param {import("@slack/bolt").App} app
  */
-export function setupApp(app) {
+function setupApp(app) {
   //* ******************* Commands ********************//
   // display hours
   app.command(
