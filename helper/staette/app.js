@@ -1,13 +1,13 @@
 // imports
-const util = require('../general/util');
-const views = require('./views');
-const functions = require('./functions');
+import * as util from '../general/util';
+import * as views from './views';
+import * as functions from './functions';
 
 /**
  *
  * @param {import("@slack/bolt").App} app
  */
-function setupApp(app) {
+export function setupApp(app) {
   //* ******************* Commands ********************//
   app.command('/weristda', async ({ command, ack, client, respond }) => {
     await ack();
@@ -141,8 +141,3 @@ function setupApp(app) {
     }
   );
 }
-
-//* ******************* Exports ********************//
-module.exports = {
-  setupApp
-};

@@ -1,6 +1,6 @@
 // imports
-const util = require('./util');
-const apps = require('./apps');
+import * as util from './util';
+import { apps } from './apps';
 
 //* ******************* Views ********************//
 /** @type {import("@slack/web-api").ViewsPublishArguments} */
@@ -27,7 +27,7 @@ const homeView = {
  * @param {import("@slack/bolt").AppHomeOpenedEvent} event
  * @returns {import("@slack/web-api").ViewsPublishArguments}
  */
-function getHomeView({ user }) {
+export function getHomeView({ user }) {
   const view = util.deepCopy(homeView);
 
   view.user_id = user;
@@ -43,8 +43,3 @@ function getHomeView({ user }) {
 
   return view;
 }
-
-//* ******************* Export ********************//
-module.exports = {
-  getHomeView
-};

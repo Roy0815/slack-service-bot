@@ -1,7 +1,7 @@
 // References
-const functions = require('./functions');
-const { App } = require('@slack/bolt');
-const util = require('../general/util');
+import * as functions from './functions';
+import { App } from '@slack/bolt';
+import * as util from '../general/util';
 
 // Create Bolt App
 const app = new App({

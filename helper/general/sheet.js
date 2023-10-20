@@ -128,7 +128,7 @@ export async function copySheet(sheetName) {
  */
 export async function getSheetID(sheetName) {
   const sheetArray = await getSheets();
-  const sheet = await sheetArray.find((s) => s.properties.title === sheetName);
+  const sheet = sheetArray.find((s) => s.properties.title === sheetName);
   return sheet.properties.sheetId;
 }
 

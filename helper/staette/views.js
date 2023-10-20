@@ -1,18 +1,18 @@
 // imports
-const util = require('../general/util');
+import * as util from '../general/util';
 
 // constants
-const whoIsThereInputBlockName = 'staette-whoIsThereBlock';
-const whoIsThereTimePickerName = 'staette-whoIsThereTimePicker';
+export const whoIsThereInputBlockName = 'staette-whoIsThereBlock';
+export const whoIsThereTimePickerName = 'staette-whoIsThereTimePicker';
 
-const messageOverflowAction = 'staette-overflow-action';
-const messageOverflowDelete = 'delete';
+export const messageOverflowAction = 'staette-overflow-action';
+export const messageOverflowDelete = 'delete';
 
 const sectionUsers = 5;
 
-const homeViewCommand = 'staette-home-command';
-const homeViewInputBlockId = 'staette-home-input-block';
-const homeViewDatePickerAction = 'staette-home-datepicker-action';
+export const homeViewCommand = 'staette-home-command';
+export const homeViewInputBlockId = 'staette-home-input-block';
+export const homeViewDatePickerAction = 'staette-home-datepicker-action';
 
 //* ******************* Views ********************//
 /** @type {import('@slack/web-api').ChatPostMessageArguments} */
@@ -150,7 +150,7 @@ const homeView = [
  * @returns {import('@slack/web-api').ChatPostMessageArguments}
  */
 // eslint-disable-next-line camelcase
-function getWhoIsThereMessage({ user_id, text }) {
+export function getWhoIsThereMessage({ user_id, text }) {
   const view = util.deepCopy(whoIsThereMessage);
 
   // set admin in overflow button
@@ -195,7 +195,10 @@ function getWhoIsThereMessage({ user_id, text }) {
  * @param {import('@slack/bolt').KnownBlock[]} [message.blocks]
  * @returns {import('@slack/web-api').ChatPostMessageArguments}
  */
-function updateWhoIsThereMessage({ user, time, xdelete }, { text, blocks }) {
+export function updateWhoIsThereMessage(
+  { user, time, xdelete },
+  { text, blocks }
+) {
   const view = util.deepCopy(whoIsThereMessage);
 
   /** @type {{time: string, user: string}[]} */
@@ -292,22 +295,6 @@ function updateWhoIsThereMessage({ user, time, xdelete }, { text, blocks }) {
  *
  * @returns {import("@slack/bolt").KnownBlock[]}
  */
-function getHomeView() {
+export function getHomeView() {
   return util.deepCopy(homeView);
 }
-
-// exports
-module.exports = {
-  getHomeView,
-  homeViewCommand,
-  homeViewInputBlockId,
-  homeViewDatePickerAction,
-
-  getWhoIsThereMessage,
-  updateWhoIsThereMessage,
-
-  whoIsThereInputBlockName,
-  whoIsThereTimePickerName,
-  messageOverflowAction,
-  messageOverflowDelete
-};

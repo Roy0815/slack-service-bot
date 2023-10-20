@@ -1,9 +1,9 @@
 // Require the Bolt package (github.com/slackapi/bolt)
-const { App } = require('@slack/bolt');
+import { App } from '@slack/bolt';
 
 // local references
-const views = require('./helper/general/views');
-const apps = require('./helper/general/apps');
+import * as views from './helper/general/views';
+import { apps } from './helper/general/apps';
 
 // Create Bolt App
 const app = new App({

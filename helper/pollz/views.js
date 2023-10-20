@@ -1,12 +1,12 @@
 // local imports
-const util = require('../general/util');
+import * as util from '../general/util';
 
 //* ******************* Constants ********************//
 /**
  * @readonly
  * @enum {string}
  */
-const viewNames = {
+export const viewNames = {
   creationModal: 'pollz-pollView',
   addAnswerModal: 'pollz-addAnswerView'
 };
@@ -16,7 +16,7 @@ const viewNames = {
  * @readonly
  * @enum {string}
  */
-const creationModalBlocks = {
+export const creationModalBlocks = {
   question: 'pollz-questionBlock',
   conversationSelect: 'pollz-conversationSelectBlock',
   options: 'pollz-optionsBlock',
@@ -27,7 +27,7 @@ const creationModalBlocks = {
  * @readonly
  * @enum {string}
  */
-const creationModalActions = {
+export const creationModalActions = {
   questionInput: 'pollz-question_input-action',
   conversationSelect: 'pollz-conversations_select-action',
   options: 'pollz-options-action',
@@ -52,7 +52,7 @@ const optionCheckboxes = {
  * @readonly
  * @enum {string}
  */
-const pollMessageActions = {
+export const pollMessageActions = {
   addAnswer: 'pollz-message-add-answer',
   deleteAnswer: 'pollz-message-delete-answer',
   overflow: 'pollz-message-overflow',
@@ -62,7 +62,7 @@ const pollMessageActions = {
 };
 
 // home view
-const homeViewCommand = 'pollz-home-command';
+export const homeViewCommand = 'pollz-home-command';
 
 //* ******************* Views ********************//
 /** @type {import("@slack/web-api").ViewsOpenArguments|import("@slack/web-api").ViewsUpdateArguments} */
@@ -474,7 +474,7 @@ const homeView = [
  * @returns {import('@slack/web-api').ViewsOpenArguments}
  */
 // eslint-disable-next-line camelcase
-function getPollsView({ trigger_id, text }) {
+export function getPollsView({ trigger_id, text }) {
   const view = util.deepCopy(
     /** @type {import('@slack/web-api').ViewsOpenArguments} */ (pollView)
   );
@@ -499,7 +499,7 @@ function getPollsView({ trigger_id, text }) {
  * @param {import('@slack/bolt').ViewOutput} view
  * @returns {import('@slack/web-api').ViewsUpdateArguments}
  */
-function addAnswer({ id, hash, blocks, state }) {
+export function addAnswer({ id, hash, blocks, state }) {
   const view = util.deepCopy(pollView);
 
   view.view_id = id;
@@ -528,7 +528,7 @@ function addAnswer({ id, hash, blocks, state }) {
  * @param {import('@slack/bolt').ButtonAction  } action
  * @returns {import('@slack/web-api').ViewsUpdateArguments}
  */
-function deleteAnswer({ id, hash, blocks }, { value }) {
+export function deleteAnswer({ id, hash, blocks }, { value }) {
   const view = util.deepCopy(pollView);
 
   view.view_id = id;
@@ -588,7 +588,7 @@ function deleteAnswer({ id, hash, blocks }, { value }) {
  * @param {import('@slack/bolt').SlackViewAction} viewAction
  * @returns {import('@slack/web-api').ChatPostMessageArguments}
  */
-function getPollMessage({ user, view }) {
+export function getPollMessage({ user, view }) {
   const retView = util.deepCopy(pollMessage);
 
   // block castings
@@ -710,7 +710,7 @@ function getPollMessage({ user, view }) {
  * @param {import('@slack/bolt').SlackViewAction} viewAction
  * @returns {boolean} check if answers exist if no adding is allowed
  */
-function answerOptionsValid({ view }) {
+export function answerOptionsValid({ view }) {
   const answers = view.blocks.filter((block) => {
     const sectionBlock =
       /** @type {import('@slack/bolt').SectionBlock} */
@@ -748,7 +748,7 @@ function answerOptionsValid({ view }) {
  * @param {import("@slack/bolt").ButtonAction} [action]
  * @returns {import("@slack/bolt").RespondArguments}
  */
-function vote({ message, user }, action) {
+export function vote({ message, user }, action) {
   /** @type {import("@slack/bolt").RespondArguments} */
   const view = util.deepCopy(pollMessage);
 
@@ -865,7 +865,7 @@ function vote({ message, user }, action) {
  * @returns {import('@slack/web-api').ViewsOpenArguments}
  */
 // eslint-disable-next-line camelcase
-function getAddAnswerView({ trigger_id, message, channel }) {
+export function getAddAnswerView({ trigger_id, message, channel }) {
   const view = util.deepCopy(addAnswerView);
 
   // eslint-disable-next-line camelcase
@@ -882,8 +882,11 @@ function getAddAnswerView({ trigger_id, message, channel }) {
  * @param {import('@slack/web-api/dist/response/ConversationsHistoryResponse').Message} message
  * @returns {import('@slack/web-api').ChatUpdateArguments}
  */
-// eslint-disable-next-line camelcase
-function addAnswerMessage({ private_metadata, state: { values } }, { blocks }) {
+export function addAnswerMessage(
+  // eslint-disable-next-line camelcase
+  { private_metadata, state: { values } },
+  { blocks }
+) {
   /** @type {import('@slack/web-api').ChatUpdateArguments} */
   const updateMessage = {
     token: process.env.SLACK_BOT_TOKEN,
@@ -923,34 +926,6 @@ function addAnswerMessage({ private_metadata, state: { values } }, { blocks }) {
  *
  * @returns {import("@slack/bolt").KnownBlock[]}
  */
-function getHomeView() {
+export function getHomeView() {
   return util.deepCopy(homeView);
 }
-
-// exports
-module.exports = {
-  getHomeView,
-  homeViewCommand,
-
-  getPollsView,
-  addAnswer,
-  deleteAnswer,
-  getPollMessage,
-  answerOptionsValid,
-  vote,
-  getAddAnswerView,
-  addAnswerMessage,
-
-  newAnswerBlockName: creationModalBlocks.newAnswer,
-  newAnswerInputAction: creationModalActions.newAnswerInput,
-  pollViewName: viewNames.creationModal,
-  addAnswerAction: creationModalActions.addAnswer,
-  deleteSingleAnswerAction: creationModalActions.deleteSingleAnswer,
-  deleteAllAnswerAction: creationModalActions.deleteAllAnswers,
-  voteButtonAction: pollMessageActions.voteButton,
-  messageAddAnswerAction: pollMessageActions.addAnswer,
-  messageDeleteAnswersAction: pollMessageActions.deleteAnswer,
-  messageOverflowAction: pollMessageActions.overflow,
-  messageOverflowDelete: pollMessageActions.overflowDelete,
-  addAnswerViewName: viewNames.addAnswerModal
-};

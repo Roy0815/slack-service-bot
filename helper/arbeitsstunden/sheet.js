@@ -1,6 +1,6 @@
-const general = require('../general/util');
-const sheet = require('../general/sheet');
-const types = require('./types');
+import * as util from '../general/util';
+import * as sheet from '../general/sheet';
+import * as types from './types';
 
 /**
  * @readonly
@@ -85,7 +85,7 @@ async function copySheetToNewYear(nameBase, year) {
 
   if (nameBase === sheetNames.stundenSumme) {
     sheet.updateCell({
-      range: `'${newName}'!${general.convertNumberToColumn(
+      range: `'${newName}'!${util.convertNumberToColumn(
         stundenSummeColumns.year
       )}1`,
       values: [[currYear]]
@@ -167,7 +167,7 @@ async function getDetails({ fullname, year }) {
  * @param {string} id
  * @returns {Promise<types.user|undefined>}
  */
-async function getUserFromSlackId(id) {
+export async function getUserFromSlackId(id) {
   const data = await sheet.getCells(sheetNames.allgDaten);
   if (!data) return undefined;
 
@@ -193,7 +193,7 @@ async function getUserFromSlackId(id) {
  *
  * @returns {Promise<workedHours|undefined>}
  */
-async function getHoursFromSlackId({ id, year, details }) {
+export async function getHoursFromSlackId({ id, year, details }) {
   const user = await getUserFromSlackId(id);
   if (user === undefined) return undefined;
 
@@ -234,7 +234,7 @@ async function getHoursFromSlackId({ id, year, details }) {
  * Get all active users from sheet
  * @returns {Promise<types.user[]>}
  */
-async function getAllUsers() {
+export async function getAllUsers() {
   const array = await sheet.getCells(sheetNames.allgDaten);
   if (!array) return [];
 
@@ -274,7 +274,7 @@ async function getAllUsers() {
  * Get admin channel from sheet
  * @returns {Promise<string>}
  */
-async function getAdminChannel() {
+export async function getAdminChannel() {
   await checkYearSheetsExists(new Date().getFullYear());
   const sumData = await sheet.getCells(
     getSheetNameYear(sheetNames.stundenSumme)
@@ -289,7 +289,7 @@ async function getAdminChannel() {
  * Saves the slack id to the column of the user in the sheet
  * @param {types.registerObj} registerObj
  */
-async function saveSlackId({ id, slackId }) {
+export async function saveSlackId({ id, slackId }) {
   // find line with user
   const data = await sheet.getCells(sheetNames.allgDaten);
   if (!data) return;
@@ -298,7 +298,7 @@ async function saveSlackId({ id, slackId }) {
     data.findIndex((element) => element[allgDatenColumns.id - 1] === id) + 1;
 
   sheet.updateCell({
-    range: `'${sheetNames.allgDaten}'!${general.convertNumberToColumn(
+    range: `'${sheetNames.allgDaten}'!${util.convertNumberToColumn(
       allgDatenColumns.slackId
     )}${index}`,
     values: [[slackId]]
@@ -309,7 +309,7 @@ async function saveSlackId({ id, slackId }) {
  *
  * @param {types.hoursObjMaint} hoursObjMaint
  */
-async function saveHours({ slackId, description, hours, date }) {
+export async function saveHours({ slackId, description, hours, date }) {
   const user = await getUserFromSlackId(slackId);
   await checkYearSheetsExists(Number(date.split('-')[0]));
 
@@ -333,20 +333,9 @@ async function saveHours({ slackId, description, hours, date }) {
  * @param {string} id.slackId
  * @returns {Promise<string|undefined>}
  */
-async function getNameFromSlackId({ slackId }) {
+export async function getNameFromSlackId({ slackId }) {
   const user = await getUserFromSlackId(slackId);
   if (user === undefined) return undefined;
 
   return `${user.firstname} ${user.lastname}`;
 }
-
-// exports
-module.exports = {
-  getAllUsers,
-  getUserFromSlackId,
-  getNameFromSlackId,
-  getAdminChannel,
-  getHoursFromSlackId,
-  saveSlackId,
-  saveHours
-};

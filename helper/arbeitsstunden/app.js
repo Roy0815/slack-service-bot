@@ -1,14 +1,14 @@
 // local imports
-const views = require('./views');
-const sheet = require('./sheet');
-const util = require('../general/util');
-const types = require('./types');
+import * as views from './views';
+import * as sheet from './sheet';
+import * as util from '../general/util';
+import * as types from './types';
 
 /**
  *
  * @param {import("@slack/bolt").App} app
  */
-function setupApp(app) {
+export function setupApp(app) {
   //* ******************* Commands ********************//
   // display hours
   app.command(
@@ -457,8 +457,3 @@ function setupApp(app) {
     );
   });
 }
-
-//* ******************* Exports ********************//
-module.exports = {
-  setupApp
-};

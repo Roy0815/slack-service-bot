@@ -4,7 +4,7 @@
  * @param {import('@slack/bolt').App} app
  * @returns {Promise<import('@slack/web-api/dist/response/ConversationsHistoryResponse').Message[]>}
  */
-async function cleanup({ client }) {
+export async function cleanup({ client }) {
   // get bot ID
   const botId = (
     await client.auth.test({
@@ -61,7 +61,7 @@ async function cleanup({ client }) {
  * @param {string} obj.date
  * @param {import('@slack/web-api').WebClient} obj.client
  */
-async function sortMessages({ client, date }) {
+export async function sortMessages({ client, date }) {
   // get bot ID
   const botId = (
     await client.auth.test({
@@ -127,7 +127,7 @@ async function sortMessages({ client, date }) {
  * @param {import('@slack/web-api').WebClient} obj.client
  * @returns {Promise<boolean>}
  */
-async function dateIsUnique({ client, date }) {
+export async function dateIsUnique({ client, date }) {
   // get bot ID
   const botId = (
     await client.auth.test({
@@ -152,10 +152,3 @@ async function dateIsUnique({ client, date }) {
 
   return !(filtered.length > 0);
 }
-
-//* ******************* Exports ********************//
-module.exports = {
-  cleanup,
-  sortMessages,
-  dateIsUnique
-};
