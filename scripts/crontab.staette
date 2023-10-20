@@ -1,1 +1,1 @@
-0 0 * * * node /docker/slack-arbeitsstunden-bot/helper/staette/cleanup.js
+0 0 * * * node /docker/slack-service-bot/helper/staette/cleanup.js
