@@ -3,6 +3,10 @@ const util = require('../general/util');
 const views = require('./views');
 const functions = require('./functions');
 
+/**
+ *
+ * @param {import("@slack/bolt").App} app
+ */
 function setupApp(app) {
   //* ******************* Commands ********************//
   app.command('/weristda', async ({ command, ack, client, respond }) => {
@@ -12,8 +16,11 @@ function setupApp(app) {
     if (command.text === '') command.text = util.formatDate(new Date());
     else {
       const dateArr = command.text.split('.');
-
-      const date = new Date(dateArr[2], dateArr[1] - 1, dateArr[0]);
+      const date = new Date(
+        Number(dateArr[2]),
+        Number(dateArr[1]) - 1,
+        Number(dateArr[0])
+      );
 
       if (
         dateArr.length !== 3 ||
@@ -44,29 +51,24 @@ function setupApp(app) {
   app.action(views.homeViewCommand, async ({ ack, body, client }) => {
     await ack();
 
-    let date =
-      body.view.state.values[views.homeViewInputBlockId][
-        views.homeViewDatePickerAction
-      ].selected_date;
+    let date = /** @type {import('@slack/bolt').BlockAction} */ (body).view
+      .state.values[views.homeViewInputBlockId][views.homeViewDatePickerAction]
+      .selected_date;
 
     if (date != null) {
-      date = new Date(
-        date.split('-')[0],
-        date.split('-')[1] - 1,
-        date.split('-')[2]
-      );
+      // datum darf nicht in der Vergangenheit liegen
+      const [year, month, day] = date.split('.');
+      const dateObj = new Date(Number(year), Number(month) - 1, Number(day));
 
-      if (date < new Date()) {
+      date = util.formatDate(dateObj);
+
+      if (dateObj < new Date()) {
         client.chat.postMessage({
           channel: body.user.id,
-          text: `*Stätte Abfrage*\nDatum ${util.formatDate(
-            date
-          )} liegt in der Vergangenheit. Bitte ein Datum >= heute angeben`
+          text: `*Stätte Abfrage*\nDatum ${date} liegt in der Vergangenheit. Bitte ein Datum >= heute angeben`
         });
         return;
       }
-
-      date = util.formatDate(date);
     } else date = util.formatDate(new Date());
 
     if (!(await functions.dateIsUnique({ client, date }))) {
@@ -89,16 +91,23 @@ function setupApp(app) {
     new RegExp('staette-whoisthere-(update)*(delete)*'),
     async ({ ack, action, respond, body }) => {
       await ack();
+
+      const blockAction = /** @type {import('@slack/bolt').BlockAction} */ (
+        body
+      );
+
       await respond(
         views.updateWhoIsThereMessage(
           {
-            user: body.user.id,
-            time: body.state.values[views.whoIsThereInputBlockName][
+            user: blockAction.user.id,
+            time: blockAction.state.values[views.whoIsThereInputBlockName][
               views.whoIsThereTimePickerName
             ].selected_time,
-            xdelete: action.value === 'delete'
+            xdelete:
+              /** @type {import('@slack/bolt').ButtonAction} */ (action)
+                .value === 'delete'
           },
-          body.message
+          blockAction.message
         )
       );
     }
@@ -109,11 +118,15 @@ function setupApp(app) {
     async ({ ack, body, respond, action, client }) => {
       await ack();
 
+      const blockAction = /** @type {import('@slack/bolt').OverflowAction} */ (
+        action
+      );
+
       if (
-        !action.selected_option ||
-        action.selected_option.value.split('-')[0] !==
+        !blockAction.selected_option ||
+        blockAction.selected_option.value.split('-')[0] !==
           views.messageOverflowDelete ||
-        action.selected_option.value.split('-')[1] !== body.user.id
+        blockAction.selected_option.value.split('-')[1] !== body.user.id
       ) {
         await client.chat.postEphemeral({
           token: process.env.SLACK_BOT_TOKEN,

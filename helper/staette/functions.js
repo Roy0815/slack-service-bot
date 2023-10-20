@@ -1,4 +1,9 @@
 //* ******************* Public Functions ********************//
+/**
+ * Cleanup old messages
+ * @param {import('@slack/bolt').App} app
+ * @returns {Promise<import('@slack/web-api/dist/response/ConversationsHistoryResponse').Message[]>}
+ */
 async function cleanup({ client }) {
   // get bot ID
   const botId = (
@@ -26,17 +31,15 @@ async function cleanup({ client }) {
   const cutoffDate = new Date();
   cutoffDate.setDate(cutoffDate.getDate() - 1);
 
-  const returnObj = { count: 0, messages: [] };
+  /** @type {import('@slack/web-api/dist/response/ConversationsHistoryResponse').Message[]} */
+  const returnObj = [];
 
   filtered.forEach((msg) => {
     // get date from message
     const text = msg.blocks[0].text.text.replace(/`/g, '');
-    const dateArr = text.split('.');
-    dateArr[0] = parseInt(dateArr[0]);
-    dateArr[1] = parseInt(dateArr[1]) - 1;
-    dateArr[2] = parseInt(dateArr[2]);
 
-    const date = new Date(dateArr[2], dateArr[1], dateArr[0]);
+    const [year, month, day] = text.split('.');
+    const date = new Date(Number(year), Number(month) - 1, Number(day));
 
     if (date < cutoffDate) {
       // ASYNC! delete message
@@ -45,14 +48,19 @@ async function cleanup({ client }) {
         ts: msg.ts,
         token: process.env.SLACK_BOT_TOKEN
       });
-      returnObj.messages.push(msg);
-      returnObj.count++;
+      returnObj.push(msg);
     }
   });
 
   return returnObj;
 }
 
+/**
+ * sort messages to keep chronological
+ * @param {object} obj
+ * @param {string} obj.date
+ * @param {import('@slack/web-api').WebClient} obj.client
+ */
 async function sortMessages({ client, date }) {
   // get bot ID
   const botId = (
@@ -78,21 +86,15 @@ async function sortMessages({ client, date }) {
   );
 
   // get messages with date later than current message
+  const [year, month, day] = date.split('.');
+  const currDate = new Date(Number(year), Number(month) - 1, Number(day));
   const messagesOrdered = [];
-  const currDate = new Date(
-    date.split('.')[2],
-    date.split('.')[1] - 1,
-    date.split('.')[0]
-  );
 
   filtered.forEach((msg) => {
     const text = msg.blocks[0].text.text.replace(/`/g, '');
 
-    const msgDate = new Date(
-      text.split('.')[2],
-      text.split('.')[1] - 1,
-      text.split('.')[0]
-    );
+    const [year, month, day] = text.split('.');
+    const msgDate = new Date(Number(year), Number(month) - 1, Number(day));
 
     if (msgDate < currDate) return;
 
@@ -118,6 +120,13 @@ async function sortMessages({ client, date }) {
   }
 }
 
+/**
+ * Check if date is unique
+ * @param {object} obj
+ * @param {string} obj.date
+ * @param {import('@slack/web-api').WebClient} obj.client
+ * @returns {Promise<boolean>}
+ */
 async function dateIsUnique({ client, date }) {
   // get bot ID
   const botId = (

@@ -15,6 +15,7 @@ const homeViewInputBlockId = 'staette-home-input-block';
 const homeViewDatePickerAction = 'staette-home-datepicker-action';
 
 //* ******************* Views ********************//
+/** @type {import('@slack/web-api').ChatPostMessageArguments} */
 const whoIsThereMessage = {
   channel: process.env.STAETTE_CHANNEL,
   text: '', // Text in the notification, set in the method
@@ -97,6 +98,7 @@ const whoIsThereMessage = {
   ]
 };
 
+/** @type {import("@slack/bolt").KnownBlock[]} */
 const homeView = [
   {
     type: 'header',
@@ -140,41 +142,78 @@ const homeView = [
 ];
 
 //* ******************* Functions ********************//
+/**
+ * Get message for specific date
+ * @param {object} command
+ * @param {string} command.user_id
+ * @param {string} command.text
+ * @returns {import('@slack/web-api').ChatPostMessageArguments}
+ */
 // eslint-disable-next-line camelcase
 function getWhoIsThereMessage({ user_id, text }) {
-  const view = JSON.parse(JSON.stringify(whoIsThereMessage));
+  const view = util.deepCopy(whoIsThereMessage);
 
   // set admin in overflow button
+  const actionsBlock =
+    /** @type {import('@slack/bolt').ActionsBlock} */
+    (view.blocks[3]);
+
+  /** @type {import('@slack/bolt').Overflow} */
   // eslint-disable-next-line camelcase
-  view.blocks[3].elements[2].options[0].value += `-${user_id}`;
+  (actionsBlock.elements[2]).options[0].value += `-${user_id}`;
 
   // get day description
   const day =
     text === `${util.formatDate(new Date())}` ? 'heute' : `am ${text}`;
 
   // set date
-  view.blocks[0].text.text = `\`${text}\``;
+  /** @type {import('@slack/bolt').SectionBlock} */
+  (view.blocks[0]).text.text = `\`${text}\``;
 
   // set questions
   view.text =
-    // eslint-disable-next-line camelcase
-    view.blocks[1].text.text = `<@${user_id}> will wissen wer ${day} in der Stätte ist`;
+    /** @type {import('@slack/bolt').SectionBlock} */
+    (
+      view.blocks[1]
+      // eslint-disable-next-line camelcase
+    ).text.text = `<@${user_id}> will wissen wer ${day} in der Stätte ist`;
 
-  view.blocks[2].text.text = `Wann bist du ${day} da?`;
+  /** @type {import('@slack/bolt').SectionBlock} */
+  (view.blocks[2]).text.text = `Wann bist du ${day} da?`;
 
   return view;
 }
 
+/**
+ * Update requtested message
+ * @param {object} updateData
+ * @param {string} updateData.user
+ * @param {string} updateData.time
+ * @param {boolean} updateData.xdelete
+ * @param {object} message
+ * @param {string} [message.text]
+ * @param {import('@slack/bolt').KnownBlock[]} [message.blocks]
+ * @returns {import('@slack/web-api').ChatPostMessageArguments}
+ */
 function updateWhoIsThereMessage({ user, time, xdelete }, { text, blocks }) {
-  const view = JSON.parse(JSON.stringify(whoIsThereMessage));
+  const view = util.deepCopy(whoIsThereMessage);
+
+  /** @type {{time: string, user: string}[]} */
   const users = [];
 
   view.blocks = blocks;
   view.text = text;
 
+  /** @type {import('@slack/bolt').SectionBlock} */
+  let userBlock;
+
   if (view.blocks[sectionUsers]) {
+    userBlock = /** @type {import('@slack/bolt').SectionBlock} */ (
+      view.blocks[sectionUsers]
+    );
+
     // get user list
-    view.blocks[sectionUsers].text.text.split('\n').forEach((element) => {
+    userBlock.text.text.split('\n').forEach((element) => {
       const userArr = element.split('\t');
       users.push({
         time: userArr[0],
@@ -189,15 +228,15 @@ function updateWhoIsThereMessage({ user, time, xdelete }, { text, blocks }) {
     if (index !== -1) users.splice(index, 1);
 
     // reset text
-    view.blocks[sectionUsers].text.text = '';
+    userBlock.text.text = '';
   }
 
   // no time = delete: return view now
   if (xdelete) {
     users.forEach((element, index) => {
-      view.blocks[sectionUsers].text.text = `${
-        view.blocks[sectionUsers].text.text
-      }${index > 0 ? '\n' : ''}${element.time}\t${element.user}`;
+      userBlock.text.text = `${userBlock.text.text}${index > 0 ? '\n' : ''}${
+        element.time
+      }\t${element.user}`;
     });
 
     // if empty, delete section(s)
@@ -241,16 +280,20 @@ function updateWhoIsThereMessage({ user, time, xdelete }, { text, blocks }) {
   );
 
   users.forEach((element, index) => {
-    view.blocks[sectionUsers].text.text = `${
-      view.blocks[sectionUsers].text.text
-    }${index > 0 ? '\n' : ''}${element.time}\t${element.user}`;
+    userBlock.text.text = `${userBlock.text.text}${index > 0 ? '\n' : ''}${
+      element.time
+    }\t${element.user}`;
   });
 
   return view;
 }
 
+/**
+ *
+ * @returns {import("@slack/bolt").KnownBlock[]}
+ */
 function getHomeView() {
-  return JSON.parse(JSON.stringify(homeView));
+  return util.deepCopy(homeView);
 }
 
 // exports
