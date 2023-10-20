@@ -3,7 +3,7 @@ const util = require('../general/util');
 const views = require('./views');
 const functions = require('./functions');
 
-function setupApp (app) {
+function setupApp(app) {
   //* ******************* Commands ********************//
   app.command('/weristda', async ({ command, ack, client, respond }) => {
     await ack();

@@ -6,7 +6,7 @@ const idColumn = 1;
 const firstNameColumn = 2;
 const lastNameColumn = 3;
 const leaveDateColumn = 5;
-const slackIdColumn = 15;
+const slackIdColumn = 16;
 
 const sheetStunden = 'Arbeitseinsätze';
 const dateColumn = 1;
@@ -21,12 +21,12 @@ const yearColumn = 9;
 const adminChannelColumn = 15;
 
 //* ******************* Private functions ********************//
-async function getUserFromSlackId (id) {
+async function getUserFromSlackId(id) {
   const data = await sheet.getCells(sheetAllgDaten);
   return data.find((element) => element[slackIdColumn - 1] === id);
 }
 
-async function copySheetToNewYear (nameBase, year) {
+async function copySheetToNewYear(nameBase, year) {
   let currYear;
   if (year) {
     currYear = year;
@@ -56,7 +56,7 @@ async function copySheetToNewYear (nameBase, year) {
   }
 }
 
-async function checkYearSheetsExists (year) {
+async function checkYearSheetsExists(year) {
   try {
     await sheet.getSheetID(getSheetNameYear(sheetStunden, year));
   } catch (err) {
@@ -69,14 +69,14 @@ async function checkYearSheetsExists (year) {
   }
 }
 
-function getSheetNameYear (name, year) {
+function getSheetNameYear(name, year) {
   if (year) return `${name} ${year}`;
   return `${name} ${new Date().getFullYear()}`;
 }
 
 //* ******************* Public functions ********************//
 
-async function getHoursFromSlackId ({ id, year, details }) {
+async function getHoursFromSlackId({ id, year, details }) {
   const user = await getUserFromSlackId(id);
   if (user === undefined) return undefined;
 
@@ -84,7 +84,9 @@ async function getHoursFromSlackId ({ id, year, details }) {
 
   await checkYearSheetsExists(year);
 
-  const dataSum = await sheet.getCells(getSheetNameYear(sheetStundenSumme, year));
+  const dataSum = await sheet.getCells(
+    getSheetNameYear(sheetStundenSumme, year)
+  );
 
   const returnObj = {
     workedHours: dataSum[user[idColumn - 1]][workedHoursColumn - 1],
@@ -119,7 +121,7 @@ async function getHoursFromSlackId ({ id, year, details }) {
   return returnObj;
 }
 
-async function getAllUsers () {
+async function getAllUsers() {
   const array = await sheet.getCells(sheetAllgDaten);
   array.shift();
   const activeUsers = [];
@@ -127,7 +129,9 @@ async function getAllUsers () {
 
   for (const user of array) {
     // firstname and lastname empty: skip
-    if (user[firstNameColumn - 1] === '' && user[lastNameColumn - 1] === '') { continue; }
+    if (user[firstNameColumn - 1] === '' && user[lastNameColumn - 1] === '') {
+      continue;
+    }
 
     // if leave date empty: active
     if (user[leaveDateColumn - 1] === '') {
@@ -153,14 +157,14 @@ async function getAllUsers () {
   return activeUsers;
 }
 
-async function getAdminChannel () {
+async function getAdminChannel() {
   await checkYearSheetsExists(new Date().getFullYear());
   return (await sheet.getCells(getSheetNameYear(sheetStundenSumme)))[0][
     adminChannelColumn - 1
   ];
 }
 
-async function saveSlackId ({ id, slackId }) {
+async function saveSlackId({ id, slackId }) {
   // find line with user
   const data = await sheet.getCells(sheetAllgDaten);
   const index = data.findIndex((element) => element[idColumn - 1] === id) + 1;
@@ -173,7 +177,7 @@ async function saveSlackId ({ id, slackId }) {
   });
 }
 
-async function saveHours ({ slackId, title, hours, date }) {
+async function saveHours({ slackId, title, hours, date }) {
   const user = await getUserFromSlackId(slackId);
   await checkYearSheetsExists(date.split('-')[0]);
 
@@ -188,7 +192,7 @@ async function saveHours ({ slackId, title, hours, date }) {
   });
 }
 
-async function getNameFromSlackId ({ slackId }) {
+async function getNameFromSlackId({ slackId }) {
   const user = await getUserFromSlackId(slackId);
   if (user === undefined) return undefined;
 

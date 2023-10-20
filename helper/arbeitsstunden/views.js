@@ -254,7 +254,7 @@ const homeView = [
 ];
 
 //* ******************* Functions ********************//
-async function getRegisterView (triggerId) {
+async function getRegisterView(triggerId) {
   const view = JSON.parse(JSON.stringify(registerView));
   view.trigger_id = triggerId;
 
@@ -275,7 +275,7 @@ async function getRegisterView (triggerId) {
   return view;
 }
 
-async function getAutoRegisterMessage (slackId) {
+async function getAutoRegisterMessage(slackId) {
   const view = JSON.parse(JSON.stringify(basicConfirmDialogView));
   view.channel = await sheet.getAdminChannel();
 
@@ -304,7 +304,7 @@ async function getAutoRegisterMessage (slackId) {
   return view;
 }
 
-async function getRegisterConfirmDialog (registerObj) {
+async function getRegisterConfirmDialog(registerObj) {
   // { id, slackId, name, approved }
   const view = JSON.parse(JSON.stringify(basicConfirmDialogView));
   view.channel = await sheet.getAdminChannel();
@@ -320,14 +320,14 @@ async function getRegisterConfirmDialog (registerObj) {
   return view;
 }
 
-function getUserRegisterStartMessage ({ slackId, name }) {
+function getUserRegisterStartMessage({ slackId, name }) {
   return {
     channel: slackId,
     text: `Deine Registrierung als ${name} wurde zur Freigabe weitergeleitet.\nDu wirst informiert, sobald die Verlinkung freigegeben wurde.`
   };
 }
 
-function getUserRegisterEndMessage ({ slackId, name, approved }) {
+function getUserRegisterEndMessage({ slackId, name, approved }) {
   return {
     channel: slackId,
     text: `Deine Registrierung als ${name} wurde ${
@@ -338,14 +338,14 @@ function getUserRegisterEndMessage ({ slackId, name, approved }) {
   };
 }
 
-function getMaintainHoursView (triggerId) {
+function getMaintainHoursView(triggerId) {
   const view = JSON.parse(JSON.stringify(maintainHoursView));
   view.trigger_id = triggerId;
 
   return view;
 }
 
-async function getMaintainConfirmDialog (entity) {
+async function getMaintainConfirmDialog(entity) {
   // { slackId, title, hours, date }
   const view = JSON.parse(JSON.stringify(basicConfirmDialogView));
   const dateObj = new Date(
@@ -369,7 +369,7 @@ async function getMaintainConfirmDialog (entity) {
   return view;
 }
 
-function getUserMaintainStartMessage ({ slackId, title, hours, date }) {
+function getUserMaintainStartMessage({ slackId, title, hours, date }) {
   const dateObj = new Date(
     date.split('-')[0],
     date.split('-')[1] - 1,
@@ -384,7 +384,7 @@ function getUserMaintainStartMessage ({ slackId, title, hours, date }) {
   };
 }
 
-function getUserMaintainEndMessage ({ slackId, title, hours, date, approved }) {
+function getUserMaintainEndMessage({ slackId, title, hours, date, approved }) {
   const dateObj = new Date(
     date.split('-')[0],
     date.split('-')[1] - 1,
@@ -399,7 +399,7 @@ function getUserMaintainEndMessage ({ slackId, title, hours, date, approved }) {
   };
 }
 
-function getHomeView () {
+function getHomeView() {
   const view = JSON.parse(JSON.stringify(homeView));
 
   // add year options

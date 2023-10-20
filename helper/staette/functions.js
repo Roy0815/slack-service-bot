@@ -1,5 +1,5 @@
 //* ******************* Public Functions ********************//
-async function cleanup ({ client }) {
+async function cleanup({ client }) {
   // get bot ID
   const botId = (
     await client.auth.test({
@@ -53,7 +53,7 @@ async function cleanup ({ client }) {
   return returnObj;
 }
 
-async function sortMessages ({ client, date }) {
+async function sortMessages({ client, date }) {
   // get bot ID
   const botId = (
     await client.auth.test({
@@ -118,7 +118,7 @@ async function sortMessages ({ client, date }) {
   }
 }
 
-async function dateIsUnique ({ client, date }) {
+async function dateIsUnique({ client, date }) {
   // get bot ID
   const botId = (
     await client.auth.test({
