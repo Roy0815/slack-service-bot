@@ -1,7 +1,7 @@
 // imports
-import * as util from '../general/util';
-import * as views from './views';
-import * as functions from './functions';
+import * as util from '../general/util.js';
+import * as views from './views.js';
+import * as functions from './functions.js';
 
 /** @type {import('../general/types').appComponent} */
 export const staetteApp = { setupApp, getHomeView: views.getHomeView };
@@ -59,7 +59,7 @@ export function setupApp(app) {
 
     if (date != null) {
       // datum darf nicht in der Vergangenheit liegen
-      const [year, month, day] = date.split('.');
+      const [year, month, day] = date.split('-');
       const dateObj = new Date(Number(year), Number(month) - 1, Number(day));
 
       date = util.formatDate(dateObj);

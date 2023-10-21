@@ -1,5 +1,5 @@
 // local imports
-import * as views from './views';
+import * as views from './views.js';
 
 /** @type {import('../general/types').appComponent} */
 export const pollzApp = { setupApp, getHomeView: views.getHomeView };

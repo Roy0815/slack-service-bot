@@ -1,7 +1,7 @@
 // local references
-import * as sheet from './sheet';
-import * as util from '../general/util';
-import * as types from './types';
+import * as sheet from './sheet.js';
+import * as util from '../general/util.js';
+import * as types from './types.js';
 
 // constants
 export const registerViewName = 'registerview';
@@ -440,7 +440,7 @@ export async function getMaintainConfirmDialog(hoursObjMaint) {
   btn1.value = JSON.stringify(hoursObjMaint);
   btn1.action_id = 'maintain-approve-button';
   btn2.value = JSON.stringify(hoursObjMaint);
-  btn2.action_id = 'register-reject-button';
+  btn2.action_id = 'maintain-reject-button';
 
   return view;
 }

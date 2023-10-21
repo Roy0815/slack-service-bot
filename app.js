@@ -1,12 +1,14 @@
 // Require the Bolt package (github.com/slackapi/bolt)
-import { App } from '@slack/bolt';
+import * as slack from '@slack/bolt';
 
 // local references
-import * as views from './helper/general/views';
-import { apps } from './helper/general/apps';
+import * as views from './helper/general/views.js';
+import { apps } from './helper/general/apps.js';
 
 // Create Bolt App
-const app = new App({
+/** @type {import('@slack/bolt').App} */
+// @ts-ignore
+const app = new slack.default.App({
   token: process.env.SLACK_BOT_TOKEN,
   signingSecret: process.env.SLACK_SIGNING_SECRET,
   extendedErrorHandler: true
@@ -30,6 +32,7 @@ app.action(new RegExp('.*'), async ({ ack }) => {
 });
 
 //* ******************* Error notifies Admin ********************//
+// @ts-ignore
 app.error(async ({ error, context, body }) => {
   // catch server reponse time: notify user
   if (body.command && error.data.error === 'expired_trigger_id') {
@@ -63,7 +66,7 @@ app.error(async ({ error, context, body }) => {
     title: 'Body',
     content: JSON.stringify(body, null, '\t')
   });
-  console.log(error);
+  console.log(JSON.stringify(error, null, '\t'));
 });
 
 //* ******************* Start App ********************//

@@ -1,6 +1,6 @@
-import * as util from '../general/util';
-import * as sheet from '../general/sheet';
-import * as types from './types';
+import * as util from '../general/util.js';
+import * as sheet from '../general/sheet.js';
+import * as types from './types.js';
 
 /**
  * @readonly
@@ -295,7 +295,9 @@ export async function saveSlackId({ id, slackId }) {
   if (!data) return;
 
   const index =
-    data.findIndex((element) => element[allgDatenColumns.id - 1] === id) + 1;
+    data.findIndex(
+      (element) => element[allgDatenColumns.id - 1] === id.toString()
+    ) + 1;
 
   sheet.updateCell({
     range: `'${sheetNames.allgDaten}'!${util.convertNumberToColumn(

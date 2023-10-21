@@ -1,7 +1,7 @@
 // References
-import * as functions from './functions';
+import * as functions from './functions.js';
 import { App } from '@slack/bolt';
-import * as util from '../general/util';
+import * as util from '../general/util.js';
 
 // Create Bolt App
 const app = new App({

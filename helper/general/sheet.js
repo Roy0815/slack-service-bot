@@ -1,6 +1,6 @@
-import { google } from 'googleapis';
+import { google } from 'googleapis/build/src/index.js';
 // eslint-disable-next-line camelcase
-import { sheets_v4 } from 'googleapis/build/src/apis/sheets';
+import { sheets_v4 } from 'googleapis/build/src/apis/sheets/index.js';
 
 //* ******************* Types ********************//
 /**

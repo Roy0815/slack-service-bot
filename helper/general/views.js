@@ -1,6 +1,6 @@
 // imports
-import * as util from './util';
-import { apps } from './apps';
+import * as util from './util.js';
+import { apps } from './apps.js';
 
 //* ******************* Views ********************//
 /** @type {import("@slack/web-api").ViewsPublishArguments} */
@@ -14,7 +14,11 @@ const homeView = {
         type: 'section',
         text: {
           type: 'mrkdwn',
-          text: 'Hallo 👋 Ich bin der Schwerathletik Mannheim Service-Bot.\nIch habe viele nützliche Funktionen:'
+          text: `Hallo 👋 Ich bin der Schwerathletik Mannheim Service-Bot.\n${
+            process.env.APP_ADMIN
+              ? `Wenn du Fragen hast oder einen Fehler entdeckt hast wende dich gerne an <@${process.env.APP_ADMIN}>\n`
+              : ''
+          }Ich habe viele nützliche Funktionen:`
         }
       }
     ]

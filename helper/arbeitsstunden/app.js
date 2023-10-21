@@ -1,8 +1,8 @@
 // local imports
-import * as views from './views';
-import * as sheet from './sheet';
-import * as util from '../general/util';
-import * as types from './types';
+import * as views from './views.js';
+import * as sheet from './sheet.js';
+import * as util from '../general/util.js';
+import * as types from './types.js';
 
 /** @type {import('../general/types').appComponent} */
 export const asApp = { setupApp, getHomeView: views.getHomeView };
@@ -147,15 +147,17 @@ function setupApp(app) {
     }
 
     // build message
+    const text = `Du hast ${year} bereits ${hoursObj.workedHours} Arbeitsstunden geleistet. Du musst noch ${hoursObj.targetHours} Stunden leisten.`;
     /** @type {import("@slack/web-api").ChatPostMessageArguments} */
     const message = {
       channel: body.user.id,
+      text,
       blocks: [
         {
           type: 'section',
           text: {
             type: 'mrkdwn',
-            text: `Du hast ${year} bereits ${hoursObj.workedHours} Arbeitsstunden geleistet. Du musst noch ${hoursObj.targetHours} Stunden leisten.`
+            text
           }
         }
       ]
@@ -198,7 +200,7 @@ function setupApp(app) {
     const blckAction = /** @type {import("@slack/bolt").BlockAction} */ (body);
 
     // check user is registered
-    if ((await sheet.getHoursFromSlackId({ id: body.user.id })) === undefined) {
+    if ((await sheet.getUserFromSlackId(body.user.id)) === undefined) {
       // not registered: start dialog
 
       await client.views.open(
@@ -345,6 +347,7 @@ function setupApp(app) {
       return;
     }
 
+    /** @type {import("@slack/bolt").PlainTextOption[]} */
     const userOptions = [];
 
     users
@@ -359,7 +362,7 @@ function setupApp(app) {
             type: 'plain_text',
             text: `${user.firstname} ${user.lastname}`
           },
-          value: user.id
+          value: user.id.toString()
         });
       });
 
@@ -435,7 +438,7 @@ function setupApp(app) {
       hours: Number(
         body.view.state.values[views.maintainHoursBlockHours][
           views.maintainHoursActionHours
-        ].value
+        ].value.replace(',', '.')
       ),
       date: body.view.state.values[views.maintainHoursBlockDate][
         views.maintainHoursActionDate

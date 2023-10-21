@@ -1,5 +1,5 @@
 // imports
-import * as util from '../general/util';
+import * as util from '../general/util.js';
 
 // constants
 export const whoIsThereInputBlockName = 'staette-whoIsThereBlock';
@@ -280,6 +280,10 @@ export function updateWhoIsThereMessage(
     {
       type: 'divider'
     }
+  );
+
+  userBlock = /** @type {import('@slack/bolt').SectionBlock} */ (
+    view.blocks[sectionUsers]
   );
 
   users.forEach((element, index) => {

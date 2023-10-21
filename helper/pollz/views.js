@@ -1,5 +1,5 @@
 // local imports
-import * as util from '../general/util';
+import * as util from '../general/util.js';
 
 //* ******************* Constants ********************//
 /**
