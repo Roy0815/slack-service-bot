@@ -1,46 +1,76 @@
+// local imports
+import * as util from '../general/util.js';
+
 //* ******************* Constants ********************//
-const pollViewName = 'pollz-pollView';
+/**
+ * @readonly
+ * @enum {string}
+ */
+export const viewNames = {
+  creationModal: 'pollz-pollView',
+  addAnswerModal: 'pollz-addAnswerView'
+};
 
 // Creation Modal
-const questionBlockName = 'pollz-questionBlock';
-const questionInputAction = 'pollz-question_input-action';
+/**
+ * @readonly
+ * @enum {string}
+ */
+export const creationModalBlocks = {
+  question: 'pollz-questionBlock',
+  conversationSelect: 'pollz-conversationSelectBlock',
+  options: 'pollz-optionsBlock',
+  newAnswer: 'pollz-newAnswerBlock'
+};
 
-const conversationSelectBlockName = 'pollz-conversationSelectBlock';
-const conversationSelectAction = 'pollz-conversations_select-action';
+/**
+ * @readonly
+ * @enum {string}
+ */
+export const creationModalActions = {
+  questionInput: 'pollz-question_input-action',
+  conversationSelect: 'pollz-conversations_select-action',
+  options: 'pollz-options-action',
+  newAnswerInput: 'pollz-newAnswerInput-action',
+  addAnswer: 'pollz-add-answer',
+  deleteSingleAnswer: 'pollz-delete-single-answer',
+  deleteAllAnswers: 'pollz-delete-all-answers'
+};
 
-const optionsBlockName = 'pollz-optionsBlock';
-const optionsAction = 'pollz-options-action';
-const optionAddAllowed = 'addoptions';
-const optionMultipleSelect = 'multiplechoice';
-const optionAnonym = 'anon';
-
-const newAnswerBlockName = 'pollz-newAnswerBlock';
-const newAnswerInputAction = 'pollz-newAnswerInput-action';
-
-const addAnswerAction = 'pollz-add-answer';
-const deleteSingleAnswerAction = 'pollz-delete-single-answer';
-const deleteAllAnswerAction = 'pollz-delete-all-answers';
+/**
+ * @readonly
+ * @enum {string}
+ */
+const optionCheckboxes = {
+  addAllowed: 'addoptions',
+  multipleSelect: 'multiplechoice',
+  anonym: 'anon'
+};
 
 // Poll Message
-const messageAddAnswerAction = 'pollz-message-add-answer';
-const messageDeleteAnswersAction = 'pollz-message-delete-answers';
-const messageOverflowAction = 'pollz-message-overflow';
-const messageOverflowDelete = 'delete';
-
-const addAnswerViewName = 'pollz-addAnswerView';
-const addAnswerViewTextInput = 'pollz-addAnswerViewTextInput';
-
-const voteButtonAction = 'pollz-vote';
+/**
+ * @readonly
+ * @enum {string}
+ */
+export const pollMessageActions = {
+  addAnswer: 'pollz-message-add-answer',
+  deleteAnswer: 'pollz-message-delete-answer',
+  overflow: 'pollz-message-overflow',
+  overflowDelete: 'delete',
+  voteButton: 'pollz-vote',
+  addAnswerViewTextInput: 'pollz-addAnswerViewTextInput'
+};
 
 // home view
-const homeViewCommand = 'pollz-home-command';
+export const homeViewCommand = 'pollz-home-command';
 
 //* ******************* Views ********************//
+/** @type {import("@slack/web-api").ViewsOpenArguments|import("@slack/web-api").ViewsUpdateArguments} */
 const pollView = {
   // trigger_id: "",
   view: {
     type: 'modal',
-    callback_id: pollViewName,
+    callback_id: viewNames.creationModal,
     title: {
       type: 'plain_text',
       text: 'Neue Umfrage erstellen',
@@ -59,10 +89,10 @@ const pollView = {
     blocks: [
       {
         type: 'input',
-        block_id: questionBlockName,
+        block_id: creationModalBlocks.question,
         element: {
           type: 'plain_text_input',
-          action_id: questionInputAction
+          action_id: creationModalActions.questionInput
         },
         label: {
           type: 'plain_text',
@@ -122,10 +152,10 @@ const pollView = {
       }, */
       {
         type: 'input',
-        block_id: conversationSelectBlockName,
+        block_id: creationModalBlocks.conversationSelect,
         element: {
           type: 'conversations_select',
-          action_id: conversationSelectAction,
+          action_id: creationModalActions.conversationSelect,
           default_to_current_conversation: true
         },
         label: {
@@ -136,7 +166,7 @@ const pollView = {
       },
       {
         type: 'input',
-        block_id: optionsBlockName,
+        block_id: creationModalBlocks.options,
         element: {
           type: 'checkboxes',
           options: [
@@ -146,7 +176,7 @@ const pollView = {
                 text: 'mehrere Antworten auswählbar',
                 emoji: true
               },
-              value: optionMultipleSelect
+              value: optionCheckboxes.multipleSelect
             },
             {
               text: {
@@ -154,7 +184,7 @@ const pollView = {
                 text: 'Teilnehmer können Optionen hinzufügen',
                 emoji: true
               },
-              value: optionAddAllowed
+              value: optionCheckboxes.addAllowed
             },
             {
               text: {
@@ -162,10 +192,10 @@ const pollView = {
                 text: 'Anonym',
                 emoji: true
               },
-              value: optionAnonym
+              value: optionCheckboxes.anonym
             }
           ],
-          action_id: optionsAction
+          action_id: creationModalActions.options
         },
         optional: true,
         label: {
@@ -189,9 +219,9 @@ const pollView = {
         type: 'input',
         element: {
           type: 'plain_text_input',
-          action_id: newAnswerInputAction
+          action_id: creationModalActions.newAnswerInput
         },
-        block_id: newAnswerBlockName,
+        block_id: creationModalBlocks.newAnswer,
         optional: true,
         label: {
           type: 'plain_text',
@@ -210,7 +240,7 @@ const pollView = {
               emoji: true
             },
             value: 'add',
-            action_id: addAnswerAction
+            action_id: creationModalActions.addAnswer
           },
           {
             type: 'button',
@@ -221,7 +251,7 @@ const pollView = {
             },
             style: 'danger',
             value: 'all',
-            action_id: deleteAllAnswerAction
+            action_id: creationModalActions.deleteAllAnswers
           }
         ]
       },
@@ -232,6 +262,7 @@ const pollView = {
   }
 };
 
+/** @type {import('@slack/bolt').SectionBlock} */
 const answerView = {
   type: 'section',
   text: {
@@ -247,10 +278,11 @@ const answerView = {
     },
     style: 'danger',
     value: '', // set in method
-    action_id: deleteSingleAnswerAction
+    action_id: creationModalActions.deleteSingleAnswer
   }
 };
 
+/** @type {import("@slack/web-api").ChatPostMessageArguments} */
 const pollMessage = {
   channel: '',
   text: '', // Text in the notification, set in the method
@@ -290,7 +322,7 @@ const pollMessage = {
             text: 'Antwort hinzufügen'
           },
           // value: "click_me_123",
-          action_id: messageAddAnswerAction
+          action_id: pollMessageActions.addAnswer
         },
         {
           type: 'button',
@@ -301,7 +333,7 @@ const pollMessage = {
             text: 'Meine Antwort/en löschen'
           },
           value: '', // store info about options in method here
-          action_id: messageDeleteAnswersAction
+          action_id: pollMessageActions.deleteAnswer
         },
         {
           type: 'overflow',
@@ -312,7 +344,7 @@ const pollMessage = {
                 text: 'Ersteller: Umfrage löschen',
                 emoji: true
               },
-              value: messageOverflowDelete // delete-{ admin } (added in method)
+              value: pollMessageActions.overflowDelete // delete-{ admin } (added in method)
             }
             /* {
               text: {
@@ -323,13 +355,14 @@ const pollMessage = {
               value: messageOverflowShow,
             }, */
           ],
-          action_id: messageOverflowAction
+          action_id: pollMessageActions.overflow
         }
       ]
     }
   ]
 };
 
+/** @type {import("@slack/bolt").SectionBlock} */
 const answerBlockMessage = {
   type: 'section',
   text: {
@@ -344,16 +377,17 @@ const answerBlockMessage = {
       text: 'Abstimmen'
     },
     value: '', // set in method, contains answer number and peoples ids (split by -)
-    action_id: voteButtonAction
+    action_id: pollMessageActions.voteButton
   }
 };
 
+/** @type {import("@slack/web-api").ViewsOpenArguments} */
 const addAnswerView = {
   trigger_id: '', // set in method
   view: {
     type: 'modal',
     private_metadata: '', // set in method, contains message info
-    callback_id: addAnswerViewName,
+    callback_id: viewNames.addAnswerModal,
     title: {
       type: 'plain_text',
       text: 'Neue Antwort hinzufügen'
@@ -369,14 +403,14 @@ const addAnswerView = {
     blocks: [
       {
         type: 'input',
-        block_id: newAnswerBlockName,
+        block_id: creationModalBlocks.newAnswer,
         element: {
           type: 'plain_text_input',
           placeholder: {
             type: 'plain_text',
             text: 'Antwort'
           },
-          action_id: addAnswerViewTextInput
+          action_id: pollMessageActions.addAnswerViewTextInput
         },
         label: {
           type: 'plain_text',
@@ -387,6 +421,7 @@ const addAnswerView = {
   }
 };
 
+/** @type {import("@slack/bolt").ContextBlock} */
 const resultBlockMessage = {
   type: 'context',
   elements: [
@@ -397,6 +432,7 @@ const resultBlockMessage = {
   ]
 };
 
+/** @type {import("@slack/bolt").KnownBlock[]} */
 const homeView = [
   {
     type: 'header',
@@ -430,63 +466,116 @@ const homeView = [
 ];
 
 //* ******************* Functions ********************//
+/**
+ * get Popup for creation
+ * @param {object} command
+ * @param {string} command.trigger_id
+ * @param {string} [command.text]
+ * @returns {import('@slack/web-api').ViewsOpenArguments}
+ */
 // eslint-disable-next-line camelcase
-function getPollsView({ trigger_id, text }) {
-  const view = JSON.parse(JSON.stringify(pollView));
+export function getPollsView({ trigger_id, text }) {
+  const view = util.deepCopy(
+    /** @type {import('@slack/web-api').ViewsOpenArguments} */ (pollView)
+  );
+
   // eslint-disable-next-line camelcase
   view.trigger_id = trigger_id;
 
-  if (text !== '') view.view.blocks[0].element.initial_value = text;
+  if (!text || text !== '') {
+    const element = /** @type {import('@slack/bolt').InputBlock} */ (
+      view.view.blocks[0]
+    ).element;
+
+    /** @type {import('@slack/bolt').PlainTextInput } */
+    (element).initial_value = text;
+  }
 
   return view;
 }
 
-function addAnswer({ id, hash, blocks, state }) {
-  const view = JSON.parse(JSON.stringify(pollView));
+/**
+ * Add answer to popup poll
+ * @param {import('@slack/bolt').ViewOutput} view
+ * @returns {import('@slack/web-api').ViewsUpdateArguments}
+ */
+export function addAnswer({ id, hash, blocks, state }) {
+  const view = util.deepCopy(pollView);
 
   view.view_id = id;
   view.hash = hash;
 
   view.view.blocks = blocks;
 
-  const newAnswerView = JSON.parse(JSON.stringify(answerView));
+  const newAnswerView = util.deepCopy(answerView);
 
   newAnswerView.text.text =
-    state.values[newAnswerBlockName][newAnswerInputAction].value;
+    state.values[creationModalBlocks.newAnswer][
+      creationModalActions.newAnswerInput
+    ].value;
 
-  newAnswerView.accessory.value = `${view.view.blocks.length + 1}`;
+  /** @type {import('@slack/bolt').Button } */
+  (newAnswerView.accessory).value = `${view.view.blocks.length + 1}`;
 
   view.view.blocks.push(newAnswerView);
 
   return view;
 }
 
-function deleteAnswer({ id, hash, blocks }, { value }) {
-  const view = JSON.parse(JSON.stringify(pollView));
+/**
+ * delete one or all answers from popup poll
+ * @param {import('@slack/bolt').ViewOutput} view
+ * @param {import('@slack/bolt').ButtonAction  } action
+ * @returns {import('@slack/web-api').ViewsUpdateArguments}
+ */
+export function deleteAnswer({ id, hash, blocks }, { value }) {
+  const view = util.deepCopy(pollView);
 
   view.view_id = id;
   view.hash = hash;
 
   if (value === 'all') {
     // delete all
-    view.view.blocks = blocks.filter(
-      (block) =>
-        !block.accessory ||
-        block.accessory.action_id !== deleteSingleAnswerAction
-    );
+    view.view.blocks = blocks.filter((block) => {
+      const sectionBlock =
+        /** @type {import('@slack/bolt').SectionBlock} */
+        (block);
+
+      return (
+        !sectionBlock.accessory ||
+        /** @type {import('@slack/bolt').Button } */
+        (sectionBlock.accessory).action_id !==
+          creationModalActions.deleteSingleAnswer
+      );
+    });
   } else {
     // delete selected
-    view.view.blocks = blocks.filter(
-      (block) => !block.accessory || block.accessory.value !== value
-    );
+    view.view.blocks = blocks.filter((block) => {
+      const sectionBlock =
+        /** @type {import('@slack/bolt').SectionBlock} */
+        (block);
+
+      return (
+        !sectionBlock.accessory ||
+        /** @type {import('@slack/bolt').Button } */
+        (sectionBlock.accessory).value !== value
+      );
+    });
 
     // adapt values
     view.view.blocks.forEach((block, index) => {
+      const sectionBlock =
+        /** @type {import('@slack/bolt').SectionBlock} */
+        (block);
+
       if (
-        block.accessory &&
-        block.accessory.action_id === deleteSingleAnswerAction
+        sectionBlock.accessory &&
+        /** @type {import('@slack/bolt').Button } */
+        (sectionBlock.accessory).action_id ===
+          creationModalActions.deleteSingleAnswer
       ) {
-        block.accessory.value = `${index + 1}`;
+        /** @type {import('@slack/bolt').Button } */
+        (sectionBlock.accessory).value = `${index + 1}`;
       }
     });
   }
@@ -494,75 +583,121 @@ function deleteAnswer({ id, hash, blocks }, { value }) {
   return view;
 }
 
-function getPollMessage({ user, view }) {
-  const retView = JSON.parse(JSON.stringify(pollMessage));
+/**
+ * Get initial poll message after sending poll
+ * @param {import('@slack/bolt').SlackViewAction} viewAction
+ * @returns {import('@slack/web-api').ChatPostMessageArguments}
+ */
+export function getPollMessage({ user, view }) {
+  const retView = util.deepCopy(pollMessage);
+
+  // block castings
+  const actionsBlock =
+    /** @type {import('@slack/bolt').ActionsBlock} */
+    (retView.blocks[4]);
+
+  const contextBlock =
+    /** @type {import('@slack/bolt').ContextBlock} */
+    (retView.blocks[1]);
+
+  // elements of block castings
+  const contextElement =
+    /** @type {import('@slack/bolt').MrkdwnElement } */
+    (contextBlock.elements[0]);
+
+  const actionsElementIdx1 =
+    /** @type {import('@slack/bolt').Button } */
+    (actionsBlock.elements[1]);
 
   // set question
   retView.text =
-    view.state.values[questionBlockName][questionInputAction].value;
+    view.state.values[creationModalBlocks.question][
+      creationModalActions.questionInput
+    ].value;
 
   // set text in Message
-  retView.blocks[0].text.text = `Neue Umfrage von <@${user.id}>\n*${view.state.values[questionBlockName][questionInputAction].value}*`;
+  /** @type {import('@slack/bolt').SectionBlock} */
+  (retView.blocks[0]).text.text = `Neue Umfrage von <@${user.id}>\n*${
+    view.state.values[creationModalBlocks.question][
+      creationModalActions.questionInput
+    ].value
+  }*`;
 
   // set channel
   retView.channel =
-    view.state.values[conversationSelectBlockName][
-      conversationSelectAction
+    view.state.values[creationModalBlocks.conversationSelect][
+      creationModalActions.conversationSelect
     ].selected_conversation;
 
   // store admin in overflow button
-  retView.blocks[4].elements[2].options[0].value += `-${user.id}`;
+  /** @type {import('@slack/bolt').Overflow } */
+  (actionsBlock.elements[2]).options[0].value += `-${user.id}`;
 
   // -- set options --//
   // anonymous
-  let option = view.state.values[optionsBlockName][
-    optionsAction
-  ].selected_options.find((option) => option.value === optionAnonym);
+  let option = view.state.values[creationModalBlocks.options][
+    creationModalActions.options
+  ].selected_options.find((option) => option.value === optionCheckboxes.anonym);
 
+  // set text
+  contextElement.text = option ? 'Anonym' : 'nicht Anonym';
   if (option) {
-    // set text
-    retView.blocks[1].elements[0].text = 'Anonym';
     // set value to store
-    retView.blocks[4].elements[1].value = optionAnonym;
-  } else retView.blocks[1].elements[0].text = 'nicht Anonym';
-
-  // multiple select
-  option = view.state.values[optionsBlockName][
-    optionsAction
-  ].selected_options.find((option) => option.value === optionMultipleSelect);
-
-  if (option) {
-    // set text
-    retView.blocks[1].elements[0].text += ', mehrere Antworten auswählbar';
-    // set value to store
-    retView.blocks[4].elements[1].value += optionMultipleSelect;
-  } else retView.blocks[1].elements[0].text += ', eine Antwort auswählbar';
-
-  // make sure value is not initial
-  if (retView.blocks[4].elements[1].value === '') {
-    retView.blocks[4].elements[1].value = '_';
+    actionsElementIdx1.value = optionCheckboxes.anonym;
   }
 
-  // add answers
-  option = view.state.values[optionsBlockName][
-    optionsAction
-  ].selected_options.find((option) => option.value === optionAddAllowed);
+  // multiple select
+  option = view.state.values[creationModalBlocks.options][
+    creationModalActions.options
+  ].selected_options.find(
+    (option) => option.value === optionCheckboxes.multipleSelect
+  );
 
-  if (!option) retView.blocks[4].elements.shift(); // remove button if not selected
+  if (option) {
+    // set text
+    contextElement.text += ', mehrere Antworten auswählbar';
+    // set value to store
+    actionsElementIdx1.value += optionCheckboxes.multipleSelect;
+  } else contextElement.text += ', eine Antwort auswählbar';
+
+  // make sure value is not initial
+  if (actionsElementIdx1.value === '') actionsElementIdx1.value = '_';
+
+  // add answers
+  option = view.state.values[creationModalBlocks.options][
+    creationModalActions.options
+  ].selected_options.find(
+    (option) => option.value === optionCheckboxes.addAllowed
+  );
+
+  if (!option) actionsBlock.elements.shift(); // remove button if not selected
 
   // set answers
   view.blocks
-    .filter(
-      (block) =>
-        block.accessory &&
-        block.accessory.action_id === deleteSingleAnswerAction
-    )
-    .forEach((element, index) => {
-      const answerView = JSON.parse(JSON.stringify(answerBlockMessage));
-      answerView.accessory.value = `${index}`;
-      answerView.text.text = `*${element.text.text}*`;
+    .filter((block) => {
+      const sectionBlock =
+        /** @type {import('@slack/bolt').SectionBlock} */
+        (block);
 
-      const resultView = JSON.parse(JSON.stringify(resultBlockMessage));
+      return (
+        sectionBlock.accessory &&
+        /** @type {import('@slack/bolt').Button} */
+        (sectionBlock.accessory).action_id ===
+          creationModalActions.deleteSingleAnswer
+      );
+    })
+    .forEach((block, index) => {
+      const answerView = util.deepCopy(answerBlockMessage);
+
+      /** @type {import('@slack/bolt').Button} */
+      (answerView.accessory).value = `${index}`;
+
+      answerView.text.text = `*${
+        /** @type {import('@slack/bolt').SectionBlock} */
+        (block).text.text
+      }*`;
+
+      const resultView = util.deepCopy(resultBlockMessage);
 
       retView.blocks.splice(3 + index * 2, 0, answerView, resultView);
     });
@@ -570,17 +705,32 @@ function getPollMessage({ user, view }) {
   return retView;
 }
 
-function answerOptionsValid({ view }) {
-  const answers = view.blocks.filter(
-    (block) =>
-      block.accessory && block.accessory.action_id === deleteSingleAnswerAction
-  );
+/**
+ *
+ * @param {import('@slack/bolt').SlackViewAction} viewAction
+ * @returns {boolean} check if answers exist if no adding is allowed
+ */
+export function answerOptionsValid({ view }) {
+  const answers = view.blocks.filter((block) => {
+    const sectionBlock =
+      /** @type {import('@slack/bolt').SectionBlock} */
+      (block);
+
+    return (
+      sectionBlock.accessory &&
+      /** @type {import('@slack/bolt').Button} */
+      (sectionBlock.accessory).action_id ===
+        creationModalActions.deleteSingleAnswer
+    );
+  });
 
   if (answers.length === 0) {
     // check options
-    const addAnswers = view.state.values[optionsBlockName][
-      optionsAction
-    ].selected_options.filter((option) => option.value === optionAddAllowed);
+    const addAnswers = view.state.values[creationModalBlocks.options][
+      creationModalActions.options
+    ].selected_options.filter(
+      (option) => option.value === optionCheckboxes.addAllowed
+    );
 
     // add Options not selected: error
     if (addAnswers.length === 0) {
@@ -592,8 +742,15 @@ function answerOptionsValid({ view }) {
 }
 
 // action = undefined means delete all answers of user
-function vote({ message, user }, action) {
-  const view = JSON.parse(JSON.stringify(pollMessage));
+/**
+ * vote, remove vote and remove all votes of user
+ * @param {import("@slack/bolt").BlockAction} body
+ * @param {import("@slack/bolt").ButtonAction} [action]
+ * @returns {import("@slack/bolt").RespondArguments}
+ */
+export function vote({ message, user }, action) {
+  /** @type {import("@slack/bolt").RespondArguments} */
+  const view = util.deepCopy(pollMessage);
 
   // take over all information
   view.text = message.text;
@@ -601,19 +758,51 @@ function vote({ message, user }, action) {
 
   // get options from "delete my answers" button
   const options =
-    view.blocks[view.blocks.length - 1].elements[
-      view.blocks[view.blocks.length - 1].elements.length - 2
-    ].value;
+    /** @type {import('@slack/bolt').Button} */
+    (
+      /** @type {import('@slack/bolt').ActionsBlock} */
+      (view.blocks[view.blocks.length - 1]).elements[
+        /** @type {import('@slack/bolt').ActionsBlock} */
+        (view.blocks[view.blocks.length - 1]).elements.length - 2
+      ]
+    ).value; // - much readable, very wow
 
   view.blocks.forEach((block, index) => {
-    if (!block.accessory || !/^\d*/.test(block.accessory.value)) return;
+    const sectionBlock =
+      /** @type {import('@slack/bolt').SectionBlock} */
+      (block);
+
+    if (
+      !sectionBlock.accessory ||
+      !/^\d*/.test(
+        /** @type {import('@slack/bolt').Button} */ (sectionBlock.accessory)
+          .value
+      )
+    )
+      return;
+
+    const accessory = /** @type {import('@slack/bolt').Button} */ (
+      sectionBlock.accessory
+    );
 
     // get users that already voted + remove answer number
-    const users = block.accessory.value.split('-');
+    const users = accessory.value.split('-');
+
     users.shift();
 
     // see if user already voted
     const indexUser = users.indexOf(user.id);
+
+    // get context block after answer block
+    const contextBlock =
+      /** @type {import('@slack/bolt').ContextBlock} */
+      (view.blocks[index + 1]);
+
+    // get element of context block after answer block
+    const contextTextElement =
+      /** @type {import('@slack/bolt').MrkdwnElement} */ (
+        contextBlock.elements[0]
+      );
 
     // action is "delete all votes"
     if (!action) {
@@ -628,8 +817,8 @@ function vote({ message, user }, action) {
       // check if the current block was voted on,
       // or if "single select" is enabled (all other blocks are cleared from user)
       if (
-        block.accessory.value !== action.value &&
-        options.includes(optionMultipleSelect)
+        accessory.value !== action.value &&
+        options.includes(optionCheckboxes.multipleSelect)
       ) {
         return;
       }
@@ -638,32 +827,30 @@ function vote({ message, user }, action) {
       // no matter if voted block or not
       if (indexUser !== -1) users.splice(indexUser, 1);
       // user didn't vote yet and it's voted block: add
-      else if (indexUser === -1 && block.accessory.value === action.value) {
+      else if (indexUser === -1 && accessory.value === action.value) {
         users.push(user.id);
       }
     }
 
     // reset block
-    block.accessory.value = block.accessory.value.split('-')[0];
-    view.blocks[index + 1].elements[0].text = '';
+    accessory.value = accessory.value.split('-')[0];
+    contextTextElement.text = '';
 
     users.forEach((user, idx) => {
       // fill value
-      block.accessory.value += `-${user}`;
+      accessory.value += `-${user}`;
 
       // fill text only if not anonymous
-      if (options.includes(optionAnonym)) return; // goes into next iteration
+      if (options.includes(optionCheckboxes.anonym)) return; // goes into next iteration
 
-      view.blocks[index + 1].elements[0].text += `${
-        idx !== 0 ? ', ' : ''
-      }<@${user}>`;
+      contextTextElement.text += `${idx !== 0 ? ', ' : ''}<@${user}>`;
     });
 
     // add total number of votes
     if (users.length === 0) {
-      view.blocks[index + 1].elements[0].text += 'Keine Stimmen';
+      contextTextElement.text += 'Keine Stimmen';
     } else {
-      view.blocks[index + 1].elements[0].text += `\n${users.length} ${
+      contextTextElement.text += `\n${users.length} ${
         users.length === 1 ? 'Stimme' : 'Stimmen'
       }`;
     }
@@ -672,9 +859,14 @@ function vote({ message, user }, action) {
   return view;
 }
 
+/**
+ * Popup to add answer to existing poll
+ * @param {import('@slack/bolt').BlockAction} body
+ * @returns {import('@slack/web-api').ViewsOpenArguments}
+ */
 // eslint-disable-next-line camelcase
-function getAddAnswerView({ trigger_id, message, channel }) {
-  const view = JSON.parse(JSON.stringify(addAnswerView));
+export function getAddAnswerView({ trigger_id, message, channel }) {
+  const view = util.deepCopy(addAnswerView);
 
   // eslint-disable-next-line camelcase
   view.trigger_id = trigger_id;
@@ -684,14 +876,25 @@ function getAddAnswerView({ trigger_id, message, channel }) {
   return view;
 }
 
-// eslint-disable-next-line camelcase
-function addAnswerMessage({ private_metadata, state: { values } }, { blocks }) {
+/**
+ *
+ * @param {import('@slack/bolt').ViewOutput} view
+ * @param {import('@slack/web-api/dist/response/ConversationsHistoryResponse').Message} message
+ * @returns {import('@slack/web-api').ChatUpdateArguments}
+ */
+export function addAnswerMessage(
+  // eslint-disable-next-line camelcase
+  { private_metadata, state: { values } },
+  { blocks }
+) {
+  /** @type {import('@slack/web-api').ChatUpdateArguments} */
   const updateMessage = {
     token: process.env.SLACK_BOT_TOKEN,
     // eslint-disable-next-line camelcase
     channel: private_metadata.split('-')[0],
     // eslint-disable-next-line camelcase
     ts: private_metadata.split('-')[1],
+    // @ts-ignore - unsolvable type conflict
     blocks
   };
 
@@ -701,45 +904,28 @@ function addAnswerMessage({ private_metadata, state: { values } }, { blocks }) {
     if (block.accessory && /^\d*/.test(block.accessory.value)) idx += 1;
   });
 
-  const answerView = JSON.parse(JSON.stringify(answerBlockMessage));
-  answerView.accessory.value = `${idx}`;
-  answerView.text.text = `*${values[newAnswerBlockName][addAnswerViewTextInput].value}*`;
+  const answerView = util.deepCopy(answerBlockMessage);
 
-  const resultView = JSON.parse(JSON.stringify(resultBlockMessage));
+  /** @type {import('@slack/bolt').Button} */
+  (answerView.accessory).value = `${idx}`;
+
+  answerView.text.text = `*${
+    values[creationModalBlocks.newAnswer][
+      pollMessageActions.addAnswerViewTextInput
+    ].value
+  }*`;
+
+  const resultView = util.deepCopy(resultBlockMessage);
 
   updateMessage.blocks.splice(blocks.length - 2, 0, answerView, resultView);
 
   return updateMessage;
 }
 
-function getHomeView() {
-  return JSON.parse(JSON.stringify(homeView));
+/**
+ *
+ * @returns {import("@slack/bolt").KnownBlock[]}
+ */
+export function getHomeView() {
+  return util.deepCopy(homeView);
 }
-
-// exports
-module.exports = {
-  getHomeView,
-  homeViewCommand,
-
-  getPollsView,
-  addAnswer,
-  deleteAnswer,
-  getPollMessage,
-  answerOptionsValid,
-  vote,
-  getAddAnswerView,
-  addAnswerMessage,
-
-  newAnswerBlockName,
-  newAnswerInputAction,
-  pollViewName,
-  addAnswerAction,
-  deleteSingleAnswerAction,
-  deleteAllAnswerAction,
-  voteButtonAction,
-  messageAddAnswerAction,
-  messageDeleteAnswersAction,
-  messageOverflowAction,
-  messageOverflowDelete,
-  addAnswerViewName
-};

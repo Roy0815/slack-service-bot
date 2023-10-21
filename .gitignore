@@ -3,3 +3,4 @@ secret.json
 .prettierrc.json
 node_modules/
 package-lock.json
+gcloud-artifact-registry.json

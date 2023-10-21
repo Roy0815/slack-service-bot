@@ -1,6 +1,12 @@
-// imports
-const views = require('./views');
+// local imports
+import * as views from './views.js';
 
+/** @type {import('../general/types').appComponent} */
+export const pollzApp = { setupApp, getHomeView: views.getHomeView };
+
+/**
+ * @param {import("@slack/bolt").App} app
+ */
 function setupApp(app) {
   //* ******************* Commands ********************//
   app.command('/umfrage', async ({ command, ack, client }) => {
@@ -16,60 +22,89 @@ function setupApp(app) {
 
     // open modal
     await client.views.open(
-      views.getPollsView({ trigger_id: body.trigger_id, text: '' })
+      views.getPollsView(
+        /** @type {import('@slack/bolt').BlockAction} */ (body)
+      )
     );
   });
 
-  app.action(views.addAnswerAction, async ({ ack, client, body }) => {
-    await ack();
+  app.action(
+    views.creationModalActions.addAnswer,
+    async ({ ack, client, body }) => {
+      await ack();
 
-    if (
-      body.view.state.values[views.newAnswerBlockName][
-        views.newAnswerInputAction
-      ].value == null
-    ) {
-      return;
+      const action =
+        /** @type {import('@slack/bolt').BlockButtonAction} */
+        (body);
+
+      if (
+        action.view.state.values[views.creationModalBlocks.newAnswer][
+          views.creationModalActions.newAnswerInput
+        ].value == null
+      ) {
+        return;
+      }
+
+      await client.views.update(views.addAnswer(action.view));
     }
-
-    await client.views.update(views.addAnswer(body.view));
-  });
+  );
 
   app.action(
     new RegExp(
-      `^(${views.deleteSingleAnswerAction})*(${views.deleteAllAnswerAction})*$`
+      `^(${views.creationModalActions.deleteSingleAnswer})*(${views.creationModalActions.deleteAllAnswers})*$`
     ),
     async ({ ack, action, body, client }) => {
       await ack();
 
-      await client.views.update(views.deleteAnswer(body.view, action));
+      await client.views.update(
+        views.deleteAnswer(
+          /** @type {import('@slack/bolt').BlockButtonAction} */ (body).view,
+          /** @type {import('@slack/bolt').ButtonAction } */ (action)
+        )
+      );
     }
   );
 
-  app.action(views.voteButtonAction, async ({ ack, action, body, respond }) => {
-    await ack();
+  app.action(
+    views.pollMessageActions.voteButton,
+    async ({ ack, action, body, respond }) => {
+      await ack();
 
-    await respond(views.vote(body, action));
-  });
+      await respond(
+        views.vote(
+          /** @type {import('@slack/bolt').BlockButtonAction} */ (body),
+          /** @type {import('@slack/bolt').ButtonAction } */ (action)
+        )
+      );
+    }
+  );
 
   app.action(
-    views.messageDeleteAnswersAction,
+    views.pollMessageActions.deleteAnswer,
     async ({ ack, body, respond }) => {
       await ack();
 
-      await respond(views.vote(body));
+      await respond(
+        views.vote(
+          /** @type {import('@slack/bolt').BlockButtonAction} */ (body)
+        )
+      );
     }
   );
 
   app.action(
-    views.messageOverflowAction,
+    views.pollMessageActions.overflow,
     async ({ ack, body, respond, action, client }) => {
       await ack();
 
+      const overflowAction =
+        /** @type {import('@slack/bolt').OverflowAction } */ (action);
+
       if (
-        !action.selected_option ||
-        action.selected_option.value.split('-')[0] !==
-          views.messageOverflowDelete ||
-        action.selected_option.value.split('-')[1] !== body.user.id
+        !overflowAction.selected_option ||
+        overflowAction.selected_option.value.split('-')[0] !==
+          views.pollMessageActions.overflowDelete ||
+        overflowAction.selected_option.value.split('-')[1] !== body.user.id
       ) {
         await client.chat.postEphemeral({
           token: process.env.SLACK_BOT_TOKEN,
@@ -84,20 +119,26 @@ function setupApp(app) {
     }
   );
 
-  app.action(views.messageAddAnswerAction, async ({ ack, client, body }) => {
-    await ack();
+  app.action(
+    views.pollMessageActions.addAnswer,
+    async ({ ack, client, body }) => {
+      await ack();
 
-    client.views.open(views.getAddAnswerView(body));
-  });
+      client.views.open(
+        views.getAddAnswerView(
+          /** @type {import('@slack/bolt').BlockButtonAction} */ (body)
+        )
+      );
+    }
+  );
 
   //* ******************* View Submissions ********************//
-  app.view(views.pollViewName, async ({ body, ack, client }) => {
-    // check if answers exist if no adding is allowed
+  app.view(views.viewNames.creationModal, async ({ body, ack, client }) => {
     if (!views.answerOptionsValid(body)) {
       await ack({
         response_action: 'errors',
         errors: {
-          [views.newAnswerBlockName]:
+          [views.creationModalBlocks.newAnswer]:
             'Bitte Antwortmöglichkeiten eingeben oder hinzufügen erlauben'
         }
       });
@@ -110,7 +151,7 @@ function setupApp(app) {
     await client.chat.postMessage(views.getPollMessage(body));
   });
 
-  app.view(views.addAnswerViewName, async ({ view, ack, client }) => {
+  app.view(views.viewNames.addAnswerModal, async ({ view, ack, client }) => {
     await ack();
 
     // get source message
@@ -125,8 +166,3 @@ function setupApp(app) {
     await client.chat.update(views.addAnswerMessage(view, result.messages[0]));
   });
 }
-
-//* ******************* Exports ********************//
-module.exports = {
-  setupApp
-};

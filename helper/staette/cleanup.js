@@ -1,7 +1,7 @@
 // References
-const functions = require('./functions');
-const { App } = require('@slack/bolt');
-const util = require('../general/util');
+import * as functions from './functions.js';
+import { App } from '@slack/bolt';
+import * as util from '../general/util.js';
 
 // Create Bolt App
 const app = new App({
@@ -20,10 +20,10 @@ functions.cleanup(app).then((result) => {
     filetype: 'javascript',
     initial_comment: `Job ran at ${util.formatDate(
       new Date()
-    )} ${util.formatTime(new Date())} and deleted ${result.count} Message${
-      result.count === 1 ? '' : 's'
+    )} ${util.formatTime(new Date())} and deleted ${result.length} Message${
+      result.length === 1 ? '' : 's'
     }`,
     title: 'Messages',
-    content: JSON.stringify(result.messages, null, '\t')
+    content: JSON.stringify(result, null, '\t')
   });
 });

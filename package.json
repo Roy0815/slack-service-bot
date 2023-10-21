@@ -3,6 +3,7 @@
   "version": "0.0.1",
   "description": "A basic template to spin up a Bolt app for Slack",
   "main": "app.js",
+  "type": "module",
   "scripts": {
     "start": "node app.js",
     "lint": "eslint app.js helper/",
@@ -29,6 +30,7 @@
     "eslint-config-prettier": "^9.0.0",
     "eslint-config-standard": "^17.1.0",
     "eslint-plugin-import": "^2.27.5",
+    "eslint-plugin-jsdoc": "^46.8.2",
     "eslint-plugin-n": "^16.0.0",
     "eslint-plugin-promise": "^6.1.1",
     "prettier": "^3.0.3"

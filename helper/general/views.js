@@ -1,7 +1,9 @@
 // imports
-const apps = require('./apps');
+import * as util from './util.js';
+import { apps } from './apps.js';
 
 //* ******************* Views ********************//
+/** @type {import("@slack/web-api").ViewsPublishArguments} */
 const homeView = {
   // Use the user ID associated with the event
   user_id: '',
@@ -12,25 +14,30 @@ const homeView = {
         type: 'section',
         text: {
           type: 'mrkdwn',
-          text: 'Hallo 👋 Ich bin der Schwerathletik Mannheim Service-Bot.\nIch habe viele nützliche Funktionen:'
+          text: `Hallo 👋 Ich bin der Schwerathletik Mannheim Service-Bot.\n${
+            process.env.APP_ADMIN
+              ? `Wenn du Fragen hast oder einen Fehler entdeckt hast wende dich gerne an <@${process.env.APP_ADMIN}>\n`
+              : ''
+          }Ich habe viele nützliche Funktionen:`
         }
       }
     ]
   }
 };
 
-const basicMessage = {
-  channel: '',
-  text: ''
-};
-
 //* ******************* Functions ********************//
-function getHomeView({ user }) {
-  const view = JSON.parse(JSON.stringify(homeView));
+/**
+ *
+ * @param {import("@slack/bolt").AppHomeOpenedEvent} event
+ * @returns {import("@slack/web-api").ViewsPublishArguments}
+ */
+export function getHomeView({ user }) {
+  const view = util.deepCopy(homeView);
+
   view.user_id = user;
 
   // add homeviews of apps
-  apps.views.forEach((element) => {
+  apps.forEach((element) => {
     view.view.blocks.push({
       type: 'divider'
     });
@@ -40,10 +47,3 @@ function getHomeView({ user }) {
 
   return view;
 }
-
-//* ******************* Export ********************//
-module.exports = {
-  getHomeView,
-
-  basicMessage
-};

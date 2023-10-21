@@ -1,28 +1,30 @@
 // local references
-const sheet = require('./sheet');
-const util = require('../general/util');
+import * as sheet from './sheet.js';
+import * as util from '../general/util.js';
+import * as types from './types.js';
 
 // constants
-const registerViewName = 'registerview';
-const registerBlockNameSelect = 'name_select_block';
-const registerActionNameSelect = 'name_select';
+export const registerViewName = 'registerview';
+export const registerBlockNameSelect = 'name_select_block';
+export const registerActionNameSelect = 'name_select';
 
-const maintainHoursViewName = 'maintainhours';
-const maintainHoursBlockDescription = 'description_block';
-const autoregisterInputBlock = 'autoregisterinput_block';
-const maintainHoursActionDescription = 'description';
-const maintainHoursBlockDate = 'date_block';
-const maintainHoursActionDate = 'date';
-const maintainHoursBlockHours = 'hours_block';
-const maintainHoursActionHours = 'hours';
+export const maintainHoursViewName = 'maintainhours';
+export const maintainHoursBlockDescription = 'description_block';
+export const autoregisterInputBlock = 'autoregisterinput_block';
+export const maintainHoursActionDescription = 'description';
+export const maintainHoursBlockDate = 'date_block';
+export const maintainHoursActionDate = 'date';
+export const maintainHoursBlockHours = 'hours_block';
+export const maintainHoursActionHours = 'hours';
 
-const homeViewInputBlockId = 'as-home-view-input-block';
-const homeViewYearSelect = 'as-home-year-select-action';
-const homeViewDetailsSelect = 'as-home-details-select-action';
-const homeViewDisplayHours = 'as-home-display-hours-action';
-const homeViewMaintainHours = 'as-home-maintain-hours-action';
+export const homeViewInputBlockId = 'as-home-view-input-block';
+export const homeViewYearSelect = 'as-home-year-select-action';
+export const homeViewDetailsSelect = 'as-home-details-select-action';
+export const homeViewDisplayHours = 'as-home-display-hours-action';
+export const homeViewMaintainHours = 'as-home-maintain-hours-action';
 
 //* ******************* Views ********************//
+/** @type {import("@slack/web-api").ViewsOpenArguments} */
 const registerView = {
   trigger_id: '',
   view: {
@@ -66,6 +68,7 @@ const registerView = {
   }
 };
 
+/** @type {import('@slack/web-api').ViewsOpenArguments} */
 const maintainHoursView = {
   trigger_id: '',
   view: {
@@ -136,6 +139,7 @@ const maintainHoursView = {
   }
 };
 
+/** @type {import("@slack/web-api").ChatPostMessageArguments} */
 const basicConfirmDialogView = {
   channel: '',
   text: '', // Text in the notification, set in the method
@@ -179,6 +183,7 @@ const basicConfirmDialogView = {
   ]
 };
 
+/** @type {import("@slack/bolt").KnownBlock[]} */
 const homeView = [
   {
     type: 'header',
@@ -215,7 +220,7 @@ const homeView = [
       },
       {
         type: 'static_select',
-        initial_option: '', // object like in options. Filled in method
+        initial_option: { text: { type: 'plain_text', text: '' } }, // object like in options. Filled in method
         options: [], // filled in method
         action_id: homeViewYearSelect
       },
@@ -254,41 +259,61 @@ const homeView = [
 ];
 
 //* ******************* Functions ********************//
-async function getRegisterView(triggerId) {
-  const view = JSON.parse(JSON.stringify(registerView));
+/**
+ * Get popup for own user registration
+ * @param {string} triggerId
+ * @returns {Promise<import("@slack/web-api").ViewsOpenArguments>}
+ */
+export async function getRegisterView(triggerId) {
+  const view = util.deepCopy(registerView);
   view.trigger_id = triggerId;
 
-  // set users
-  const users = await sheet.getAllUsers();
+  const element = /** @type {import("@slack/bolt").InputBlock} */ (
+    view.view.blocks[0]
+  ).element;
 
-  for (const user of users) {
-    view.view.blocks[0].element.options.push({
+  for (const user of await sheet.getAllUsers()) {
+    /** @type {import("@slack/bolt").StaticSelect} */ (element).options.push({
       text: {
         type: 'plain_text',
-        text: user.name,
+        text: `${user.firstname} ${user.lastname}`,
         emoji: true
       },
-      value: user.id
+      value: user.id.toString()
     });
   }
 
   return view;
 }
 
-async function getAutoRegisterMessage(slackId) {
-  const view = JSON.parse(JSON.stringify(basicConfirmDialogView));
+/**
+ * Get message for admin channel user registration
+ * @param {string} slackId
+ * @returns {Promise<import("@slack/web-api").ChatPostMessageArguments>}
+ */
+export async function getAutoRegisterMessage(slackId) {
+  const view = util.deepCopy(basicConfirmDialogView);
   view.channel = await sheet.getAdminChannel();
 
-  view.text =
-    view.blocks[0].text.text = `<@${slackId}> ist beigetreten und noch nicht registriert. Bitte wähle den Namen aus:`;
+  view.text = /** @type {import('@slack/bolt').SectionBlock} */ (
+    view.blocks[0]
+  ).text.text = `<@${slackId}> ist beigetreten und noch nicht registriert. Bitte wähle den Namen aus:`;
 
-  view.blocks[1].elements[0].value = slackId;
-  view.blocks[1].elements[0].text.text = 'Submit';
-  view.blocks[1].elements[0].action_id = 'auto-register-submit-button';
-  view.blocks[1].block_id = autoregisterInputBlock;
+  const actionBlock = /** @type {import('@slack/bolt').ActionsBlock} */ (
+    view.blocks[1]
+  );
+
+  /** @type {import('@slack/bolt').Button} */
+  (actionBlock.elements[0]).value = slackId;
+
+  /** @type {import('@slack/bolt').Button} */
+  (actionBlock.elements[0]).text.text = 'Submit';
+
+  actionBlock.elements[0].action_id = 'auto-register-submit-button';
+  actionBlock.block_id = autoregisterInputBlock;
 
   // add user select
-  view.blocks[1].elements.unshift({
+  actionBlock.elements.unshift({
     type: 'external_select',
     placeholder: {
       type: 'plain_text',
@@ -299,35 +324,62 @@ async function getAutoRegisterMessage(slackId) {
   });
 
   // remove decline button
-  view.blocks[1].elements.pop();
+  actionBlock.elements.pop();
 
   return view;
 }
 
-async function getRegisterConfirmDialog(registerObj) {
-  // { id, slackId, name, approved }
-  const view = JSON.parse(JSON.stringify(basicConfirmDialogView));
+/**
+ * Admin channel confirm dialog for register
+ * @param {types.registerObj} registerObj
+ * @returns {Promise<import("@slack/web-api").ChatPostMessageArguments>}
+ */
+export async function getRegisterConfirmDialog(registerObj) {
+  const view = util.deepCopy(basicConfirmDialogView);
   view.channel = await sheet.getAdminChannel();
 
-  view.text =
-    view.blocks[0].text.text = `<@${registerObj.slackId}> möchte sich als ${registerObj.name} registrieren`;
+  view.text = /** @type {import('@slack/bolt').SectionBlock} */ (
+    view.blocks[0]
+  ).text.text = `<@${registerObj.slackId}> möchte sich als ${registerObj.name} registrieren`;
 
-  view.blocks[1].elements[0].value = JSON.stringify(registerObj);
-  view.blocks[1].elements[0].action_id = 'register-approve-button';
-  view.blocks[1].elements[1].value = JSON.stringify(registerObj);
-  view.blocks[1].elements[1].action_id = 'register-reject-button';
+  const actionBlock = /** @type {import('@slack/bolt').ActionsBlock} */ (
+    view.blocks[1]
+  );
+
+  const btn1 = /** @type {import('@slack/bolt').Button} */ (
+    actionBlock.elements[0]
+  );
+
+  const btn2 = /** @type {import('@slack/bolt').Button} */ (
+    actionBlock.elements[1]
+  );
+
+  btn1.value = JSON.stringify(registerObj);
+  btn1.action_id = 'register-approve-button';
+  btn2.value = JSON.stringify(registerObj);
+  btn2.action_id = 'register-reject-button';
 
   return view;
 }
 
-function getUserRegisterStartMessage({ slackId, name }) {
+/**
+ * Message to notify user that registration has been requested
+ * @param {types.registerObj} registerObj
+ * @returns {import("@slack/web-api").ChatPostMessageArguments}
+ */
+export function getUserRegisterStartMessage({ slackId, name }) {
   return {
     channel: slackId,
     text: `Deine Registrierung als ${name} wurde zur Freigabe weitergeleitet.\nDu wirst informiert, sobald die Verlinkung freigegeben wurde.`
   };
 }
 
-function getUserRegisterEndMessage({ slackId, name, approved }) {
+/**
+ * Message to notify user that registration has been finalized
+ * @param {types.registerObjectFinalizer} registerObjectFinalizer
+ * @returns {import("@slack/web-api").ChatPostMessageArguments}
+ */
+export function getUserRegisterEndMessage({ slackId, name, approved }) {
   return {
     channel: slackId,
     text: `Deine Registrierung als ${name} wurde ${
@@ -338,75 +390,120 @@ function getUserRegisterEndMessage({ slackId, name, approved }) {
   };
 }
 
-function getMaintainHoursView(triggerId) {
-  const view = JSON.parse(JSON.stringify(maintainHoursView));
+/**
+ * Get popup for hours maintenance
+ * @param {string} triggerId
+ * @returns {import("@slack/web-api").ViewsOpenArguments}
+ */
+export function getMaintainHoursView(triggerId) {
+  const view = util.deepCopy(maintainHoursView);
   view.trigger_id = triggerId;
 
   return view;
 }
 
-async function getMaintainConfirmDialog(entity) {
-  // { slackId, title, hours, date }
-  const view = JSON.parse(JSON.stringify(basicConfirmDialogView));
-  const dateObj = new Date(
-    entity.date.split('-')[0],
-    entity.date.split('-')[1] - 1,
-    entity.date.split('-')[2]
-  );
+/**
+ * Get confirm dialog for hours maintenance in admin channel
+ * @param {types.hoursObjMaint} hoursObjMaint
+ * @returns {Promise<import("@slack/web-api").ChatPostMessageArguments>}
+ */
+export async function getMaintainConfirmDialog(hoursObjMaint) {
+  const view = util.deepCopy(basicConfirmDialogView);
+
+  const [year, month, day] = hoursObjMaint.date.split('-');
+  const dateObj = new Date(Number(year), Number(month) - 1, Number(day));
 
   view.channel = await sheet.getAdminChannel();
-  view.text = view.blocks[0].text.text = `<@${
-    entity.slackId
-  }> möchte folgenden Arbeitseinsatz erfassen:\n${entity.title}: ${
-    entity.hours
-  } Stunde${entity.hours === 1 ? '' : 'n'} am ${util.formatDate(dateObj)}`;
 
-  view.blocks[1].elements[0].value = JSON.stringify(entity);
-  view.blocks[1].elements[0].action_id = 'maintain-approve-button';
-  view.blocks[1].elements[1].value = JSON.stringify(entity);
-  view.blocks[1].elements[1].action_id = 'maintain-reject-button';
+  view.text = /** @type {import('@slack/bolt').SectionBlock} */ (
+    view.blocks[0]
+  ).text.text = `<@${
+    hoursObjMaint.slackId
+  }> möchte folgenden Arbeitseinsatz erfassen:\n${hoursObjMaint.description}: ${
+    hoursObjMaint.hours
+  } Stunde${hoursObjMaint.hours === 1 ? '' : 'n'} am ${util.formatDate(
+    dateObj
+  )}`;
+
+  const actionBlock = /** @type {import('@slack/bolt').ActionsBlock} */ (
+    view.blocks[1]
+  );
+
+  const btn1 = /** @type {import('@slack/bolt').Button} */ (
+    actionBlock.elements[0]
+  );
+
+  const btn2 = /** @type {import('@slack/bolt').Button} */ (
+    actionBlock.elements[1]
+  );
+
+  btn1.value = JSON.stringify(hoursObjMaint);
+  btn1.action_id = 'maintain-approve-button';
+  btn2.value = JSON.stringify(hoursObjMaint);
+  btn2.action_id = 'maintain-reject-button';
 
   return view;
 }
 
-function getUserMaintainStartMessage({ slackId, title, hours, date }) {
-  const dateObj = new Date(
-    date.split('-')[0],
-    date.split('-')[1] - 1,
-    date.split('-')[2]
-  );
+/**
+ * Get message to notify user that hours maintenance has been requested
+ * @param {types.hoursObjMaint} hoursObjMaint
+ * @returns {import("@slack/web-api").ChatPostMessageArguments}
+ */
+export function getUserMaintainStartMessage({
+  slackId,
+  description,
+  hours,
+  date
+}) {
+  const [year, month, day] = date.split('-');
+  const dateObj = new Date(Number(year), Number(month) - 1, Number(day));
 
   return {
     channel: slackId,
     text: `Deine Erfassung von ${hours} Stunden am ${util.formatDate(
       dateObj
-    )} für "${title}" wurde zur Freigabe weitergeleitet.\nDu wirst informiert, sobald die Stunden genehmigt wurden.`
+    )} für "${description}" wurde zur Freigabe weitergeleitet.\nDu wirst informiert, sobald die Stunden genehmigt wurden.`
   };
 }
 
-function getUserMaintainEndMessage({ slackId, title, hours, date, approved }) {
-  const dateObj = new Date(
-    date.split('-')[0],
-    date.split('-')[1] - 1,
-    date.split('-')[2]
-  );
+/**
+ * Get message to notify user that hours maintenance has been finalized
+ * @param {types.hoursMaintFinalizer} hoursMaintFinalizer
+ * @returns {import("@slack/web-api").ChatPostMessageArguments}
+ */
+export function getUserMaintainEndMessage(hoursMaintFinalizer) {
+  const [year, month, day] = hoursMaintFinalizer.date.split('-');
+  const dateObj = new Date(Number(year), Number(month) - 1, Number(day));
 
   return {
-    channel: slackId,
-    text: `Deine Erfassung von ${hours} Stunden am ${util.formatDate(
-      dateObj
-    )} für "${title}" wurde ${approved ? 'genehmigt' : 'abgelehnt'}.`
+    channel: hoursMaintFinalizer.slackId,
+    text: `Deine Erfassung von ${
+      hoursMaintFinalizer.hours
+    } Stunden am ${util.formatDate(dateObj)} für "${
+      hoursMaintFinalizer.description
+    }" wurde ${hoursMaintFinalizer.approved ? 'genehmigt' : 'abgelehnt'}.`
   };
 }
 
-function getHomeView() {
-  const view = JSON.parse(JSON.stringify(homeView));
+/**
+ * Get part of the home view
+ * @returns {import("@slack/bolt").KnownBlock[]}
+ */
+export function getHomeView() {
+  const view = util.deepCopy(homeView);
 
   // add year options
   let year = new Date().getFullYear();
 
+  const actionBlock = /** @type {import('@slack/bolt').ActionsBlock} */ (
+    view[2]
+  );
+
   while (year >= 2022) {
-    view[2].elements[1].options.push({
+    /** @type {import('@slack/bolt').StaticSelect} */ (
+      actionBlock.elements[1]
+    ).options.push({
       text: {
         type: 'plain_text',
         text: `${year}`,
@@ -417,39 +514,11 @@ function getHomeView() {
     year--;
   }
 
-  view[2].elements[1].initial_option = view[2].elements[1].options[0];
+  /** @type {import('@slack/bolt').StaticSelect} */ (
+    actionBlock.elements[1]
+  ).initial_option = /** @type {import('@slack/bolt').StaticSelect} */ (
+    actionBlock.elements[1]
+  ).options[0];
 
   return view;
 }
-
-// exports
-module.exports = {
-  getHomeView,
-  homeViewInputBlockId,
-  homeViewYearSelect,
-  homeViewDetailsSelect,
-  homeViewDisplayHours,
-  homeViewMaintainHours,
-
-  getRegisterView,
-  getRegisterConfirmDialog,
-  getUserRegisterStartMessage,
-  getUserRegisterEndMessage,
-  getAutoRegisterMessage,
-  registerViewName,
-  registerBlockNameSelect,
-  registerActionNameSelect,
-  autoregisterInputBlock,
-
-  getMaintainHoursView,
-  getMaintainConfirmDialog,
-  getUserMaintainStartMessage,
-  getUserMaintainEndMessage,
-  maintainHoursViewName,
-  maintainHoursBlockDescription,
-  maintainHoursActionDescription,
-  maintainHoursBlockDate,
-  maintainHoursActionDate,
-  maintainHoursBlockHours,
-  maintainHoursActionHours
-};

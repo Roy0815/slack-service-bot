@@ -1,15 +1,6 @@
-const asApp = require('../arbeitsstunden/app');
-const asView = require('../arbeitsstunden/views');
+import { asApp } from '../arbeitsstunden/app.js';
+import { staetteApp } from '../staette/app.js';
+import { pollzApp } from '../pollz/app.js';
 
-const staetteApp = require('../staette/app');
-const staetteView = require('../staette/views');
-
-const pollzApp = require('../pollz/app');
-const pollzView = require('../pollz/views');
-
-module.exports = {
-  // all of the apps have to contain a function "setupApp" that takes in the bolt app
-  apps: [asApp, staetteApp, pollzApp],
-  // all of the views have to contain a function "getHomeView" that returns the blocks of their respective home view
-  views: [asView, staetteView, pollzView]
-};
+/** @type {import('./types').appComponent[]} */
+export const apps = [asApp, staetteApp, pollzApp];
