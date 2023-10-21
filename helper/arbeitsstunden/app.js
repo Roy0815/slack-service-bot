@@ -273,12 +273,6 @@ function setupApp(app) {
         return;
       }
 
-      console.log(
-        blckAction.state.values[views.autoregisterInputBlock][
-          views.registerActionNameSelect
-        ].selected_option
-      );
-
       // edit approval message to show final result
       await respond(
         `<@${
