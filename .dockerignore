@@ -1,9 +1,15 @@
+# folders
+.github
+example-docker-compose-files
+node_modules
+images
+
+# files
 .env
 .gitignore
 .prettierrc.json
-secret.json
+.eslintrc.json
 docker-compose.yml
-example-docker-compose-files
-images
 gcloud-artifact-registry.json
 README.md
+secret.json
