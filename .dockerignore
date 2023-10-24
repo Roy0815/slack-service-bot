@@ -6,3 +6,4 @@ docker-compose.yml
 example-docker-compose-files
 images
 gcloud-artifact-registry.json
+README.md

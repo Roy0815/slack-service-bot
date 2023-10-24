@@ -1,10 +1,11 @@
 // References
 import * as functions from './functions.js';
-import { App } from '@slack/bolt';
+import * as slack from '@slack/bolt';
 import * as util from '../general/util.js';
 
 // Create Bolt App
-const app = new App({
+// @ts-ignore
+const app = new slack.default.App({
   token: process.env.SLACK_BOT_TOKEN,
   signingSecret: process.env.SLACK_SIGNING_SECRET
 });
@@ -12,6 +13,7 @@ const app = new App({
 // cleanup old messages
 functions.cleanup(app).then((result) => {
   // log job execution
+  console.log(`deleted ${result.length} Messages`);
   if (!process.env.CRONJOB_LOG_TO_ADMIN) return;
 
   app.client.files.upload({

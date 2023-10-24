@@ -38,7 +38,7 @@ export async function cleanup({ client }) {
     // get date from message
     const text = msg.blocks[0].text.text.replace(/`/g, '');
 
-    const [year, month, day] = text.split('.');
+    const [day, month, year] = text.split('.');
     const date = new Date(Number(year), Number(month) - 1, Number(day));
 
     if (date < cutoffDate) {
