@@ -33,7 +33,8 @@ export function setupApp(app) {
         return;
       }
 
-      if (date < new Date().setHours(0,0,0,0)) {
+      // @ts-ignore
+      if (date < new Date().setHours(0, 0, 0, 0)) {
         respond('Bitte ein Datum >= heute angeben');
         return;
       }
@@ -64,7 +65,8 @@ export function setupApp(app) {
 
       date = util.formatDate(dateObj);
 
-      if (dateObj < new Date().setHours(0,0,0,0)) {
+      // @ts-ignore
+      if (dateObj < new Date().setHours(0, 0, 0, 0)) {
         client.chat.postMessage({
           channel: body.user.id,
           text: `*Stätte Abfrage*\nDatum ${date} liegt in der Vergangenheit. Bitte ein Datum >= heute angeben`
