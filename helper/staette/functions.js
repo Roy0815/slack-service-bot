@@ -86,14 +86,14 @@ export async function sortMessages({ client, date }) {
   );
 
   // get messages with date later than current message
-  const [year, month, day] = date.split('.');
+  const [day, month, year] = date.split('.');
   const currDate = new Date(Number(year), Number(month) - 1, Number(day));
   const messagesOrdered = [];
 
   filtered.forEach((msg) => {
     const text = msg.blocks[0].text.text.replace(/`/g, '');
 
-    const [year, month, day] = text.split('.');
+    const [day, month, year] = text.split('.');
     const msgDate = new Date(Number(year), Number(month) - 1, Number(day));
 
     if (msgDate < currDate) return;
