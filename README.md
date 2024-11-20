@@ -10,25 +10,49 @@ Slack Bot für administrative Aufgaben innerhalb Schwerathletik Mannheim 2018 e.
 
 ## Setup
 
-Grundlegend und ausreichend ist ein Server, auf dem [Docker](https://www.docker.com/) läuft. Hier kann das Image aus diesem Repository aufgespielt und konfiguriert werden. Ich denke man könnte direkt einen Docker Service anmieten, da ich aber bereits einen Linux Server hatte, habe ich nicht weiter in diese Richtung recherchiert.
+Grundlegend und ausreichend ist ein Server, auf dem [Docker](https://www.docker.com/) läuft. Hier kann das Image aus diesem Repository aufgespielt und konfiguriert werden.
+Alternativ kann auch ein Cloud Service für Docker direkt genutzt werden, was ich hier am Beispiel Google Cloud Run kurz erläutere.
 
 Hier im Setup werde ich die Schritte auflisten, die ich beim Aufsetzen meines Servers und des Service Bots durchgeführt habe.
 
 **Wo immer möglich habe ich Links zu Guides eingefügt. Trotzdem kann hier oder auch an anderen Stellen eine kurze Google Recherche notwendig sein.**
 
-1. [Server aufsetzen](#1-server-aufsetzen)
-2. [Google Sheets einrichten](#2-google-sheets-einrichten)
-3. [Google und Slack Zugangsdaten holen](#3-google-und-slack-zugangsdaten-holen)
-4. [Docker Image starten](#4-docker-image-starten)
-5. [Slack App Konfiguration](#5-slack-app-konfiguration)
+1. [Google Sheets einrichten](#1-google-sheets-einrichten)
+1. [Google und Slack Zugangsdaten holen](#2-google-und-slack-zugangsdaten-holen)
+1. Umgebung für Docker wählen **(eine der beiden)**
+   1. [Server aufsetzen](#31-server-aufsetzen)
+   1. [Google Cloud Run aufsetzen](#32-google-cloud-run-aufsetzen)
+1. [Slack App Konfiguration](#4-slack-app-konfiguration)
 
-### **1. Server aufsetzen**
+### **1. Google Sheets einrichten**
+
+Für die Integration mit Google Sheets wird die offizielle Google Sheets API genutzt, die über eine sehr gute [Dokumentation](https://developers.google.com/sheets/api/guides/concepts) verfügt.
+In der [Google Cloud Console](console.cloud.google.com/welcome) können die persönlichen Projekte eingesehen werden. Ich habe das Projekt aktuell auf meinem persönlichen Gmail Account. Mitarbeiter hinzufügen geht dort nicht. Hier könnte man in Zukunft schauen es auf einen Schwerathletik-Organisationsaccount umzuhängen.
+
+Danach muss die Google Sheets API im Projekt [aktiviert](https://console.cloud.google.com/flows/enableapi?apiid=sheets.googleapis.com&hl=de) werden.
+
+Nun wird noch ein Dienstkonto benötigt. Das kann [hier](https://console.cloud.google.com/iam-admin/serviceaccounts?hl=de) errstellt werden.
+
+Die Email des Dienstkontos muss als Bearbeiter bei der Google Sheet Datei hinzugefügt werden.
+
+### **2. Google und Slack Zugangsdaten holen**
+
+Slack
+
+Wenn du aktuell in deinem Workspace angemeldet bist kommst du [hier](https://api.slack.com/apps) zu deinen Slack Apps. Wenn du als Contributor zu eine App hinzugefügt wurdest oder die App selbst erstellt hast kannst du sie hier in der Liste sehen. Direkt auf der ersten Seite _"Basic Information"_ kannst du das Signing Secret der App sehen. Im Abschnitt _"OAuth & Permissions"_ kannst du das Bot Token finden, sobald die App auf dem Workspace installiert ist. Sollte das nicht reichen musst du auch direkt die Scopes für den Bot hinzufügen wie in [Sektion 4](#4-slack-app-konfiguration) beschrieben.
+
+Google
+
+Wenn du allen Schritten im Punkt [1. Google Sheets einrichten](#1-google-sheets-einrichten) gefolgt bist kannst du jetzt zum angelegten Dienstkonto navigieren. Hier kannst du in den Details einen Schlüssel erstellen, den du beim einrichten der [Arbeitsstunden](#3-arbeitsstunden) Funktion brauchst.
+
+### **3.1 Server aufsetzen**
 
 - [Server mieten](#server-mieten)
 - [_[optional]_ Domain kaufen und verlinken](#optional-domain-kaufen-und-verlinken)
 - [Server sichern](#server-sichern)
 - [Docker installieren](#docker-installieren)
 - [_[optional]_ Nginx Proxy Manager](#optional-nginx-proxy-manager)
+- [Docker Image starten](#docker-image-starten)
 
 #### **Server mieten**
 
@@ -60,28 +84,7 @@ Beispiel: [`docker-compose.yml`](/example-docker-compose-files/npm-docker-compos
 
 Hier müssen die mit `#` gefüllten Variablen festgelegt werden. Ich weiß nicht mehr genau ob NPM die User für die Datenbank im Container selbst anlegt, oder ob man das manuell übernehmen muss.
 
-### **2. Google Sheets einrichten**
-
-Für die Integration mit Google Sheets wird die offizielle Google Sheets API genutzt, die über eine sehr gute [Dokumentation](https://developers.google.com/sheets/api/guides/concepts) verfügt.
-In der [Google Cloud Console](console.cloud.google.com/welcome) können die persönlichen Projekte eingesehen werden. Ich habe das Projekt aktuell auf meinem persönlichen Gmail Account. Mitarbeiter hinzufügen geht dort nicht. Hier könnte man in Zukunft schauen es auf einen Schwerathletik-Organisationsaccount umzuhängen.
-
-Danach muss die Google Sheets API im Projekt [aktiviert](https://console.cloud.google.com/flows/enableapi?apiid=sheets.googleapis.com&hl=de) werden.
-
-Nun wird noch ein Dienstkonto benötigt. Das kann [hier](https://console.cloud.google.com/iam-admin/serviceaccounts?hl=de) errstellt werden.
-
-Die Email des Dienstkontos muss als Bearbeiter bei der Google Sheet Datei hinzugefügt werden.
-
-### **3. Google und Slack Zugangsdaten holen**
-
-Slack
-
-Wenn du aktuell in deinem Workspace angemeldet bist kommst du [hier](https://api.slack.com/apps) zu deinen Slack Apps. Wenn du als Contributor zu eine App hinzugefügt wurdest oder die App selbst erstellt hast kannst du sie hier in der Liste sehen. Direkt auf der ersten Seite _"Basic Information"_ kannst du das Signing Secret der App sehen. Im Abschnitt _"OAuth & Permissions"_ kannst du das Bot Token finden, sobald die App auf dem Workspace installiert ist. Sollte das nicht reichen musst du auch direkt die Scopes für den Bot hinzufügen wie in [Sektion 5](#5-slack-app-konfiguration) beschrieben.
-
-Google
-
-Wenn du allen Schritten im Punkt [2. Google Sheets einrichten](#2-google-sheets-einrichten) gefolgt bist kannst du jetzt zum angelegten Dienstkonto navigieren. Hier kannst du in den Details einen Schlüssel erstellen, den du beim einrichten der [Arbeitsstunden](#3-arbeitsstunden) Funktion brauchst.
-
-### **4. Docker Image starten**
+#### **Docker Image starten**
 
 Um das Docker Image zu starten sollte die [docker-compose.yml](docker-compose.yml) auf den Server kopiert werden. Hier müssen die mit `#` gefüllten Environment Variablen angepasst werden. Generell sind auf jeden Fall `SLACK_SIGNING_SECRET` und `SLACK_BOT_TOKEN` zu füllen. Funktionsspezifische Variablen werden im Abschnitt [Funktionen](#funktionen) erläutert. In die Variable `APP_ADMIN` kann die Slack-ID des Administrators eingetragen werden. Dieser erhält die Fehlermeldungen der App als Slack Nachricht.
 
@@ -100,7 +103,32 @@ networks:
       name: proxy
 ```
 
-### **5. Slack App Konfiguration**
+### **3.2 Google Cloud Run aufsetzen**
+
+- [Secrets anlegen](#secrets-anlegen)
+- [Docker container konfigurieren](#docker-container-konfigurieren)
+
+#### Secrets anlegen
+
+Im angelegten Google Projekt zum [Secret Manager](https://console.cloud.google.com/security/secret-manager) navigieren und diesen aktivieren. Hier kann man dann ein neues Secret erstellen und die Datei aus Schritt [2. Google und Slack Zugangsdaten holen](#2-google-und-slack-zugangsdaten-holen) für Google Sheets hochladen.
+
+#### Docker container konfigurieren
+
+[Google Cloud Run](https://console.cloud.google.com/run) aktivieren und einen neuen Dienst erstellen.
+
+Wenn das Container Image auf Dockerhub ist, ist die URL docker.io/{user}/{repository}:{tag}
+
+In der weiteren Konfiguration habe ich zunächst eingestellt:
+Max. Anzahl Instanzen: 10
+Port: 8080
+CPU Limit: 1
+Arbeitsspeicher Limit: 512 MB
+Umgebungsvariablen: siehe [Docker Image starten](#docker-image-starten) (lediglich die `GOOGLE_APPLICATION_CREDENTIALS` müssen angepasst werden)
+
+Für die `GOOGLE_APPLICATION_CREDENTIALS` muss ein Volume für das Secret erstellt werden, welches zuvor angelegt wurde. Als Bereistellungspfad im Volume habe ich `/var/lib/files/google-sheets` gewählt.
+Dieser Pfad muss bei der Umgebungsvariable eingetragen werden.
+
+### **4. Slack App Konfiguration**
 
 _Hier gehe ich nur auf die technische und nicht die optische Konfiguration der App ein._
 
@@ -108,7 +136,7 @@ Wenn du in deinem Slack Workspace angemeldet bist kannst du [hier](https://api.s
 
 - **App Home**: `Home Tab`, `Messages Tab` und `Allow users to send Slash commands and messages from the messages tab` aktivieren
 - **Interactivity & Shortcuts**: `Interactivity` aktivieren. `Request URL` und `Options Load URL` auf die URL setzen, unter der das [Docker Image](#4-docker-image-starten) erreichbar ist (+ /slack/events ans Ende der URL)
-- **Slash Commands**: Hier müssen alle Kommandos hinzugefügt werden, die von der App zur Verfügung gestellt werden. Wichtig ist `Escape channels, users, and links sent to your app` immer zu aktivieren. Auch hier sollte die URL auf die URL gesetzt werden, unter der das [Docker Image](#4-docker-image-starten) erreichbar ist (+ /slack/events ans Ende der URL)
+- **Slash Commands**: Hier müssen alle Kommandos hinzugefügt werden, die von der App zur Verfügung gestellt werden. Wichtig ist `Escape channels, users, and links sent to your app` immer zu aktivieren. Auch hier sollte die URL auf die URL gesetzt werden, unter der das Docker Image (entweder [Cloud Run](#32-google-cloud-run-aufsetzen) oder [Server](#docker-image-starten)) erreichbar ist (+ /slack/events ans Ende der URL)
 - **OAuth & Permissions**: Alle benötigten Scopes hinzufügen:
   |OAuth Scope|Description|
   |:---:|:---|
@@ -124,7 +152,7 @@ Wenn du in deinem Slack Workspace angemeldet bist kannst du [hier](https://api.s
   |`im:read`|View basic information about direct messages that Schwerathletik Mannheim Service has been added to|
   |`im:write`|Start direct messages with people|
   |`users:read`|View people in a workspace|
-- **Event Subscriptions**: `Enable Events` aktivieren. Auch hier sollte die URL auf die URL gesetzt werden, unter der das [Docker Image](#4-docker-image-starten) erreichbar ist (+ /slack/events ans Ende der URL). Bei `Subscribe to bot events` die benötigten Events hinzufügen:
+- **Event Subscriptions**: `Enable Events` aktivieren. Auch hier sollte die URL auf die URL gesetzt werden, unter der das Docker Image (entweder [Cloud Run](#32-google-cloud-run-aufsetzen) oder [Server](#docker-image-starten)) erreichbar ist (+ /slack/events ans Ende der URL). Bei `Subscribe to bot events` die benötigten Events hinzufügen:
   |Event Name|Description|
   |:---:|:---|
   |`app_home_opened`|User clicked into your App Home|
@@ -147,19 +175,19 @@ Pollz hat aktuell nur eine Funktion und die ist das Kommando `/umfrage`. Es gibt
 
 ### **2. Staette**
 
-Staette stellt aktuell das Kommando `/weristda` zur Verfügung. Dafür muss die [Environment Variable](#4-docker-image-starten) `STAETTE_CHANNEL` mit der ID des Channels gefüllt werden in dem die Abfragen landen sollen.
+Staette stellt aktuell das Kommando `/weristda` zur Verfügung. Dafür muss die [Environment Variable](#docker-image-starten) `STAETTE_CHANNEL` mit der ID des Channels gefüllt werden in dem die Abfragen landen sollen.
 
-Das Docker Image beinhaltet außerdem einen Cronjob, welcher täglich um 1 Uhr CET läuft und die Abfragen von vergangenen Tagen automatisch löscht. Der Admin hat die Option darüber benachrichtigt zu werden um möglicherweise falsches Systemverhalten besser zu untersuchen. Dafür muss er nur die [Environment Variable](#4-docker-image-starten) `CRONJOB_LOG_TO_ADMIN` setzen. Möchte er nicht benachrichtigt werden kann diese Variable aus dem [`docker-compose.yml`](docker-compose.yml) gelöscht werden.
+Das Docker Image beinhaltet außerdem einen Cronjob, welcher täglich um 1 Uhr CET läuft und die Abfragen von vergangenen Tagen automatisch löscht. Der Admin hat die Option darüber benachrichtigt zu werden um möglicherweise falsches Systemverhalten besser zu untersuchen. Dafür muss er nur die [Environment Variable](#docker-image-starten) `CRONJOB_LOG_TO_ADMIN` setzen. Möchte er nicht benachrichtigt werden kann diese Variable aus dem [`docker-compose.yml`](docker-compose.yml) gelöscht werden.
 
 ### **3. Arbeitsstunden**
 
 Arbeitsstunden stellt die Kommandos `/arbeitsstunden_anzeigen` und `/arbeitsstunden_erfassen` zur Verfügung. Außerdem konsumiert dieser Teil das Event `team_join` um die Verknüpfung zwischen Slack-ID und Mitglieder-Excel herzustellen.
 
-Für diesen Bereich müssen die [Environment Variablen](#4-docker-image-starten) `SHEET_ID` und `GOOGLE_APPLICATION_CREDENTIALS` gefüllt werden.
+Für diesen Bereich müssen die [Environment Variablen](#docker-image-starten) `SHEET_ID` und `GOOGLE_APPLICATION_CREDENTIALS` gefüllt werden.
 
 Die `SHEET_ID` findet man in der URL der Tabelle um die es geht. Sie steht zwischen `docs.google.com/spreadsheets/d/` und dem nächsten `/`.
 
-Bei den `GOOGLE_APPLICATION_CREDENTIALS` wird der Pfad **im Docker Container** zu einer `secret.json` Datei angegeben. Diese Datei enthält die Daten, die beim erstellen der [Google Zugangsdaten](#3-google-und-slack-zugangsdaten-holen) heruntergeladen wurden. Da die Docker Container bei jedem neu erstellen ihre Daten verlieren, können gewisse Verzeichnisse auf die Verzeichnisse des Servers _gemounted_ werden. Das heißt, dass Dateien, die hier auf dem Server liegen auch immer im angegebenen Verzeichnis im Container verfügbar sind. Im [`docker-compose.yml`](docker-compose.yml) ist vorgesehen, dass im Ordner dieser Datei ein weiterer Ordner `volume` existiert, in welchem die `secret.json` liegen soll. Folgender Teil im [`docker-compose.yml`](docker-compose.yml) führt das "mounting" durch:
+Bei den `GOOGLE_APPLICATION_CREDENTIALS` wird der Pfad **im Docker Container** zu einer `secret.json` Datei angegeben. Diese Datei enthält die Daten, die beim erstellen der [Google Zugangsdaten](#2-google-und-slack-zugangsdaten-holen) heruntergeladen wurden. Da die Docker Container bei jedem neu erstellen ihre Daten verlieren, können gewisse Verzeichnisse auf die Verzeichnisse des Servers _gemounted_ werden. Das heißt, dass Dateien, die hier auf dem Server liegen auch immer im angegebenen Verzeichnis im Container verfügbar sind. Im [`docker-compose.yml`](docker-compose.yml) ist vorgesehen, dass im Ordner dieser Datei ein weiterer Ordner `volume` existiert, in welchem die `secret.json` liegen soll. Folgender Teil im [`docker-compose.yml`](docker-compose.yml) führt das "mounting" durch:
 
 ```
 volumes:
