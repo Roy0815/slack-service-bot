@@ -399,6 +399,7 @@ function setupApp(app) {
   });
 
   app.view(views.maintainHoursViewName, async ({ body, ack, client }) => {
+    // check for valid year
     const year = Number(
       body.view.state.values[views.maintainHoursBlockDate][
         views.maintainHoursActionDate
@@ -419,6 +420,23 @@ function setupApp(app) {
       return;
     }
 
+    // check hours
+    const hours = Number(
+      body.view.state.values[views.maintainHoursBlockHours][
+        views.maintainHoursActionHours
+      ].value.replace(',', '.')
+    );
+
+    if (Number.isNaN(hours) || hours <= 0) {
+      await ack({
+        response_action: 'errors',
+        errors: {
+          [views.maintainHoursBlockHours]: `Deine eingegeben Stunden sind keine Zahl. Bitte nur Zahlen und "," verwenden.`
+        }
+      });
+      return;
+    }
+
     await ack();
 
     // build maintenance object
@@ -429,11 +447,7 @@ function setupApp(app) {
         body.view.state.values[views.maintainHoursBlockDescription][
           views.maintainHoursActionDescription
         ].value,
-      hours: Number(
-        body.view.state.values[views.maintainHoursBlockHours][
-          views.maintainHoursActionHours
-        ].value.replace(',', '.')
-      ),
+      hours,
       date: body.view.state.values[views.maintainHoursBlockDate][
         views.maintainHoursActionDate
       ].selected_date
