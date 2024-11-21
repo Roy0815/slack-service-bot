@@ -19,7 +19,7 @@ Hier im Setup werde ich die Schritte auflisten, die ich beim Aufsetzen meines Se
 
 1. [Google Sheets einrichten](#1-google-sheets-einrichten)
 1. [Google und Slack Zugangsdaten holen](#2-google-und-slack-zugangsdaten-holen)
-1. Umgebung für Docker wählen **(eine der beiden)**
+1. Umgebung für Docker wählen **(eine der beiden, ich empfehle Google Cloud Run)**
    1. [Server aufsetzen](#31-server-aufsetzen)
    1. [Google Cloud Run aufsetzen](#32-google-cloud-run-aufsetzen)
 1. [Slack App Konfiguration](#4-slack-app-konfiguration)
@@ -107,6 +107,7 @@ networks:
 
 - [Secrets anlegen](#secrets-anlegen)
 - [Docker container konfigurieren](#docker-container-konfigurieren)
+- [Automatischen Docker Build auf main branch aufsetzen](#automatischen-docker-build-auf-main-branch-aufsetzen)
 
 #### Secrets anlegen
 
@@ -121,12 +122,20 @@ Wenn das Container Image auf Dockerhub ist, ist die URL docker.io/{user}/{reposi
 In der weiteren Konfiguration habe ich zunächst eingestellt:
 Max. Anzahl Instanzen: 10
 Port: 8080
-CPU Limit: 1
+CPU Limit: 2
 Arbeitsspeicher Limit: 512 MB
 Umgebungsvariablen: siehe [Docker Image starten](#docker-image-starten) (lediglich die `GOOGLE_APPLICATION_CREDENTIALS` müssen angepasst werden)
 
 Für die `GOOGLE_APPLICATION_CREDENTIALS` muss ein Volume für das Secret erstellt werden, welches zuvor angelegt wurde. Als Bereistellungspfad im Volume habe ich `/var/lib/files/google-sheets` gewählt.
 Dieser Pfad muss bei der Umgebungsvariable eingetragen werden.
+
+#### Automatischen Docker Build auf main branch aufsetzen
+
+In der Cloud Run Konsole, im Slack Service Dienst den Button "Kontinuierliche Bereitstellung bearbeiten" drücken. Hier wird man in wenigen Schritten durch die Konfiguration geleitet, welche recht selbsterklärend ist:
+
+- Google Build API aktivieren
+- GitHub Repository verlinken und Google Build API berechtigen
+- auf Main branch einschränken und speichern
 
 ### **4. Slack App Konfiguration**
 
