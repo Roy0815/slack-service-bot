@@ -14,11 +14,11 @@ const homeView = {
         type: 'section',
         text: {
           type: 'mrkdwn',
-          text: `Hallo 👋 Ich bin der Schwerathletik Mannheim Service-Bot.\n${
+          text: `Hallo 👋\nIch bin der Schwerathletik Mannheim Service-Bot.\n${
             process.env.APP_ADMIN
               ? `Wenn du Fragen hast oder einen Fehler entdeckt hast wende dich gerne an <@${process.env.APP_ADMIN}>\n`
               : ''
-          }Ich habe viele nützliche Funktionen:`
+          }Solltest du Fehler selber beheben wollen, oder mit an neuen Funktionen arbeiten, schau doch mal mein <https://github.com/Roy0815/slack-service-bot|:github: GitHub Repository> an \n\nIch habe viele nützliche Funktionen:`
         }
       }
     ]
