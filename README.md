@@ -222,6 +222,8 @@ Das erste valide Jahr ist 2022. Sollte ein User eine Abfrage für ein Jahr start
 
 1. [Generelle Projektstruktur](#1-generelle-projektstruktur)
 2. [Slack App Entwicklung](#2-slack-app-entwicklung)
+   1. [Testen mit Glitch (Live Webserver)](#21-testen-mit-glitch)
+   1. [Testen mit lokalem Docker Container](#22-testen-mit-lokalem-docker-container)
 3. [Docker Image Deployment](#3-docker-image-deployment)
 4. [Contribution Guidelines](#4-contribution-guidelines)
 
@@ -242,7 +244,17 @@ Slack hat ein eigenes Framework entwickelt, welches das Aufsetzen und Entwickeln
 
 Um Layouts für Nachrichten, Popups und den Homeview zu testen kann man einfach den [Block Kit Builder](https://api.slack.com/tools/block-kit-builder) von Slack nutzen. Ist man bei seinem Workspace angemeldet kann man sich die Nachrichten probeweise schicken lassen, oder sogar die Metadaten von Aktionen wie Buttonklicks sehen.
 
+#### 2.1 Testen mit Glitch
+
 Da Docker das Testen in der Produktivumgebung etwas verlangsamt und man im Zweifel seine Features erstmal lokal testen möchte habe ich oft auf [Glitch](https://glitch.com/) zurückgegriffen. Angemeldet mit Github kann man hier ein Projekt erstellen und es läuft während man entwickelt ein Server, der von Slack angesprochen werden kann. Auch wenn es als Entwicklungsumgebung sagen wir ausbaufähig ist, so kann man doch seine Änderungen innerhalb weniger Sekunden testen. Dafür legt man ein neues Projekt an (oder "remixt" die offizielle [Bolt Vorlage](https://glitch.com/edit/#!/bolt-app-template)) und kopiert seine Projektfiles ins Glitch Projekt. Hier läuft direkt der Server. Drückt man unten auf "Preview", dann auf die 3 Punkte und kopiert sich den Link, kann dieser genau wie die eigene Server URL genutzt werden, um die Slack App statt mit dem eigenen Server mit dem Glitch Server zu verbinden. Möchte man möglichst wenig an der Produktionsapp verändern kann man sich einfach eine Test-Slackapp anlegen, welche die Glitch URL für alles nutzt. Nimmt man nun Änderungen am Code in Glitch vor, werden die Änderungen sofort aktiviert und man kann in Slack testen.
+
+#### 2.2 Testen mit lokalem Docker Container
+
+Die zweite, etwas geschicktere Möglichkeit ist es, das fertige Docker Image direkt als Container auf seiner lokalen Maschine zu starten. Dieser muss dann öffentlich im Internet verfügbar gemacht werden. Ich habe das mit [ngrok](https://ngrok.com) erreicht. Hier habe ich die .exe heruntergeladen, per Befehl meinen API Key aus dem ngrok Account gesetzt und dann mit einem Befehl den localhost mit Docker Container Port öffentlich verfügbar gemacht unter einer ngrok Webadresse. Diese kann man dann bei Slack hinterlegen und den lokalen Docker Container ansteuern.
+
+```bash
+ngrok http http://localhost:8080`
+```
 
 ### **3. Docker Image Deployment**
 
