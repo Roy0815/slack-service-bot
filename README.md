@@ -19,7 +19,7 @@ Hier im Setup werde ich die Schritte auflisten, die ich beim Aufsetzen meines Se
 
 1. [Google Sheets einrichten](#1-google-sheets-einrichten)
 1. [Google und Slack Zugangsdaten holen](#2-google-und-slack-zugangsdaten-holen)
-1. Umgebung für Docker wählen **(eine der beiden, ich empfehle Google Cloud Run)**
+1. Umgebung für Docker wählen **(eine der beiden, der erste Test mit Google Cloud Run hat zu hohe Kosten verursacht, Alternativen werden gesucht)**
    1. [Server aufsetzen](#31-server-aufsetzen)
    1. [Google Cloud Run aufsetzen](#32-google-cloud-run-aufsetzen)
 1. [Slack App Konfiguration](#4-slack-app-konfiguration)
