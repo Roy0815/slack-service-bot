@@ -19,9 +19,9 @@ Hier im Setup werde ich die Schritte auflisten, die ich beim Aufsetzen meines Se
 
 1. [Google Sheets einrichten](#1-google-sheets-einrichten)
 1. [Google und Slack Zugangsdaten holen](#2-google-und-slack-zugangsdaten-holen)
-1. Umgebung für Docker wählen **(eine der beiden)**
+1. Umgebung für Docker wählen **(eine der beiden, der erste Test mit Google Cloud Run hat zu hohe Kosten verursacht, Alternativen werden gesucht)**
    1. [Server aufsetzen](#31-server-aufsetzen)
-   1. [Google Cloud Run aufsetzen](#32-google-cloud-run-aufsetzen)
+   1. [Google Cloud Run aufsetzen (deprecated aus Kostengründen)](#32-google-cloud-run-aufsetzen)
 1. [Slack App Konfiguration](#4-slack-app-konfiguration)
 
 ### **1. Google Sheets einrichten**
@@ -107,6 +107,7 @@ networks:
 
 - [Secrets anlegen](#secrets-anlegen)
 - [Docker container konfigurieren](#docker-container-konfigurieren)
+- [Automatischen Docker Build auf main branch aufsetzen](#automatischen-docker-build-auf-main-branch-aufsetzen)
 
 #### Secrets anlegen
 
@@ -119,14 +120,23 @@ Im angelegten Google Projekt zum [Secret Manager](https://console.cloud.google.c
 Wenn das Container Image auf Dockerhub ist, ist die URL docker.io/{user}/{repository}:{tag}
 
 In der weiteren Konfiguration habe ich zunächst eingestellt:
-Max. Anzahl Instanzen: 10
-Port: 8080
-CPU Limit: 1
-Arbeitsspeicher Limit: 512 MB
-Umgebungsvariablen: siehe [Docker Image starten](#docker-image-starten) (lediglich die `GOOGLE_APPLICATION_CREDENTIALS` müssen angepasst werden)
+
+- Max. Anzahl Instanzen: 10
+- Port: 8080
+- CPU Limit: 2
+- Arbeitsspeicher Limit: 512 MB
+- Umgebungsvariablen: siehe [Docker Image starten](#docker-image-starten) (lediglich die `GOOGLE_APPLICATION_CREDENTIALS` müssen angepasst werden)
 
 Für die `GOOGLE_APPLICATION_CREDENTIALS` muss ein Volume für das Secret erstellt werden, welches zuvor angelegt wurde. Als Bereistellungspfad im Volume habe ich `/var/lib/files/google-sheets` gewählt.
 Dieser Pfad muss bei der Umgebungsvariable eingetragen werden.
+
+#### Automatischen Docker Build auf main branch aufsetzen
+
+In der Cloud Run Konsole, im Slack Service Dienst den Button "Kontinuierliche Bereitstellung bearbeiten" drücken. Hier wird man in wenigen Schritten durch die Konfiguration geleitet, welche recht selbsterklärend ist:
+
+- Google Build API aktivieren
+- GitHub Repository verlinken und Google Build API berechtigen
+- auf Main branch einschränken und speichern
 
 ### **4. Slack App Konfiguration**
 
@@ -168,6 +178,7 @@ Die zentrale App verarbeitet das Event `app_home_opened`.
 1. [Pollz](#1-pollz)
 2. [Staette](#2-staette)
 3. [Arbeitsstunden](#3-arbeitsstunden)
+4. [Stammdaten](#4-stammdaten)
 
 ### **1. Pollz**
 
@@ -182,6 +193,7 @@ Das Docker Image beinhaltet außerdem einen Cronjob, welcher täglich um 1 Uhr C
 ### **3. Arbeitsstunden**
 
 Arbeitsstunden stellt die Kommandos `/arbeitsstunden_anzeigen` und `/arbeitsstunden_erfassen` zur Verfügung. Außerdem konsumiert dieser Teil das Event `team_join` um die Verknüpfung zwischen Slack-ID und Mitglieder-Excel herzustellen.
+Alle Genehmigungen laufen über den Admin Channel, welcher im Sheet Sheet `Summe Stunden x` (siehe unten) im aktuellen Jahr hinterlegt ist.
 
 Für diesen Bereich müssen die [Environment Variablen](#docker-image-starten) `SHEET_ID` und `GOOGLE_APPLICATION_CREDENTIALS` gefüllt werden.
 
@@ -199,20 +211,30 @@ volumes:
 Das Google Sheet erwartet eine spezielle Struktur. Bei den Sheets kommt es auf die Namen an, bei den Spalten nur auf die Reihenfolge, nicht die Titel. Sollte die Struktur unbedingt verändert werden müssen, muss auch der Code angepasst werden (x steht jeweils für das Jahr):
 
 1. Sheet `Allg Daten`
+
    ![Struktur Sheet Allg Daten](/images/%5BARBEITSSTUNDEN%5D%20Sheet%20Allg%20Daten.png)
+
 2. Sheet `Arbeitseinsätze x`
 
    ![Struktur Sheet Arbeitseinsätze x](/images/%5BARBEITSSTUNDEN%5D%20Sheet%20Arbeitseins%C3%A4tze%20x.png)
 
 3. Sheet `Summe Stunden x`
+
    ![Struktur Sheet Summe Stunden x](/images/%5BARBEITSSTUNDEN%5D%20Sheet%20Summe%20Stunden%20x.png)
 
 Das erste valide Jahr ist 2022. Sollte ein User eine Abfrage für ein Jahr starten, für das es noch kein Sheet gibt, so kopiert die App die beiden Sheets des letzten Jahres und leert alle Arbeitseinsätze. Die Soll-Stunden, sowie der Admin Channel können im "Summe Stunden x" Sheet angepasst werden.
+
+### **4. Stammdaten**
+
+Stammdaten hat aktuell nur eine Funktion und die ist das Kommando `/stammdaten`. Diese Funktion baut auf die Funktionen von [Arbeitsstunden](#3-arbeitsstunden) auf. Das Setup ist genau das gleiche. Die Stammdaten werden im Sheet `Allg Daten` gelesen und geändert.
+Auch hier laufen die Genehmigungen alle über den Admin Channel, welcher im Sheet Sheet `Summe Stunden x` (siehe unten) im aktuellen Jahr hinterlegt ist.
 
 ## Upgrades & Contribution
 
 1. [Generelle Projektstruktur](#1-generelle-projektstruktur)
 2. [Slack App Entwicklung](#2-slack-app-entwicklung)
+   1. [Testen mit Glitch (Live Webserver)](#21-testen-mit-glitch)
+   1. [Testen mit lokalem Docker Container](#22-testen-mit-lokalem-docker-container)
 3. [Docker Image Deployment](#3-docker-image-deployment)
 4. [Contribution Guidelines](#4-contribution-guidelines)
 
@@ -233,7 +255,17 @@ Slack hat ein eigenes Framework entwickelt, welches das Aufsetzen und Entwickeln
 
 Um Layouts für Nachrichten, Popups und den Homeview zu testen kann man einfach den [Block Kit Builder](https://api.slack.com/tools/block-kit-builder) von Slack nutzen. Ist man bei seinem Workspace angemeldet kann man sich die Nachrichten probeweise schicken lassen, oder sogar die Metadaten von Aktionen wie Buttonklicks sehen.
 
+#### 2.1 Testen mit Glitch
+
 Da Docker das Testen in der Produktivumgebung etwas verlangsamt und man im Zweifel seine Features erstmal lokal testen möchte habe ich oft auf [Glitch](https://glitch.com/) zurückgegriffen. Angemeldet mit Github kann man hier ein Projekt erstellen und es läuft während man entwickelt ein Server, der von Slack angesprochen werden kann. Auch wenn es als Entwicklungsumgebung sagen wir ausbaufähig ist, so kann man doch seine Änderungen innerhalb weniger Sekunden testen. Dafür legt man ein neues Projekt an (oder "remixt" die offizielle [Bolt Vorlage](https://glitch.com/edit/#!/bolt-app-template)) und kopiert seine Projektfiles ins Glitch Projekt. Hier läuft direkt der Server. Drückt man unten auf "Preview", dann auf die 3 Punkte und kopiert sich den Link, kann dieser genau wie die eigene Server URL genutzt werden, um die Slack App statt mit dem eigenen Server mit dem Glitch Server zu verbinden. Möchte man möglichst wenig an der Produktionsapp verändern kann man sich einfach eine Test-Slackapp anlegen, welche die Glitch URL für alles nutzt. Nimmt man nun Änderungen am Code in Glitch vor, werden die Änderungen sofort aktiviert und man kann in Slack testen.
+
+#### 2.2 Testen mit lokalem Docker Container
+
+Die zweite, etwas geschicktere Möglichkeit ist es, das fertige Docker Image direkt als Container auf seiner lokalen Maschine zu starten. Dieser muss dann öffentlich im Internet verfügbar gemacht werden. Ich habe das mit [ngrok](https://ngrok.com) erreicht. Hier habe ich die .exe heruntergeladen, per Befehl meinen API Key aus dem ngrok Account gesetzt und dann mit einem Befehl den localhost mit Docker Container Port öffentlich verfügbar gemacht unter einer ngrok Webadresse. Diese kann man dann bei Slack hinterlegen und den lokalen Docker Container ansteuern.
+
+```bash
+.\ngrok.exe http http://localhost:8080
+```
 
 ### **3. Docker Image Deployment**
 

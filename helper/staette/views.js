@@ -185,7 +185,7 @@ export function getWhoIsThereMessage({ user_id, text }) {
 }
 
 /**
- * Update requtested message
+ * Update requested message
  * @param {object} updateData
  * @param {string} updateData.user
  * @param {string} updateData.time
