@@ -21,7 +21,7 @@ Hier im Setup werde ich die Schritte auflisten, die ich beim Aufsetzen meines Se
 1. [Google und Slack Zugangsdaten holen](#2-google-und-slack-zugangsdaten-holen)
 1. Umgebung für Docker wählen **(eine der beiden, der erste Test mit Google Cloud Run hat zu hohe Kosten verursacht, Alternativen werden gesucht)**
    1. [Server aufsetzen](#31-server-aufsetzen)
-   1. [Google Cloud Run aufsetzen](#32-google-cloud-run-aufsetzen)
+   1. [Google Cloud Run aufsetzen (deprecated aus Kostengründen)](#32-google-cloud-run-aufsetzen)
 1. [Slack App Konfiguration](#4-slack-app-konfiguration)
 
 ### **1. Google Sheets einrichten**
@@ -120,11 +120,12 @@ Im angelegten Google Projekt zum [Secret Manager](https://console.cloud.google.c
 Wenn das Container Image auf Dockerhub ist, ist die URL docker.io/{user}/{repository}:{tag}
 
 In der weiteren Konfiguration habe ich zunächst eingestellt:
-Max. Anzahl Instanzen: 10
-Port: 8080
-CPU Limit: 2
-Arbeitsspeicher Limit: 512 MB
-Umgebungsvariablen: siehe [Docker Image starten](#docker-image-starten) (lediglich die `GOOGLE_APPLICATION_CREDENTIALS` müssen angepasst werden)
+
+- Max. Anzahl Instanzen: 10
+- Port: 8080
+- CPU Limit: 2
+- Arbeitsspeicher Limit: 512 MB
+- Umgebungsvariablen: siehe [Docker Image starten](#docker-image-starten) (lediglich die `GOOGLE_APPLICATION_CREDENTIALS` müssen angepasst werden)
 
 Für die `GOOGLE_APPLICATION_CREDENTIALS` muss ein Volume für das Secret erstellt werden, welches zuvor angelegt wurde. Als Bereistellungspfad im Volume habe ich `/var/lib/files/google-sheets` gewählt.
 Dieser Pfad muss bei der Umgebungsvariable eingetragen werden.
