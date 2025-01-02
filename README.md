@@ -19,9 +19,10 @@ Hier im Setup werde ich die Schritte auflisten, die ich beim Aufsetzen meines Se
 
 1. [Google Sheets einrichten](#1-google-sheets-einrichten)
 1. [Google und Slack Zugangsdaten holen](#2-google-und-slack-zugangsdaten-holen)
-1. Umgebung für Docker wählen **(eine der beiden, der erste Test mit Google Cloud Run hat zu hohe Kosten verursacht, Alternativen werden gesucht)**
+1. Umgebung für den Bot wählen **(nur eine, der eigene Server ist am leistungsstärksten aber aufwändigsten, Google Cloud Run zu kostenintensiv und die aktuelle Version des Bots ist für AWS Lambda ausgelegt, Docker Version des Bots in Release v2)**
    1. [Server aufsetzen](#31-server-aufsetzen)
    1. [Google Cloud Run aufsetzen (deprecated aus Kostengründen)](#32-google-cloud-run-aufsetzen)
+   1. [AWS Lambda aufsetzen](#33-aws-lambda-aufsetzen)
 1. [Slack App Konfiguration](#4-slack-app-konfiguration)
 
 ### **1. Google Sheets einrichten**
@@ -138,6 +139,39 @@ In der Cloud Run Konsole, im Slack Service Dienst den Button "Kontinuierliche Be
 - GitHub Repository verlinken und Google Build API berechtigen
 - auf Main branch einschränken und speichern
 
+### **3.3 AWS Lambda aufsetzen**
+
+Dem [Guide](https://tools.slack.dev/bolt-js/deployments/aws-lambda/) bei Slack für AWS Lambda folgen.
+
+- AWS Account anlegen
+- Person anlegen mit Zugriffsschlüssel
+- AWS CLI in der Entwicklungsumgebung installieren
+- AWS konfigurieren
+
+```
+aws configure
+AWS Access Key ID [None]: #
+AWS Secret Access Key [None]: #
+Default region name [None]: eu-central-1
+Default output format [None]: json
+```
+
+- [serverless](serverless.com) installieren und einloggen mit Free-Plan Konto bei Serverless (Keine Lizenz benötigt!)
+- app.js adaptieren und serverless.yml anlegen
+- serverless offline installieren zum lokalen testen
+
+```
+serverless offline --noPrependStageInUrl
+```
+
+- AWS Lambda Funktion deployen
+
+```
+serverless deploy
+```
+
+- bereitgestellte URL in den Slack Bot eintragen als Endpunkt (siehe [Slack App Konfigurations](#4-slack-app-konfiguration))
+
 ### **4. Slack App Konfiguration**
 
 _Hier gehe ich nur auf die technische und nicht die optische Konfiguration der App ein._
@@ -202,8 +236,7 @@ Die `SHEET_ID` findet man in der URL der Tabelle um die es geht. Sie steht zwisc
 Bei den `GOOGLE_APPLICATION_CREDENTIALS` wird der Pfad **im Docker Container** zu einer `secret.json` Datei angegeben. Diese Datei enthält die Daten, die beim erstellen der [Google Zugangsdaten](#2-google-und-slack-zugangsdaten-holen) heruntergeladen wurden. Da die Docker Container bei jedem neu erstellen ihre Daten verlieren, können gewisse Verzeichnisse auf die Verzeichnisse des Servers _gemounted_ werden. Das heißt, dass Dateien, die hier auf dem Server liegen auch immer im angegebenen Verzeichnis im Container verfügbar sind. Im [`docker-compose.yml`](docker-compose.yml) ist vorgesehen, dass im Ordner dieser Datei ein weiterer Ordner `volume` existiert, in welchem die `secret.json` liegen soll. Folgender Teil im [`docker-compose.yml`](docker-compose.yml) führt das "mounting" durch:
 
 ```
-volumes:
-    - ./volume:/var/lib/files
+volumes: - ./volume:/var/lib/files
 ```
 
 **Google Sheet Struktur**

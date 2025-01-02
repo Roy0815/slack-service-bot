@@ -16,8 +16,13 @@ import { sheets_v4 } from 'googleapis/build/src/apis/sheets/index.js';
  */
 async function auth() {
   const auth = await google.auth.getClient({
-    scopes: ['https://www.googleapis.com/auth/spreadsheets']
+    scopes: ['https://www.googleapis.com/auth/spreadsheets'],
+    credentials: {
+      client_email: process.env.GOOGLE_SERVICE_ACC_EMAIL,
+      private_key: process.env.GOOGLE_SERVICE_ACC_PRIVATE_KEY
+    }
   });
+
   return google.sheets({ version: 'v4', auth });
 }
 

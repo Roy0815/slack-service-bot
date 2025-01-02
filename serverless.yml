@@ -1,0 +1,34 @@
+# "org" ensures this Service is used with the correct Serverless Framework License Key.
+org: schwerathletikmannheim2018ev
+# "service" is the name of this project. This will also be added to your AWS resource names.
+service: slack-service-bot
+frameworkVersion: '4'
+
+provider:
+  name: aws
+  region: eu-central-1
+  runtime: nodejs20.x
+  environment:
+    SLACK_SIGNING_SECRET: ${env:SLACK_SIGNING_SECRET}
+    SLACK_BOT_TOKEN: ${env:SLACK_BOT_TOKEN}
+    APP_ADMIN: ${env:APP_ADMIN}
+    PORT: ${env:PORT}
+    SHEET_ID: ${env:SHEET_ID}
+    GOOGLE_SERVICE_ACC_EMAIL: ${env:GOOGLE_SERVICE_ACC_EMAIL}
+    GOOGLE_SERVICE_ACC_PRIVATE_KEY: ${env:GOOGLE_SERVICE_ACC_PRIVATE_KEY}
+    STAETTE_CHANNEL: ${env:STAETTE_CHANNEL}
+    CRONJOB_LOG_TO_ADMIN: ${env:CRONJOB_LOG_TO_ADMIN}
+
+package:
+  patterns:
+    - '!aws/**'
+
+functions:
+  slack-service-bot:
+    handler: app.handler
+    events:
+      - http:
+          path: slack/events
+          method: post
+plugins:
+  - serverless-offline

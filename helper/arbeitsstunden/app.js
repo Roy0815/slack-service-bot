@@ -97,7 +97,7 @@ function setupApp(app) {
         });
       }
 
-      respond(response);
+      await respond(response);
     }
   );
 
@@ -246,7 +246,7 @@ function setupApp(app) {
 
       if (!registerObj.approved) return;
       // update data in sheet
-      sheet.saveSlackId(registerObj);
+      await sheet.saveSlackId(registerObj);
     }
   );
 
@@ -285,8 +285,10 @@ function setupApp(app) {
       );
 
       // update data in sheet
-
-      sheet.saveSlackId({ id: Number(selOpt.value), slackId: btnAction.value });
+      await sheet.saveSlackId({
+        id: Number(selOpt.value),
+        slackId: btnAction.value
+      });
     }
   );
 
