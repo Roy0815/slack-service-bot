@@ -345,4 +345,4 @@ Wenn eine neue Komponente hinzugefügt wird, sollte diese auch mindestens eine `
 
 ## Version
 
-2.0
+3.0.0
