@@ -10,16 +10,15 @@ Slack Bot für administrative Aufgaben innerhalb Schwerathletik Mannheim 2018 e.
 
 ## Setup
 
-Grundlegend und ausreichend ist ein Server, auf dem [Docker](https://www.docker.com/) läuft. Hier kann das Image aus diesem Repository aufgespielt und konfiguriert werden.
-Alternativ kann auch ein Cloud Service für Docker direkt genutzt werden, was ich hier am Beispiel Google Cloud Run kurz erläutere.
+Die aktuelle Version des Bots ist für die Ausführung als AWS Lambda Funktion ausgelegt. In der Vergangenheit gab es Versionen als Docker Image, welches auf einem privaten Server oder auf Docker Cloud Services (wie z.B. Google Cloud Run) laufen kann.
 
-Hier im Setup werde ich die Schritte auflisten, die ich beim Aufsetzen meines Servers und des Service Bots durchgeführt habe.
+Ich habe in diesem Dokument versucht das Setup des Bots von Infrastrukutur, Slack und Endanwender Seite zu erläutern.
 
 **Wo immer möglich habe ich Links zu Guides eingefügt. Trotzdem kann hier oder auch an anderen Stellen eine kurze Google Recherche notwendig sein.**
 
 1. [Google Sheets einrichten](#1-google-sheets-einrichten)
 1. [Google und Slack Zugangsdaten holen](#2-google-und-slack-zugangsdaten-holen)
-1. Umgebung für den Bot wählen **(nur eine, der eigene Server ist am leistungsstärksten aber aufwändigsten, Google Cloud Run zu kostenintensiv und die aktuelle Version des Bots ist für AWS Lambda ausgelegt, Docker Version des Bots in Release v2)**
+1. Umgebung für den Bot wählen **(nur eine, der eigene Server ist am leistungsstärksten aber aufwändigsten, Google Cloud Run zu kostenintensiv und die aktuelle Version des Bots ist für AWS Lambda ausgelegt, die Docker Version des Bots ist in [Release v2](https://github.com/Roy0815/slack-service-bot/releases/tag/v2.1.0) zu finden)**
    1. [Server aufsetzen](#31-server-aufsetzen)
    1. [Google Cloud Run aufsetzen (deprecated aus Kostengründen)](#32-google-cloud-run-aufsetzen)
    1. [AWS Lambda aufsetzen](#33-aws-lambda-aufsetzen)
@@ -141,6 +140,8 @@ In der Cloud Run Konsole, im Slack Service Dienst den Button "Kontinuierliche Be
 
 ### **3.3 AWS Lambda aufsetzen**
 
+Bevor mit dem AWS Lambda Setup gestartet wird, muss eine lokale .env Datei angelegt werden. Eine Vorlage werde ich noch nachreichen. Hier werden alle Variablen definiert, die früher in der docker-compose.yml gepflegt wurden. Zusätzlich werden auch die Daten des Bot Benutzers für Google Sheets ab jetzt als Environment Variablen gespeichert und nicht in der secrets.json Datei.
+
 Dem [Guide](https://tools.slack.dev/bolt-js/deployments/aws-lambda/) bei Slack für AWS Lambda folgen.
 
 - AWS Account anlegen
@@ -158,12 +159,7 @@ Default output format [None]: json
 
 - [serverless](serverless.com) installieren und einloggen mit Free-Plan Konto bei Serverless (Keine Lizenz benötigt!)
 - app.js adaptieren und serverless.yml anlegen
-- serverless offline installieren zum lokalen testen
-
-```
-serverless offline --noPrependStageInUrl
-```
-
+- "serverless offline" installieren zum lokalen testen
 - AWS Lambda Funktion deployen
 
 ```
@@ -292,9 +288,15 @@ Um Layouts für Nachrichten, Popups und den Homeview zu testen kann man einfach 
 
 Da Docker das Testen in der Produktivumgebung etwas verlangsamt und man im Zweifel seine Features erstmal lokal testen möchte habe ich oft auf [Glitch](https://glitch.com/) zurückgegriffen. Angemeldet mit Github kann man hier ein Projekt erstellen und es läuft während man entwickelt ein Server, der von Slack angesprochen werden kann. Auch wenn es als Entwicklungsumgebung sagen wir ausbaufähig ist, so kann man doch seine Änderungen innerhalb weniger Sekunden testen. Dafür legt man ein neues Projekt an (oder "remixt" die offizielle [Bolt Vorlage](https://glitch.com/edit/#!/bolt-app-template)) und kopiert seine Projektfiles ins Glitch Projekt. Hier läuft direkt der Server. Drückt man unten auf "Preview", dann auf die 3 Punkte und kopiert sich den Link, kann dieser genau wie die eigene Server URL genutzt werden, um die Slack App statt mit dem eigenen Server mit dem Glitch Server zu verbinden. Möchte man möglichst wenig an der Produktionsapp verändern kann man sich einfach eine Test-Slackapp anlegen, welche die Glitch URL für alles nutzt. Nimmt man nun Änderungen am Code in Glitch vor, werden die Änderungen sofort aktiviert und man kann in Slack testen.
 
-#### 2.2 Testen mit lokalem Docker Container
+#### 2.2 Testen mit lokalem Server
 
-Die zweite, etwas geschicktere Möglichkeit ist es, das fertige Docker Image direkt als Container auf seiner lokalen Maschine zu starten. Dieser muss dann öffentlich im Internet verfügbar gemacht werden. Ich habe das mit [ngrok](https://ngrok.com) erreicht. Hier habe ich die .exe heruntergeladen, per Befehl meinen API Key aus dem ngrok Account gesetzt und dann mit einem Befehl den localhost mit Docker Container Port öffentlich verfügbar gemacht unter einer ngrok Webadresse. Diese kann man dann bei Slack hinterlegen und den lokalen Docker Container ansteuern.
+Die zweite, etwas geschicktere Möglichkeit ist es, das fertige Docker Image direkt als Container auf seiner lokalen Maschine zu starten.
+Mit AWS Lambda und dem "serverless offline" Paket läuft das relativ identisch. Die Funktion kann einfach per Befehl gestartet werden:
+```
+serverless offline --noPrependStageInUrl
+```
+
+Dieser Server / diese Funktion muss dann öffentlich im Internet verfügbar gemacht werden. Ich habe das mit [ngrok](https://ngrok.com) erreicht. Hier habe ich die .exe heruntergeladen, per Befehl meinen API Key aus dem ngrok Account gesetzt und dann mit einem Befehl den localhost mit Docker Container Port öffentlich verfügbar gemacht unter einer ngrok Webadresse. Diese kann man dann bei Slack hinterlegen und den lokalen Docker Container/ die Lambda Funktion ansteuern.
 
 ```bash
 .\ngrok.exe http http://localhost:8080
