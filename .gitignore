@@ -1,6 +1,5 @@
-secret.json
 .env
-.prettierrc.json
 node_modules/
 package-lock.json
-gcloud-artifact-registry.json
+aws
+.serverless

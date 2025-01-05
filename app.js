@@ -5,12 +5,19 @@ import * as slack from '@slack/bolt';
 import * as views from './helper/general/views.js';
 import { apps } from './helper/general/apps.js';
 
+// Create AWS Lambda Receiver
+/** @type {import('@slack/bolt').AwsLambdaReceiver} */
+// @ts-ignore
+const awsLambdaReceiver = new slack.default.AwsLambdaReceiver({
+  signingSecret: process.env.SLACK_SIGNING_SECRET
+});
+
 // Create Bolt App
 /** @type {import('@slack/bolt').App} */
 // @ts-ignore
 const app = new slack.default.App({
   token: process.env.SLACK_BOT_TOKEN,
-  signingSecret: process.env.SLACK_SIGNING_SECRET,
+  receiver: awsLambdaReceiver,
   extendedErrorHandler: true
 });
 
@@ -70,11 +77,14 @@ app.error(async ({ error, context, body }) => {
 });
 
 //* ******************* Start App ********************//
-(async () => {
-  // Start your app
-  await app.start(process.env.PORT || 8080);
-
-  console.log(
-    'Schwerathletik Slack Service läuft auf Port ' + process.env.PORT
-  );
-})();
+/**
+ * Handle the Lambda function event
+ * @param {import('@slack/bolt/dist/receivers/AwsLambdaReceiver.js').AwsEvent} event
+ * @param {any} context
+ * @param {import('@slack/bolt/dist/receivers/AwsLambdaReceiver.js').AwsCallback} callback
+ * @returns {Promise<import('@slack/bolt/dist/receivers/AwsLambdaReceiver.js').AwsResponse>} AWS Lambda response
+ */
+export async function handler(event, context, callback) {
+  const handler = await awsLambdaReceiver.start();
+  return handler(event, context, callback);
+}

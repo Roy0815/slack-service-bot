@@ -10,18 +10,18 @@ Slack Bot für administrative Aufgaben innerhalb Schwerathletik Mannheim 2018 e.
 
 ## Setup
 
-Grundlegend und ausreichend ist ein Server, auf dem [Docker](https://www.docker.com/) läuft. Hier kann das Image aus diesem Repository aufgespielt und konfiguriert werden.
-Alternativ kann auch ein Cloud Service für Docker direkt genutzt werden, was ich hier am Beispiel Google Cloud Run kurz erläutere.
+Die aktuelle Version des Bots ist für die Ausführung als AWS Lambda Funktion ausgelegt. In der Vergangenheit gab es Versionen als Docker Image, welches auf einem privaten Server oder auf Docker Cloud Services (wie z.B. Google Cloud Run) laufen kann.
 
-Hier im Setup werde ich die Schritte auflisten, die ich beim Aufsetzen meines Servers und des Service Bots durchgeführt habe.
+Ich habe in diesem Dokument versucht das Setup des Bots von Infrastrukutur, Slack und Endanwender Seite zu erläutern.
 
 **Wo immer möglich habe ich Links zu Guides eingefügt. Trotzdem kann hier oder auch an anderen Stellen eine kurze Google Recherche notwendig sein.**
 
 1. [Google Sheets einrichten](#1-google-sheets-einrichten)
 1. [Google und Slack Zugangsdaten holen](#2-google-und-slack-zugangsdaten-holen)
-1. Umgebung für Docker wählen **(eine der beiden, der erste Test mit Google Cloud Run hat zu hohe Kosten verursacht, Alternativen werden gesucht)**
+1. Umgebung für den Bot wählen **(nur eine, der eigene Server ist am leistungsstärksten aber aufwändigsten, Google Cloud Run zu kostenintensiv und die aktuelle Version des Bots ist für AWS Lambda ausgelegt, die Docker Version des Bots ist in [Release v2](https://github.com/Roy0815/slack-service-bot/releases/tag/v2.1.0) zu finden)**
    1. [Server aufsetzen](#31-server-aufsetzen)
    1. [Google Cloud Run aufsetzen (deprecated aus Kostengründen)](#32-google-cloud-run-aufsetzen)
+   1. [AWS Lambda aufsetzen](#33-aws-lambda-aufsetzen)
 1. [Slack App Konfiguration](#4-slack-app-konfiguration)
 
 ### **1. Google Sheets einrichten**
@@ -138,6 +138,36 @@ In der Cloud Run Konsole, im Slack Service Dienst den Button "Kontinuierliche Be
 - GitHub Repository verlinken und Google Build API berechtigen
 - auf Main branch einschränken und speichern
 
+### **3.3 AWS Lambda aufsetzen**
+
+Bevor mit dem AWS Lambda Setup gestartet wird, muss eine lokale .env Datei angelegt werden. Eine Vorlage werde ich noch nachreichen. Hier werden alle Variablen definiert, die früher in der docker-compose.yml gepflegt wurden. Zusätzlich werden auch die Daten des Bot Benutzers für Google Sheets ab jetzt als Environment Variablen gespeichert und nicht in der secrets.json Datei.
+
+Dem [Guide](https://tools.slack.dev/bolt-js/deployments/aws-lambda/) bei Slack für AWS Lambda folgen.
+
+- AWS Account anlegen
+- Person anlegen mit Zugriffsschlüssel
+- AWS CLI in der Entwicklungsumgebung installieren
+- AWS konfigurieren
+
+```
+aws configure
+AWS Access Key ID [None]: #
+AWS Secret Access Key [None]: #
+Default region name [None]: eu-central-1
+Default output format [None]: json
+```
+
+- [serverless](serverless.com) installieren und einloggen mit Free-Plan Konto bei Serverless (Keine Lizenz benötigt!)
+- app.js adaptieren und serverless.yml anlegen
+- "serverless offline" installieren zum lokalen testen
+- AWS Lambda Funktion deployen
+
+```
+serverless deploy
+```
+
+- bereitgestellte URL in den Slack Bot eintragen als Endpunkt (siehe [Slack App Konfigurations](#4-slack-app-konfiguration))
+
 ### **4. Slack App Konfiguration**
 
 _Hier gehe ich nur auf die technische und nicht die optische Konfiguration der App ein._
@@ -202,8 +232,7 @@ Die `SHEET_ID` findet man in der URL der Tabelle um die es geht. Sie steht zwisc
 Bei den `GOOGLE_APPLICATION_CREDENTIALS` wird der Pfad **im Docker Container** zu einer `secret.json` Datei angegeben. Diese Datei enthält die Daten, die beim erstellen der [Google Zugangsdaten](#2-google-und-slack-zugangsdaten-holen) heruntergeladen wurden. Da die Docker Container bei jedem neu erstellen ihre Daten verlieren, können gewisse Verzeichnisse auf die Verzeichnisse des Servers _gemounted_ werden. Das heißt, dass Dateien, die hier auf dem Server liegen auch immer im angegebenen Verzeichnis im Container verfügbar sind. Im [`docker-compose.yml`](docker-compose.yml) ist vorgesehen, dass im Ordner dieser Datei ein weiterer Ordner `volume` existiert, in welchem die `secret.json` liegen soll. Folgender Teil im [`docker-compose.yml`](docker-compose.yml) führt das "mounting" durch:
 
 ```
-volumes:
-    - ./volume:/var/lib/files
+volumes: - ./volume:/var/lib/files
 ```
 
 **Google Sheet Struktur**
@@ -259,9 +288,15 @@ Um Layouts für Nachrichten, Popups und den Homeview zu testen kann man einfach 
 
 Da Docker das Testen in der Produktivumgebung etwas verlangsamt und man im Zweifel seine Features erstmal lokal testen möchte habe ich oft auf [Glitch](https://glitch.com/) zurückgegriffen. Angemeldet mit Github kann man hier ein Projekt erstellen und es läuft während man entwickelt ein Server, der von Slack angesprochen werden kann. Auch wenn es als Entwicklungsumgebung sagen wir ausbaufähig ist, so kann man doch seine Änderungen innerhalb weniger Sekunden testen. Dafür legt man ein neues Projekt an (oder "remixt" die offizielle [Bolt Vorlage](https://glitch.com/edit/#!/bolt-app-template)) und kopiert seine Projektfiles ins Glitch Projekt. Hier läuft direkt der Server. Drückt man unten auf "Preview", dann auf die 3 Punkte und kopiert sich den Link, kann dieser genau wie die eigene Server URL genutzt werden, um die Slack App statt mit dem eigenen Server mit dem Glitch Server zu verbinden. Möchte man möglichst wenig an der Produktionsapp verändern kann man sich einfach eine Test-Slackapp anlegen, welche die Glitch URL für alles nutzt. Nimmt man nun Änderungen am Code in Glitch vor, werden die Änderungen sofort aktiviert und man kann in Slack testen.
 
-#### 2.2 Testen mit lokalem Docker Container
+#### 2.2 Testen mit lokalem Server
 
-Die zweite, etwas geschicktere Möglichkeit ist es, das fertige Docker Image direkt als Container auf seiner lokalen Maschine zu starten. Dieser muss dann öffentlich im Internet verfügbar gemacht werden. Ich habe das mit [ngrok](https://ngrok.com) erreicht. Hier habe ich die .exe heruntergeladen, per Befehl meinen API Key aus dem ngrok Account gesetzt und dann mit einem Befehl den localhost mit Docker Container Port öffentlich verfügbar gemacht unter einer ngrok Webadresse. Diese kann man dann bei Slack hinterlegen und den lokalen Docker Container ansteuern.
+Die zweite, etwas geschicktere Möglichkeit ist es, das fertige Docker Image direkt als Container auf seiner lokalen Maschine zu starten.
+Mit AWS Lambda und dem "serverless offline" Paket läuft das relativ identisch. Die Funktion kann einfach per Befehl gestartet werden:
+```
+serverless offline --noPrependStageInUrl
+```
+
+Dieser Server / diese Funktion muss dann öffentlich im Internet verfügbar gemacht werden. Ich habe das mit [ngrok](https://ngrok.com) erreicht. Hier habe ich die .exe heruntergeladen, per Befehl meinen API Key aus dem ngrok Account gesetzt und dann mit einem Befehl den localhost mit Docker Container Port öffentlich verfügbar gemacht unter einer ngrok Webadresse. Diese kann man dann bei Slack hinterlegen und den lokalen Docker Container/ die Lambda Funktion ansteuern.
 
 ```bash
 .\ngrok.exe http http://localhost:8080
@@ -312,4 +347,4 @@ Wenn eine neue Komponente hinzugefügt wird, sollte diese auch mindestens eine `
 
 ## Version
 
-2.0
+3.0.0
