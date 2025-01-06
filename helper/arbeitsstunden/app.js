@@ -319,12 +319,10 @@ function setupApp(app) {
         `<@${body.user.id}> hat folgende Stunden um ${util.formatTime(
           new Date()
         )} Uhr am ${util.formatDate(new Date())} ${
-          maintObj.approved ? 'freigegeben' : 'abgelehnt'
-        }:\n${await sheet.getNameFromSlackId(maintObj)}: "${
-          maintObj.description
-        }" - ${maintObj.hours} Stunde${
-          maintObj.hours === 1 ? '' : 'n'
-        } am ${util.formatDate(date)}.`
+          maintObj.approved ? '`freigegeben`' : '`abgelehnt`'
+        }:\n<@${maintObj.slackId}>: "${maintObj.description}" - ${
+          maintObj.hours
+        } Stunde${maintObj.hours === 1 ? '' : 'n'} am ${util.formatDate(date)}.`
       );
 
       if (!maintObj.approved) return;
