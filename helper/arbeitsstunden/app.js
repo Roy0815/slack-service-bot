@@ -308,9 +308,6 @@ function setupApp(app) {
 
       maintObj.approved = btnAction.action_id.split('-')[1] === 'approve';
 
-      // notify requestor
-      await client.chat.postMessage(views.getUserMaintainEndMessage(maintObj));
-
       // edit approval message to show final result
       const [year, month, day] = maintObj.date.split('-');
       const date = new Date(Number(year), Number(month) - 1, Number(day));
@@ -324,6 +321,9 @@ function setupApp(app) {
           maintObj.hours
         } Stunde${maintObj.hours === 1 ? '' : 'n'} am ${util.formatDate(date)}.`
       );
+
+      // notify requestor
+      await client.chat.postMessage(views.getUserMaintainEndMessage(maintObj));
 
       if (!maintObj.approved) return;
 
