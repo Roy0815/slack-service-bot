@@ -4,6 +4,7 @@ import * as slack from '@slack/bolt';
 // local references
 import * as views from './helper/general/views.js';
 import { apps } from './helper/general/apps.js';
+import * as awsRtAPI from './helper/general/aws-runtime-api.js';
 
 // Create AWS Lambda Receiver
 /** @type {import('@slack/bolt').AwsLambdaReceiver} */
@@ -86,5 +87,7 @@ app.error(async ({ error, context, body }) => {
  */
 export async function handler(event, context, callback) {
   const handler = await awsLambdaReceiver.start();
+  // buffer AWS Request ID to interact with the runtime API
+  awsRtAPI.globalData.awsRequestId = context.awsRequestId;
   return handler(event, context, callback);
 }

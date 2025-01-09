@@ -4,6 +4,8 @@ import * as sheet from './sheet.js';
 import * as util from '../general/util.js';
 import * as types from './types.js';
 
+import * as awsRtAPI from '../general/aws-runtime-api.js';
+
 /** @type {import('../general/types').appComponent} */
 export const asApp = { setupApp, getHomeView: views.getHomeView };
 
@@ -17,6 +19,8 @@ function setupApp(app) {
     '/arbeitsstunden_anzeigen',
     async ({ ack, command, respond, client }) => {
       await ack();
+      // already send HTTP 200 that slack does not time out
+      await awsRtAPI.sendResponse();
 
       // see if user wanted details
       const details = command.text.includes('details');
@@ -104,6 +108,8 @@ function setupApp(app) {
   // Maintain hours
   app.command('/arbeitsstunden_erfassen', async ({ ack, command, client }) => {
     await ack();
+    // already send HTTP 200 that slack does not time out
+    await awsRtAPI.sendResponse();
 
     // check user is registered
     if ((await sheet.getUserFromSlackId(command.user_id)) === undefined) {
@@ -119,6 +125,8 @@ function setupApp(app) {
   //* ******************* Actions ********************//
   app.action(views.homeViewDisplayHours, async ({ ack, client, body }) => {
     await ack();
+    // already send HTTP 200 that slack does not time out
+    await awsRtAPI.sendResponse();
 
     const blckAction = /** @type {import("@slack/bolt").BlockAction} */ (body);
 
@@ -196,6 +204,8 @@ function setupApp(app) {
 
   app.action(views.homeViewMaintainHours, async ({ ack, client, body }) => {
     await ack();
+    // already send HTTP 200 that slack does not time out
+    await awsRtAPI.sendResponse();
 
     const blckAction = /** @type {import("@slack/bolt").BlockAction} */ (body);
 
@@ -220,6 +230,8 @@ function setupApp(app) {
     new RegExp('^register-(approve)*(reject)*-button$'),
     async ({ ack, action, client, respond, body }) => {
       await ack();
+      // already send HTTP 200 that slack does not time out
+      await awsRtAPI.sendResponse();
 
       const btnAction = /** @type {import("@slack/bolt").ButtonAction} */ (
         action
@@ -255,6 +267,8 @@ function setupApp(app) {
     'auto-register-submit-button',
     async ({ ack, respond, body, action }) => {
       await ack();
+      // already send HTTP 200 that slack does not time out
+      await awsRtAPI.sendResponse();
 
       const blckAction = /** @type {import("@slack/bolt").BlockAction} */ (
         body
@@ -298,6 +312,8 @@ function setupApp(app) {
     new RegExp('^maintain-(approve)*(reject)*-button$'),
     async ({ ack, action, client, respond, body }) => {
       await ack();
+      // already send HTTP 200 that slack does not time out
+      await awsRtAPI.sendResponse();
 
       const btnAction = /** @type {import("@slack/bolt").ButtonAction} */ (
         action
@@ -368,6 +384,8 @@ function setupApp(app) {
   //* ******************* View Submissions ********************//
   app.view(views.registerViewName, async ({ body, ack, client }) => {
     await ack();
+    // already send HTTP 200 that slack does not time out
+    await awsRtAPI.sendResponse();
 
     if (
       !body.view.state.values[views.registerBlockNameSelect][
@@ -438,6 +456,8 @@ function setupApp(app) {
     }
 
     await ack();
+    // already send HTTP 200 that slack does not time out
+    await awsRtAPI.sendResponse();
 
     // build maintenance object
     /** @type {types.hoursObjMaint} */
@@ -453,7 +473,7 @@ function setupApp(app) {
       ].selected_date
     };
 
-    // register confirmation message
+    // maintenance approval request message
     await client.chat.postMessage(await views.getMaintainConfirmDialog(obj));
 
     // notify user that process has started
