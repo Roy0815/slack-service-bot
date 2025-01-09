@@ -1,7 +1,7 @@
 {
-  "name": "bolt-app-template",
-  "version": "0.0.1",
-  "description": "A basic template to spin up a Bolt app for Slack",
+  "name": "slack-service-bot",
+  "version": "3.0.1",
+  "description": "A service for the Slack Bot used by the non profit Schwerathletik Mannheim 2018 e.V.",
   "main": "app.js",
   "type": "module",
   "scripts": {
@@ -11,19 +11,22 @@
   },
   "dependencies": {
     "@slack/bolt": "^3.8.0",
-    "googleapis": "^107.0.0"
+    "googleapis": "^107.0.0",
+    "node-fetch": "^3.3.2"
   },
   "engines": {
     "node": "11.x"
   },
   "repository": {
-    "url": "https://glitch.com/edit/#!/bolt-app-template"
+    "type": "git",
+    "url": "git+https://github.com/Roy0815/slack-service-bot.git"
   },
   "license": "MIT",
   "keywords": [
     "node",
-    "glitch",
-    "express"
+    "slack",
+    "aws",
+    "lambda"
   ],
   "devDependencies": {
     "eslint": "^8.43.0",

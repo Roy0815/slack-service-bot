@@ -292,6 +292,7 @@ Da Docker das Testen in der Produktivumgebung etwas verlangsamt und man im Zweif
 
 Die zweite, etwas geschicktere Möglichkeit ist es, das fertige Docker Image direkt als Container auf seiner lokalen Maschine zu starten.
 Mit AWS Lambda und dem "serverless offline" Paket läuft das relativ identisch. Die Funktion kann einfach per Befehl gestartet werden:
+
 ```
 serverless offline --noPrependStageInUrl
 ```
@@ -347,4 +348,4 @@ Wenn eine neue Komponente hinzugefügt wird, sollte diese auch mindestens eine `
 
 ## Version
 
-3.0.0
+3.0.1
