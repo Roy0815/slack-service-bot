@@ -10,12 +10,21 @@ const app = new slack.default.App({
   signingSecret: process.env.SLACK_SIGNING_SECRET
 });
 
-// cleanup old messages
-functions.cleanup(app).then((result) => {
+/**
+ * Run Lambda funtion (built for scheduled job)
+ * @param {import('@slack/bolt/dist/receivers/AwsLambdaReceiver.js').AwsEvent} event
+ * @param {any} context
+ */
+export async function run(event, context) {
+  // cleanup old messages
+  const result = await functions.cleanup(app);
+
   // log job execution
   console.log(`deleted ${result.length} Messages`);
+
   if (!process.env.CRONJOB_LOG_TO_ADMIN) return;
 
+  // log deleted messages
   app.client.files.upload({
     token: process.env.SLACK_BOT_TOKEN,
     channels: process.env.APP_ADMIN,
@@ -28,4 +37,4 @@ functions.cleanup(app).then((result) => {
     title: 'Messages',
     content: JSON.stringify(result, null, '\t')
   });
-});
+}

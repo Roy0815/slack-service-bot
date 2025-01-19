@@ -36,6 +36,10 @@ functions:
       - http:
           path: slack/events
           method: post
+  slack-service-bot-staette-cleanup:
+    handler: ./helper/staette/cleanup.run
+    events:
+      - schedule: cron(0 0 * * ? *)
 
 plugins:
   - serverless-offline
