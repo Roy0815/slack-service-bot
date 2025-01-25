@@ -209,7 +209,3 @@ Dieser Server / diese Funktion muss dann öffentlich im Internet verfügbar gema
 Die [generelle Projektstruktur](#1-generelle-projektstruktur) sollte beibehalten werden.
 
 Wenn eine neue Komponente hinzugefügt wird, sollte diese auch mindestens eine `app.js` und `views.js` Datei in einem neuen Verzeichnis liefern. Außerdem muss die [`apps.js`](/helper/general/apps.js) mit den neuen Dateien ergänzt werden. Die `app.js` muss eine Funktion `setupApp` exportieren, welche die erforderlichen Anpassungen an der Slack App vornimmt (Commands, Actions, Events, etc.). Die `views.js` muss eine Funktion `getHomeView` exportieren, welche einen Teil des Homeviews liefert, der in Slack angezeigt wird und Informationen über die Funktionsweise der Komponente beinhaltet.
-
-## Version
-
-3.1.0
