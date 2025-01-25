@@ -25,9 +25,9 @@ package:
     - '!aws/**'
     - '!images/**'
     - '!.github/**'
-    - '!test/**'
     - '!.eslintrc.json*'
     - '!.prettierrc'
+    - '!example.env'
 
 functions:
   slack-service-bot:
