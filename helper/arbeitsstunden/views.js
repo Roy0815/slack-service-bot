@@ -309,7 +309,8 @@ export async function getAutoRegisterMessage(slackId) {
   /** @type {import('@slack/bolt').Button} */
   (actionBlock.elements[0]).text.text = 'Submit';
 
-  actionBlock.elements[0].action_id = 'auto-register-submit-button';
+  /** @type {import('@slack/bolt').Button} */
+  (actionBlock.elements[0]).action_id = 'auto-register-submit-button';
   actionBlock.block_id = autoregisterInputBlock;
 
   // add user select

@@ -824,7 +824,7 @@ export function getAddAnswerView({ trigger_id, message, channel }) {
 /**
  *
  * @param {import('@slack/bolt').ViewOutput} view
- * @param {import('@slack/web-api/dist/response/ConversationsHistoryResponse').Message} message
+ * @param {import('@slack/web-api/dist/response/ConversationsHistoryResponse').MessageElement} message
  * @returns {import('@slack/web-api').ChatUpdateArguments}
  */
 export function addAnswerMessage(

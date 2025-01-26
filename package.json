@@ -10,7 +10,7 @@
     "prettier-format": "prettier --config .prettierrc app.js helper/"
   },
   "dependencies": {
-    "@slack/bolt": "^3.8.0",
+    "@slack/bolt": "^3.22.0",
     "googleapis": "^107.0.0",
     "node-fetch": "^3.3.2"
   },
@@ -29,14 +29,14 @@
     "lambda"
   ],
   "devDependencies": {
-    "eslint": "^8.43.0",
-    "eslint-config-prettier": "^9.0.0",
+    "eslint": "^8.57.1",
+    "eslint-config-prettier": "^9.1.0",
     "eslint-config-standard": "^17.1.0",
-    "eslint-plugin-import": "^2.27.5",
-    "eslint-plugin-jsdoc": "^46.8.2",
-    "eslint-plugin-n": "^16.0.0",
-    "eslint-plugin-promise": "^6.1.1",
-    "prettier": "^3.0.3",
+    "eslint-plugin-import": "^2.31.0",
+    "eslint-plugin-jsdoc": "^46.10.1",
+    "eslint-plugin-n": "^16.6.2",
+    "eslint-plugin-promise": "^6.6.0",
+    "prettier": "^3.4.2",
     "serverless-offline": "^14.4.0"
   }
 }
