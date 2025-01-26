@@ -38,6 +38,8 @@ export function getHomeView({ user }) {
 
   // add homeviews of apps
   apps.forEach((element) => {
+    if (!element.getHomeView) return;
+
     view.view.blocks.push({
       type: 'divider'
     });

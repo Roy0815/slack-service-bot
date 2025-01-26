@@ -11,7 +11,7 @@
 /**
  * @typedef {object} appComponent
  * @property {fnSetup} setupApp
- * @property {fnHomeView} getHomeView
+ * @property {fnHomeView|null} getHomeView
  */
 
 export {};
