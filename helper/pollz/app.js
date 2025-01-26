@@ -138,6 +138,7 @@ function setupApp(app) {
 
   //* ******************* View Submissions ********************//
   app.view(views.viewNames.creationModal, async ({ body, ack, client }) => {
+    // no answer options provided and no adding of answers allowed
     if (!views.answerOptionsValid(body)) {
       await ack({
         response_action: 'errors',
@@ -149,17 +150,33 @@ function setupApp(app) {
       return;
     }
 
-    if (
-      !(await util.isBotInChannel(functions.getChannelFromView(body), client))
-    ) {
-      await ack({
-        response_action: 'errors',
-        errors: {
-          [views.creationModalBlocks.conversationSelect]:
-            'Bitte den Bot in diesen Channel hinzufügen'
-        }
-      });
-      return;
+    const channel = await util.getChannelInfo(
+      functions.getChannelFromView(body),
+      client
+    );
+
+    // bot is not in channel
+    if (!channel || channel.is_member === false) {
+      let joinSuccess = false;
+
+      // try to join channel if public
+      if (channel && channel.is_channel) {
+        joinSuccess = await util.joinChannel(
+          functions.getChannelFromView(body),
+          client
+        );
+      }
+
+      if (!joinSuccess) {
+        await ack({
+          response_action: 'errors',
+          errors: {
+            [views.creationModalBlocks.conversationSelect]:
+              'Bitte den Bot in diesen Channel hinzufügen'
+          }
+        });
+        return;
+      }
     }
 
     await ack();

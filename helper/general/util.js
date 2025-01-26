@@ -49,16 +49,26 @@ export function deepCopy(source) {
  * Check if bot is member in channel
  * @param {string} channelName
  * @param {import('@slack/web-api').WebClient} client
- * @returns {Promise<boolean>}
+ * @returns {Promise<import('@slack/web-api/dist/response/ConversationsListResponse').Channel | null>} channel
  */
-export async function isBotInChannel(channelName, client) {
-  return (
-    (
-      await client.conversations.list({
-        exclude_archived: true,
-        limit: 999,
-        types: 'public_channel,private_channel,mpim'
-      })
-    ).channels.filter((channel) => channel.id === channelName).length > 0
-  );
+export async function getChannelInfo(channelName, client) {
+  const channels = (
+    await client.conversations.list({
+      exclude_archived: true,
+      limit: 999,
+      types: 'public_channel,private_channel,mpim'
+    })
+  ).channels.filter((channel) => channel.id === channelName);
+
+  return channels.length > 0 ? channels[0] : null;
+}
+
+/**
+ * Bot joins channel
+ * @param {string} channelName
+ * @param {import('@slack/web-api').WebClient} client
+ * @returns {Promise<boolean>} success
+ */
+export async function joinChannel(channelName, client) {
+  return (await client.conversations.join({ channel: channelName })).ok;
 }
