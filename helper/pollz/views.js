@@ -103,53 +103,6 @@ const pollView = {
       {
         type: 'divider'
       },
-      /* {
-        type: "input",
-        block_id: typeSelectBlockName,
-        element: {
-          type: "static_select",
-          initial_option: {
-            text: {
-              type: "plain_text",
-              text: "Text",
-              emoji: true,
-            },
-            value: "text",
-          },
-          options: [
-            {
-              text: {
-                type: "plain_text",
-                text: "Text",
-                emoji: true,
-              },
-              value: "text",
-            },
-            {
-              text: {
-                type: "plain_text",
-                text: "Datum",
-                emoji: true,
-              },
-              value: "date",
-            },
-            {
-              text: {
-                type: "plain_text",
-                text: "Datum + Uhrzeit",
-                emoji: true,
-              },
-              value: "datetime",
-            },
-          ],
-          action_id: typeSelectAction,
-        },
-        label: {
-          type: "plain_text",
-          text: "Typ",
-          emoji: true,
-        },
-      }, */
       {
         type: 'input',
         block_id: creationModalBlocks.conversationSelect,
@@ -346,14 +299,6 @@ const pollMessage = {
               },
               value: pollMessageActions.overflowDelete // delete-{ admin } (added in method)
             }
-            /* {
-              text: {
-                type: "plain_text",
-                text: "Alle Stimmen zeigen",
-                emoji: true,
-              },
-              value: messageOverflowShow,
-            }, */
           ],
           action_id: pollMessageActions.overflow
         }

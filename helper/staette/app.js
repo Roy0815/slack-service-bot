@@ -29,19 +29,21 @@ export function setupApp(app) {
         isNaN(date.getFullYear()) ||
         !/^[0-3]\d\.[0-1]\d\.20[2-9]\d$/.test(command.text)
       ) {
-        respond('Bitte ein gültiges Datum im Format DD.MM.YYYY eingeben');
+        await respond('Bitte ein gültiges Datum im Format DD.MM.YYYY eingeben');
         return;
       }
 
       // @ts-ignore
       if (date < new Date().setHours(0, 0, 0, 0)) {
-        respond('Bitte ein Datum >= heute angeben');
+        await respond('Bitte ein Datum >= heute angeben');
         return;
       }
     }
 
     if (!(await functions.dateIsUnique({ client, date: command.text }))) {
-      respond(`Für das Datum ${command.text} existiert bereits eine Abfrage`);
+      await respond(
+        `Für das Datum ${command.text} existiert bereits eine Abfrage`
+      );
       return;
     }
 
@@ -67,7 +69,7 @@ export function setupApp(app) {
 
       // @ts-ignore
       if (dateObj < new Date().setHours(0, 0, 0, 0)) {
-        client.chat.postMessage({
+        await client.chat.postMessage({
           channel: body.user.id,
           text: `*Stätte Abfrage*\nDatum ${date} liegt in der Vergangenheit. Bitte ein Datum >= heute angeben`
         });
@@ -76,7 +78,7 @@ export function setupApp(app) {
     } else date = util.formatDate(new Date());
 
     if (!(await functions.dateIsUnique({ client, date }))) {
-      client.chat.postMessage({
+      await client.chat.postMessage({
         channel: body.user.id,
         text: `*Stätte Abfrage*\nFür das Datum ${date} existiert bereits eine Abfrage`
       });
