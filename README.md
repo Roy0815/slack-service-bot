@@ -96,6 +96,7 @@ Wenn du in deinem Slack Workspace angemeldet bist kannst du [hier](https://api.s
   |`im:read`|View basic information about direct messages that Schwerathletik Mannheim Service has been added to|
   |`im:write`|Start direct messages with people|
   |`users:read`|View people in a workspace|
+  |`mpim:read`|View basic information about group direct messages that Schwerathletik Mannheim Service has been added to|
 - **Event Subscriptions**: `Enable Events` aktivieren. Auch hier sollte die URL auf die URL gesetzt werden, unter der die [Lambda Funktion](#3-aws-lambda-aufsetzen) erreichbar ist (+ /slack/events ans Ende der URL). Bei `Subscribe to bot events` die benötigten Events hinzufügen:
   |Event Name|Description|
   |:---:|:---|

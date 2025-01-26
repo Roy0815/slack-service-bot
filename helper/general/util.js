@@ -44,3 +44,21 @@ export function convertNumberToColumn(number) {
 export function deepCopy(source) {
   return JSON.parse(JSON.stringify(source));
 }
+
+/**
+ * Check if bot is member in channel
+ * @param {string} channelName
+ * @param {import('@slack/web-api').WebClient} client
+ * @returns {Promise<boolean>}
+ */
+export async function isBotInChannel(channelName, client) {
+  return (
+    (
+      await client.conversations.list({
+        exclude_archived: true,
+        limit: 999,
+        types: 'public_channel,private_channel,mpim'
+      })
+    ).channels.filter((channel) => channel.id === channelName).length > 0
+  );
+}

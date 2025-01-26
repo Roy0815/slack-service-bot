@@ -1,5 +1,9 @@
 // local imports
 import * as views from './views.js';
+import * as functions from './functions.js';
+import * as util from '../general/util.js';
+
+import * as awsRtAPI from '../general/aws-runtime-api.js';
 
 /** @type {import('../general/types').appComponent} */
 export const pollzApp = { setupApp, getHomeView: views.getHomeView };
@@ -145,7 +149,23 @@ function setupApp(app) {
       return;
     }
 
+    if (
+      !(await util.isBotInChannel(functions.getChannelFromView(body), client))
+    ) {
+      await ack({
+        response_action: 'errors',
+        errors: {
+          [views.creationModalBlocks.conversationSelect]:
+            'Bitte den Bot in diesen Channel hinzufügen'
+        }
+      });
+      return;
+    }
+
     await ack();
+
+    // already send HTTP 200 that slack does not time out
+    await awsRtAPI.sendResponse();
 
     // send poll
     await client.chat.postMessage(views.getPollMessage(body));
