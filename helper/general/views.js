@@ -28,7 +28,7 @@ const homeView = {
 //* ******************* Functions ********************//
 /**
  *
- * @param {import("@slack/bolt").AppHomeOpenedEvent} event
+ * @param {import("@slack/types").AppHomeOpenedEvent} event
  * @returns {import("@slack/web-api").ViewsPublishArguments}
  */
 export function getHomeView({ user }) {

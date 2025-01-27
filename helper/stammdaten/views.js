@@ -6,7 +6,7 @@ export const homeViewCommand = 'stammdaten-home-command';
 export const homeViewInputBlockId = 'stammdaten-home-input-block';
 
 //* ******************* Views ********************//
-/** @type {import("@slack/bolt").KnownBlock[]} */
+/** @type {import("@slack/types").KnownBlock[]} */
 const homeView = [
   {
     type: 'header',
@@ -43,7 +43,7 @@ const homeView = [
 //* ******************* Functions ********************//
 /**
  *
- * @returns {import("@slack/bolt").KnownBlock[]}
+ * @returns {import("@slack/types").KnownBlock[]}
  */
 export function getHomeView() {
   return util.deepCopy(homeView);

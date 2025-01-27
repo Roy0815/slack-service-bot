@@ -5,7 +5,7 @@
 
 /**
  * @callback fnHomeView
- * @returns {import("@slack/bolt").KnownBlock[]}
+ * @returns {import("@slack/types").KnownBlock[]}
  */
 
 /**

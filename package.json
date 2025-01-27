@@ -10,12 +10,12 @@
     "prettier-format": "prettier --config .prettierrc app.js helper/"
   },
   "dependencies": {
-    "@slack/bolt": "^3.22.0",
+    "@slack/bolt": "^4.2.0",
     "googleapis": "^107.0.0",
     "node-fetch": "^3.3.2"
   },
   "engines": {
-    "node": "11.x"
+    "node": "20.x"
   },
   "repository": {
     "type": "git",

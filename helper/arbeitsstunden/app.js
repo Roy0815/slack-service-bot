@@ -357,7 +357,7 @@ function setupApp(app) {
       return;
     }
 
-    /** @type {import("@slack/bolt").PlainTextOption[]} */
+    /** @type {import("@slack/types").PlainTextOption[]} */
     const userOptions = [];
 
     users
