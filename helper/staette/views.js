@@ -19,7 +19,6 @@ export const homeViewDatePickerAction = 'staette-home-datepicker-action';
 const whoIsThereMessage = {
   channel: process.env.STAETTE_CHANNEL,
   text: '', // Text in the notification, set in the method
-  emoji: true,
   unfurl_links: false,
   blocks: [
     {
@@ -98,7 +97,7 @@ const whoIsThereMessage = {
   ]
 };
 
-/** @type {import("@slack/bolt").KnownBlock[]} */
+/** @type {import("@slack/types").KnownBlock[]} */
 const homeView = [
   {
     type: 'header',
@@ -153,12 +152,15 @@ const homeView = [
 export function getWhoIsThereMessage({ user_id, text }) {
   const view = util.deepCopy(whoIsThereMessage);
 
+  // required for correct typing
+  if (!('blocks' in view)) return view;
+
   // set admin in overflow button
   const actionsBlock =
-    /** @type {import('@slack/bolt').ActionsBlock} */
+    /** @type {import('@slack/types').ActionsBlock} */
     (view.blocks[3]);
 
-  /** @type {import('@slack/bolt').Overflow} */
+  /** @type {import('@slack/types').Overflow} */
   // eslint-disable-next-line camelcase
   (actionsBlock.elements[2]).options[0].value += `-${user_id}`;
 
@@ -167,18 +169,18 @@ export function getWhoIsThereMessage({ user_id, text }) {
     text === `${util.formatDate(new Date())}` ? 'heute' : `am ${text}`;
 
   // set date
-  /** @type {import('@slack/bolt').SectionBlock} */
+  /** @type {import('@slack/types').SectionBlock} */
   (view.blocks[0]).text.text = `\`${text}\``;
 
   // set questions
   view.text =
-    /** @type {import('@slack/bolt').SectionBlock} */
+    /** @type {import('@slack/types').SectionBlock} */
     (
       view.blocks[1]
       // eslint-disable-next-line camelcase
     ).text.text = `<@${user_id}> will wissen wer ${day} in der Stätte ist`;
 
-  /** @type {import('@slack/bolt').SectionBlock} */
+  /** @type {import('@slack/types').SectionBlock} */
   (view.blocks[2]).text.text = `Wann bist du ${day} da?`;
 
   return view;
@@ -192,7 +194,7 @@ export function getWhoIsThereMessage({ user_id, text }) {
  * @param {boolean} updateData.xdelete
  * @param {object} message
  * @param {string} [message.text]
- * @param {import('@slack/bolt').KnownBlock[]} [message.blocks]
+ * @param {import('@slack/types').KnownBlock[]} [message.blocks]
  * @returns {import('@slack/web-api').ChatPostMessageArguments}
  */
 export function updateWhoIsThereMessage(
@@ -204,14 +206,17 @@ export function updateWhoIsThereMessage(
   /** @type {{time: string, user: string}[]} */
   const users = [];
 
+  // required for correct typing
+  if (!('blocks' in view)) return view;
+
   view.blocks = blocks;
   view.text = text;
 
-  /** @type {import('@slack/bolt').SectionBlock} */
+  /** @type {import('@slack/types').SectionBlock} */
   let userBlock;
 
   if (view.blocks[sectionUsers]) {
-    userBlock = /** @type {import('@slack/bolt').SectionBlock} */ (
+    userBlock = /** @type {import('@slack/types').SectionBlock} */ (
       view.blocks[sectionUsers]
     );
 
@@ -282,7 +287,7 @@ export function updateWhoIsThereMessage(
     }
   );
 
-  userBlock = /** @type {import('@slack/bolt').SectionBlock} */ (
+  userBlock = /** @type {import('@slack/types').SectionBlock} */ (
     view.blocks[sectionUsers]
   );
 
@@ -297,7 +302,7 @@ export function updateWhoIsThereMessage(
 
 /**
  *
- * @returns {import("@slack/bolt").KnownBlock[]}
+ * @returns {import("@slack/types").KnownBlock[]}
  */
 export function getHomeView() {
   return util.deepCopy(homeView);

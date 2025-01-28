@@ -65,157 +65,154 @@ export const pollMessageActions = {
 export const homeViewCommand = 'pollz-home-command';
 
 //* ******************* Views ********************//
-/** @type {import("@slack/web-api").ViewsOpenArguments|import("@slack/web-api").ViewsUpdateArguments} */
+/** @type {import("@slack/types").View} */
 const pollView = {
-  // trigger_id: "",
-  view: {
-    type: 'modal',
-    callback_id: viewNames.creationModal,
-    title: {
-      type: 'plain_text',
-      text: 'Neue Umfrage erstellen',
-      emoji: true
+  type: 'modal',
+  callback_id: viewNames.creationModal,
+  title: {
+    type: 'plain_text',
+    text: 'Neue Umfrage erstellen',
+    emoji: true
+  },
+  submit: {
+    type: 'plain_text',
+    text: 'Abschicken',
+    emoji: true
+  },
+  close: {
+    type: 'plain_text',
+    text: 'Abbrechen',
+    emoji: true
+  },
+  blocks: [
+    {
+      type: 'input',
+      block_id: creationModalBlocks.question,
+      element: {
+        type: 'plain_text_input',
+        action_id: creationModalActions.questionInput
+      },
+      label: {
+        type: 'plain_text',
+        text: 'Frage',
+        emoji: true
+      }
     },
-    submit: {
-      type: 'plain_text',
-      text: 'Abschicken',
-      emoji: true
+    {
+      type: 'divider'
     },
-    close: {
-      type: 'plain_text',
-      text: 'Abbrechen',
-      emoji: true
+    {
+      type: 'input',
+      block_id: creationModalBlocks.conversationSelect,
+      element: {
+        type: 'conversations_select',
+        action_id: creationModalActions.conversationSelect,
+        default_to_current_conversation: true
+      },
+      label: {
+        type: 'plain_text',
+        text: 'Wo soll die Umfrage gesendet werden?',
+        emoji: true
+      }
     },
-    blocks: [
-      {
-        type: 'input',
-        block_id: creationModalBlocks.question,
-        element: {
-          type: 'plain_text_input',
-          action_id: creationModalActions.questionInput
-        },
-        label: {
-          type: 'plain_text',
-          text: 'Frage',
-          emoji: true
-        }
-      },
-      {
-        type: 'divider'
-      },
-      {
-        type: 'input',
-        block_id: creationModalBlocks.conversationSelect,
-        element: {
-          type: 'conversations_select',
-          action_id: creationModalActions.conversationSelect,
-          default_to_current_conversation: true
-        },
-        label: {
-          type: 'plain_text',
-          text: 'Wo soll die Umfrage gesendet werden?',
-          emoji: true
-        }
-      },
-      {
-        type: 'input',
-        block_id: creationModalBlocks.options,
-        element: {
-          type: 'checkboxes',
-          options: [
-            {
-              text: {
-                type: 'plain_text',
-                text: 'mehrere Antworten auswählbar',
-                emoji: true
-              },
-              value: optionCheckboxes.multipleSelect
-            },
-            {
-              text: {
-                type: 'plain_text',
-                text: 'Teilnehmer können Optionen hinzufügen',
-                emoji: true
-              },
-              value: optionCheckboxes.addAllowed
-            },
-            {
-              text: {
-                type: 'plain_text',
-                text: 'Anonym',
-                emoji: true
-              },
-              value: optionCheckboxes.anonym
-            }
-          ],
-          action_id: creationModalActions.options
-        },
-        optional: true,
-        label: {
-          type: 'plain_text',
-          text: 'Optionen',
-          emoji: true
-        }
-      },
-      {
-        type: 'divider'
-      },
-      {
-        type: 'header',
-        text: {
-          type: 'plain_text',
-          text: 'Antworten',
-          emoji: true
-        }
-      },
-      {
-        type: 'input',
-        element: {
-          type: 'plain_text_input',
-          action_id: creationModalActions.newAnswerInput
-        },
-        block_id: creationModalBlocks.newAnswer,
-        optional: true,
-        label: {
-          type: 'plain_text',
-          text: 'Neue Antwort',
-          emoji: true
-        }
-      },
-      {
-        type: 'actions',
-        elements: [
+    {
+      type: 'input',
+      block_id: creationModalBlocks.options,
+      element: {
+        type: 'checkboxes',
+        options: [
           {
-            type: 'button',
             text: {
               type: 'plain_text',
-              text: 'Hinzufügen',
+              text: 'mehrere Antworten auswählbar',
               emoji: true
             },
-            value: 'add',
-            action_id: creationModalActions.addAnswer
+            value: optionCheckboxes.multipleSelect
           },
           {
-            type: 'button',
             text: {
               type: 'plain_text',
-              text: 'Alle löschen',
+              text: 'Teilnehmer können Optionen hinzufügen',
               emoji: true
             },
-            style: 'danger',
-            value: 'all',
-            action_id: creationModalActions.deleteAllAnswers
+            value: optionCheckboxes.addAllowed
+          },
+          {
+            text: {
+              type: 'plain_text',
+              text: 'Anonym',
+              emoji: true
+            },
+            value: optionCheckboxes.anonym
           }
-        ]
+        ],
+        action_id: creationModalActions.options
       },
-      {
-        type: 'divider'
+      optional: true,
+      label: {
+        type: 'plain_text',
+        text: 'Optionen',
+        emoji: true
       }
-    ]
-  }
+    },
+    {
+      type: 'divider'
+    },
+    {
+      type: 'header',
+      text: {
+        type: 'plain_text',
+        text: 'Antworten',
+        emoji: true
+      }
+    },
+    {
+      type: 'input',
+      element: {
+        type: 'plain_text_input',
+        action_id: creationModalActions.newAnswerInput
+      },
+      block_id: creationModalBlocks.newAnswer,
+      optional: true,
+      label: {
+        type: 'plain_text',
+        text: 'Neue Antwort',
+        emoji: true
+      }
+    },
+    {
+      type: 'actions',
+      elements: [
+        {
+          type: 'button',
+          text: {
+            type: 'plain_text',
+            text: 'Hinzufügen',
+            emoji: true
+          },
+          value: 'add',
+          action_id: creationModalActions.addAnswer
+        },
+        {
+          type: 'button',
+          text: {
+            type: 'plain_text',
+            text: 'Alle löschen',
+            emoji: true
+          },
+          style: 'danger',
+          value: 'all',
+          action_id: creationModalActions.deleteAllAnswers
+        }
+      ]
+    },
+    {
+      type: 'divider'
+    }
+  ]
 };
 
-/** @type {import('@slack/bolt').SectionBlock} */
+/** @type {import('@slack/types').SectionBlock} */
 const answerView = {
   type: 'section',
   text: {
@@ -235,79 +232,72 @@ const answerView = {
   }
 };
 
-/** @type {import("@slack/web-api").ChatPostMessageArguments} */
-const pollMessage = {
-  channel: '',
-  text: '', // Text in the notification, set in the method
-  emoji: true,
-  unfurl_links: false,
-  blocks: [
-    {
-      type: 'section',
-      text: {
+/** @type {import("@slack/types").AnyBlock[]} */
+const pollMessageBlocks = [
+  {
+    type: 'section',
+    text: {
+      type: 'mrkdwn',
+      text: '' // set in the method
+    }
+  },
+  {
+    type: 'context',
+    elements: [
+      {
         type: 'mrkdwn',
         text: '' // set in the method
       }
-    },
-    {
-      type: 'context',
-      elements: [
-        {
-          type: 'mrkdwn',
-          text: '' // set in the method
-        }
-      ]
-    },
-    {
-      type: 'divider'
-    },
-    {
-      type: 'divider'
-    },
-    {
-      type: 'actions',
-      elements: [
-        {
-          type: 'button',
-          text: {
-            type: 'plain_text',
-            emoji: true,
-            text: 'Antwort hinzufügen'
-          },
-          // value: "click_me_123",
-          action_id: pollMessageActions.addAnswer
+    ]
+  },
+  {
+    type: 'divider'
+  },
+  {
+    type: 'divider'
+  },
+  {
+    type: 'actions',
+    elements: [
+      {
+        type: 'button',
+        text: {
+          type: 'plain_text',
+          emoji: true,
+          text: 'Antwort hinzufügen'
         },
-        {
-          type: 'button',
-          style: 'danger',
-          text: {
-            type: 'plain_text',
-            emoji: true,
-            text: 'Meine Antwort/en löschen'
-          },
-          value: '', // store info about options in method here
-          action_id: pollMessageActions.deleteAnswer
+        // value: "click_me_123",
+        action_id: pollMessageActions.addAnswer
+      },
+      {
+        type: 'button',
+        style: 'danger',
+        text: {
+          type: 'plain_text',
+          emoji: true,
+          text: 'Meine Antwort/en löschen'
         },
-        {
-          type: 'overflow',
-          options: [
-            {
-              text: {
-                type: 'plain_text',
-                text: 'Ersteller: Umfrage löschen',
-                emoji: true
-              },
-              value: pollMessageActions.overflowDelete // delete-{ admin } (added in method)
-            }
-          ],
-          action_id: pollMessageActions.overflow
-        }
-      ]
-    }
-  ]
-};
-
-/** @type {import("@slack/bolt").SectionBlock} */
+        value: '', // store info about options in method here
+        action_id: pollMessageActions.deleteAnswer
+      },
+      {
+        type: 'overflow',
+        options: [
+          {
+            text: {
+              type: 'plain_text',
+              text: 'Ersteller: Umfrage löschen',
+              emoji: true
+            },
+            value: pollMessageActions.overflowDelete // delete-{ admin } (added in method)
+          }
+        ],
+        action_id: pollMessageActions.overflow
+      }
+    ]
+  }
+];
+/** @type {import("@slack/types").SectionBlock} */
 const answerBlockMessage = {
   type: 'section',
   text: {
@@ -326,47 +316,44 @@ const answerBlockMessage = {
   }
 };
 
-/** @type {import("@slack/web-api").ViewsOpenArguments} */
+/** @type {import("@slack/types").View} */
 const addAnswerView = {
-  trigger_id: '', // set in method
-  view: {
-    type: 'modal',
-    private_metadata: '', // set in method, contains message info
-    callback_id: viewNames.addAnswerModal,
-    title: {
-      type: 'plain_text',
-      text: 'Neue Antwort hinzufügen'
-    },
-    submit: {
-      type: 'plain_text',
-      text: 'Hinzufügen'
-    },
-    close: {
-      type: 'plain_text',
-      text: 'Abbrechen'
-    },
-    blocks: [
-      {
-        type: 'input',
-        block_id: creationModalBlocks.newAnswer,
-        element: {
-          type: 'plain_text_input',
-          placeholder: {
-            type: 'plain_text',
-            text: 'Antwort'
-          },
-          action_id: pollMessageActions.addAnswerViewTextInput
-        },
-        label: {
+  type: 'modal',
+  private_metadata: '', // set in method, contains message info
+  callback_id: viewNames.addAnswerModal,
+  title: {
+    type: 'plain_text',
+    text: 'Neue Antwort hinzufügen'
+  },
+  submit: {
+    type: 'plain_text',
+    text: 'Hinzufügen'
+  },
+  close: {
+    type: 'plain_text',
+    text: 'Abbrechen'
+  },
+  blocks: [
+    {
+      type: 'input',
+      block_id: creationModalBlocks.newAnswer,
+      element: {
+        type: 'plain_text_input',
+        placeholder: {
           type: 'plain_text',
-          text: ' '
-        }
+          text: 'Antwort'
+        },
+        action_id: pollMessageActions.addAnswerViewTextInput
+      },
+      label: {
+        type: 'plain_text',
+        text: ' '
       }
-    ]
-  }
+    }
+  ]
 };
 
-/** @type {import("@slack/bolt").ContextBlock} */
+/** @type {import("@slack/types").ContextBlock} */
 const resultBlockMessage = {
   type: 'context',
   elements: [
@@ -377,7 +364,7 @@ const resultBlockMessage = {
   ]
 };
 
-/** @type {import("@slack/bolt").KnownBlock[]} */
+/** @type {import("@slack/types").KnownBlock[]} */
 const homeView = [
   {
     type: 'header',
@@ -420,23 +407,19 @@ const homeView = [
  */
 // eslint-disable-next-line camelcase
 export function getPollsView({ trigger_id, text }) {
-  const view = util.deepCopy(
-    /** @type {import('@slack/web-api').ViewsOpenArguments} */ (pollView)
-  );
-
-  // eslint-disable-next-line camelcase
-  view.trigger_id = trigger_id;
+  const view = util.deepCopy(pollView);
 
   if (!text || text !== '') {
-    const element = /** @type {import('@slack/bolt').InputBlock} */ (
-      view.view.blocks[0]
+    const element = /** @type {import('@slack/types').InputBlock} */ (
+      view.blocks[0]
     ).element;
 
-    /** @type {import('@slack/bolt').PlainTextInput } */
+    /** @type {import('@slack/types').PlainTextInput } */
     (element).initial_value = text;
   }
 
-  return view;
+  // eslint-disable-next-line camelcase
+  return { trigger_id, view };
 }
 
 /**
@@ -447,10 +430,7 @@ export function getPollsView({ trigger_id, text }) {
 export function addAnswer({ id, hash, blocks, state }) {
   const view = util.deepCopy(pollView);
 
-  view.view_id = id;
-  view.hash = hash;
-
-  view.view.blocks = blocks;
+  view.blocks = blocks;
 
   const newAnswerView = util.deepCopy(answerView);
 
@@ -459,12 +439,12 @@ export function addAnswer({ id, hash, blocks, state }) {
       creationModalActions.newAnswerInput
     ].value;
 
-  /** @type {import('@slack/bolt').Button } */
-  (newAnswerView.accessory).value = `${view.view.blocks.length + 1}`;
+  /** @type {import('@slack/types').Button } */
+  (newAnswerView.accessory).value = `${view.blocks.length + 1}`;
 
-  view.view.blocks.push(newAnswerView);
+  view.blocks.push(newAnswerView);
 
-  return view;
+  return { view_id: id, hash, view };
 }
 
 /**
@@ -476,56 +456,53 @@ export function addAnswer({ id, hash, blocks, state }) {
 export function deleteAnswer({ id, hash, blocks }, { value }) {
   const view = util.deepCopy(pollView);
 
-  view.view_id = id;
-  view.hash = hash;
-
   if (value === 'all') {
     // delete all
-    view.view.blocks = blocks.filter((block) => {
+    view.blocks = blocks.filter((block) => {
       const sectionBlock =
-        /** @type {import('@slack/bolt').SectionBlock} */
+        /** @type {import('@slack/types').SectionBlock} */
         (block);
 
       return (
         !sectionBlock.accessory ||
-        /** @type {import('@slack/bolt').Button } */
+        /** @type {import('@slack/types').Button } */
         (sectionBlock.accessory).action_id !==
           creationModalActions.deleteSingleAnswer
       );
     });
   } else {
     // delete selected
-    view.view.blocks = blocks.filter((block) => {
+    view.blocks = blocks.filter((block) => {
       const sectionBlock =
-        /** @type {import('@slack/bolt').SectionBlock} */
+        /** @type {import('@slack/types').SectionBlock} */
         (block);
 
       return (
         !sectionBlock.accessory ||
-        /** @type {import('@slack/bolt').Button } */
+        /** @type {import('@slack/types').Button } */
         (sectionBlock.accessory).value !== value
       );
     });
 
     // adapt values
-    view.view.blocks.forEach((block, index) => {
+    view.blocks.forEach((block, index) => {
       const sectionBlock =
-        /** @type {import('@slack/bolt').SectionBlock} */
+        /** @type {import('@slack/types').SectionBlock} */
         (block);
 
       if (
         sectionBlock.accessory &&
-        /** @type {import('@slack/bolt').Button } */
+        /** @type {import('@slack/types').Button } */
         (sectionBlock.accessory).action_id ===
           creationModalActions.deleteSingleAnswer
       ) {
-        /** @type {import('@slack/bolt').Button } */
+        /** @type {import('@slack/types').Button } */
         (sectionBlock.accessory).value = `${index + 1}`;
       }
     });
   }
 
-  return view;
+  return { view_id: id, hash, view };
 }
 
 /**
@@ -534,48 +511,36 @@ export function deleteAnswer({ id, hash, blocks }, { value }) {
  * @returns {import('@slack/web-api').ChatPostMessageArguments}
  */
 export function getPollMessage({ user, view }) {
-  const retView = util.deepCopy(pollMessage);
+  const retViewBlocks = util.deepCopy(pollMessageBlocks);
 
   // block castings
   const actionsBlock =
-    /** @type {import('@slack/bolt').ActionsBlock} */
-    (retView.blocks[4]);
+    /** @type {import('@slack/types').ActionsBlock} */
+    (retViewBlocks[4]);
 
   const contextBlock =
-    /** @type {import('@slack/bolt').ContextBlock} */
-    (retView.blocks[1]);
+    /** @type {import('@slack/types').ContextBlock} */
+    (retViewBlocks[1]);
 
   // elements of block castings
   const contextElement =
-    /** @type {import('@slack/bolt').MrkdwnElement } */
+    /** @type {import('@slack/types').MrkdwnElement } */
     (contextBlock.elements[0]);
 
   const actionsElementIdx1 =
-    /** @type {import('@slack/bolt').Button } */
+    /** @type {import('@slack/types').Button } */
     (actionsBlock.elements[1]);
 
-  // set question
-  retView.text =
-    view.state.values[creationModalBlocks.question][
-      creationModalActions.questionInput
-    ].value;
-
   // set text in Message
-  /** @type {import('@slack/bolt').SectionBlock} */
-  (retView.blocks[0]).text.text = `Neue Umfrage von <@${user.id}>\n*${
+  /** @type {import('@slack/types').SectionBlock} */
+  (retViewBlocks[0]).text.text = `Neue Umfrage von <@${user.id}>\n*${
     view.state.values[creationModalBlocks.question][
       creationModalActions.questionInput
     ].value
   }*`;
 
-  // set channel
-  retView.channel =
-    view.state.values[creationModalBlocks.conversationSelect][
-      creationModalActions.conversationSelect
-    ].selected_conversation;
-
   // store admin in overflow button
-  /** @type {import('@slack/bolt').Overflow } */
+  /** @type {import('@slack/types').Overflow } */
   (actionsBlock.elements[2]).options[0].value += `-${user.id}`;
 
   // -- set options --//
@@ -621,12 +586,12 @@ export function getPollMessage({ user, view }) {
   view.blocks
     .filter((block) => {
       const sectionBlock =
-        /** @type {import('@slack/bolt').SectionBlock} */
+        /** @type {import('@slack/types').SectionBlock} */
         (block);
 
       return (
         sectionBlock.accessory &&
-        /** @type {import('@slack/bolt').Button} */
+        /** @type {import('@slack/types').Button} */
         (sectionBlock.accessory).action_id ===
           creationModalActions.deleteSingleAnswer
       );
@@ -634,20 +599,30 @@ export function getPollMessage({ user, view }) {
     .forEach((block, index) => {
       const answerView = util.deepCopy(answerBlockMessage);
 
-      /** @type {import('@slack/bolt').Button} */
+      /** @type {import('@slack/types').Button} */
       (answerView.accessory).value = `${index}`;
 
       answerView.text.text = `*${
-        /** @type {import('@slack/bolt').SectionBlock} */
+        /** @type {import('@slack/types').SectionBlock} */
         (block).text.text
       }*`;
 
       const resultView = util.deepCopy(resultBlockMessage);
 
-      retView.blocks.splice(3 + index * 2, 0, answerView, resultView);
+      retViewBlocks.splice(3 + index * 2, 0, answerView, resultView);
     });
 
-  return retView;
+  // set channel and text in notification here
+  return {
+    channel:
+      view.state.values[creationModalBlocks.conversationSelect][
+        creationModalActions.conversationSelect
+      ].selected_conversation,
+    text: view.state.values[creationModalBlocks.question][
+      creationModalActions.questionInput
+    ].value,
+    blocks: retViewBlocks
+  };
 }
 
 /**
@@ -658,12 +633,12 @@ export function getPollMessage({ user, view }) {
 export function answerOptionsValid({ view }) {
   const answers = view.blocks.filter((block) => {
     const sectionBlock =
-      /** @type {import('@slack/bolt').SectionBlock} */
+      /** @type {import('@slack/types').SectionBlock} */
       (block);
 
     return (
       sectionBlock.accessory &&
-      /** @type {import('@slack/bolt').Button} */
+      /** @type {import('@slack/types').Button} */
       (sectionBlock.accessory).action_id ===
         creationModalActions.deleteSingleAnswer
     );
@@ -694,39 +669,36 @@ export function answerOptionsValid({ view }) {
  * @returns {import("@slack/bolt").RespondArguments}
  */
 export function vote({ message, user }, action) {
-  /** @type {import("@slack/bolt").RespondArguments} */
-  const view = util.deepCopy(pollMessage);
-
-  // take over all information
-  view.text = message.text;
-  view.blocks = message.blocks;
+  // take over blocks from original message
+  /** @type {import("@slack/types").AnyBlock[]} */
+  const blocks = message.blocks;
 
   // get options from "delete my answers" button
   const options =
-    /** @type {import('@slack/bolt').Button} */
+    /** @type {import('@slack/types').Button} */
     (
-      /** @type {import('@slack/bolt').ActionsBlock} */
-      (view.blocks[view.blocks.length - 1]).elements[
-        /** @type {import('@slack/bolt').ActionsBlock} */
-        (view.blocks[view.blocks.length - 1]).elements.length - 2
+      /** @type {import('@slack/types').ActionsBlock} */
+      (blocks[blocks.length - 1]).elements[
+        /** @type {import('@slack/types').ActionsBlock} */
+        (blocks[blocks.length - 1]).elements.length - 2
       ]
     ).value; // - much readable, very wow
 
-  view.blocks.forEach((block, index) => {
+  blocks.forEach((block, index) => {
     const sectionBlock =
-      /** @type {import('@slack/bolt').SectionBlock} */
+      /** @type {import('@slack/types').SectionBlock} */
       (block);
 
     if (
       !sectionBlock.accessory ||
       !/^\d*/.test(
-        /** @type {import('@slack/bolt').Button} */ (sectionBlock.accessory)
+        /** @type {import('@slack/types').Button} */ (sectionBlock.accessory)
           .value
       )
     )
       return;
 
-    const accessory = /** @type {import('@slack/bolt').Button} */ (
+    const accessory = /** @type {import('@slack/types').Button} */ (
       sectionBlock.accessory
     );
 
@@ -740,12 +712,12 @@ export function vote({ message, user }, action) {
 
     // get context block after answer block
     const contextBlock =
-      /** @type {import('@slack/bolt').ContextBlock} */
-      (view.blocks[index + 1]);
+      /** @type {import('@slack/types').ContextBlock} */
+      (blocks[index + 1]);
 
     // get element of context block after answer block
     const contextTextElement =
-      /** @type {import('@slack/bolt').MrkdwnElement} */ (
+      /** @type {import('@slack/types').MrkdwnElement} */ (
         contextBlock.elements[0]
       );
 
@@ -801,7 +773,8 @@ export function vote({ message, user }, action) {
     }
   });
 
-  return view;
+  // take over text from original message
+  return { text: message.text, blocks };
 }
 
 /**
@@ -813,18 +786,16 @@ export function vote({ message, user }, action) {
 export function getAddAnswerView({ trigger_id, message, channel }) {
   const view = util.deepCopy(addAnswerView);
 
+  view.private_metadata = `${channel.id}-${message.ts}`;
+
   // eslint-disable-next-line camelcase
-  view.trigger_id = trigger_id;
-
-  view.view.private_metadata = `${channel.id}-${message.ts}`;
-
-  return view;
+  return { trigger_id, view };
 }
 
 /**
  *
  * @param {import('@slack/bolt').ViewOutput} view
- * @param {import('@slack/web-api/dist/response/ConversationsHistoryResponse').MessageElement} message
+ * @param {import('@slack/web-api/dist/types/response/ConversationsHistoryResponse').MessageElement} message
  * @returns {import('@slack/web-api').ChatUpdateArguments}
  */
 export function addAnswerMessage(
@@ -851,7 +822,7 @@ export function addAnswerMessage(
 
   const answerView = util.deepCopy(answerBlockMessage);
 
-  /** @type {import('@slack/bolt').Button} */
+  /** @type {import('@slack/types').Button} */
   (answerView.accessory).value = `${idx}`;
 
   answerView.text.text = `*${
@@ -862,14 +833,16 @@ export function addAnswerMessage(
 
   const resultView = util.deepCopy(resultBlockMessage);
 
-  updateMessage.blocks.splice(blocks.length - 2, 0, answerView, resultView);
+  // required for typing
+  if ('blocks' in updateMessage)
+    updateMessage.blocks.splice(blocks.length - 2, 0, answerView, resultView);
 
   return updateMessage;
 }
 
 /**
  *
- * @returns {import("@slack/bolt").KnownBlock[]}
+ * @returns {import("@slack/types").KnownBlock[]}
  */
 export function getHomeView() {
   return util.deepCopy(homeView);

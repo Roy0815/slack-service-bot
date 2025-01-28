@@ -24,126 +24,119 @@ export const homeViewDisplayHours = 'as-home-display-hours-action';
 export const homeViewMaintainHours = 'as-home-maintain-hours-action';
 
 //* ******************* Views ********************//
-/** @type {import("@slack/web-api").ViewsOpenArguments} */
+/** @type {import("@slack/types").View} */
 const registerView = {
-  trigger_id: '',
-  view: {
-    type: 'modal',
-    callback_id: registerViewName,
-    title: {
-      type: 'plain_text',
-      text: 'Registrieren',
-      emoji: true
-    },
-    submit: {
-      type: 'plain_text',
-      text: 'Abschicken',
-      emoji: true
-    },
-    close: {
-      type: 'plain_text',
-      text: 'Abbrechen',
-      emoji: true
-    },
-    blocks: [
-      {
-        type: 'input',
-        block_id: registerBlockNameSelect,
-        label: {
+  type: 'modal',
+  callback_id: registerViewName,
+  title: {
+    type: 'plain_text',
+    text: 'Registrieren',
+    emoji: true
+  },
+  submit: {
+    type: 'plain_text',
+    text: 'Abschicken',
+    emoji: true
+  },
+  close: {
+    type: 'plain_text',
+    text: 'Abbrechen',
+    emoji: true
+  },
+  blocks: [
+    {
+      type: 'input',
+      block_id: registerBlockNameSelect,
+      label: {
+        type: 'plain_text',
+        text: 'Deine Slack ID ist noch nicht verknüpft, bitte wähle deinen Namen aus:'
+      },
+      element: {
+        type: 'static_select',
+        placeholder: {
           type: 'plain_text',
-          text: 'Deine Slack ID ist noch nicht verknüpft, bitte wähle deinen Namen aus:'
+          text: 'Name',
+          emoji: true
         },
-        element: {
-          type: 'static_select',
-          placeholder: {
-            type: 'plain_text',
-            text: 'Name',
-            emoji: true
-          },
-          options: [], // users go here
-          action_id: registerActionNameSelect
-        }
+        options: [], // users go here
+        action_id: registerActionNameSelect
       }
-    ]
-  }
+    }
+  ]
 };
 
-/** @type {import('@slack/web-api').ViewsOpenArguments} */
+/** @type {import('@slack/types').View} */
 const maintainHoursView = {
-  trigger_id: '',
-  view: {
-    type: 'modal',
-    callback_id: maintainHoursViewName,
-    title: {
-      type: 'plain_text',
-      text: 'Arbeitsstunden erfassen',
-      emoji: true
-    },
-    submit: {
-      type: 'plain_text',
-      text: 'Einreichen',
-      emoji: true
-    },
-    close: {
-      type: 'plain_text',
-      text: 'Abbrechen',
-      emoji: true
-    },
-    blocks: [
-      {
-        type: 'input',
-        block_id: maintainHoursBlockDescription,
-        element: {
-          type: 'plain_text_input',
-          action_id: maintainHoursActionDescription
-        },
-        label: {
-          type: 'plain_text',
-          text: 'Kurzbeschreibung',
-          emoji: true
-        }
+  type: 'modal',
+  callback_id: maintainHoursViewName,
+  title: {
+    type: 'plain_text',
+    text: 'Arbeitsstunden erfassen',
+    emoji: true
+  },
+  submit: {
+    type: 'plain_text',
+    text: 'Einreichen',
+    emoji: true
+  },
+  close: {
+    type: 'plain_text',
+    text: 'Abbrechen',
+    emoji: true
+  },
+  blocks: [
+    {
+      type: 'input',
+      block_id: maintainHoursBlockDescription,
+      element: {
+        type: 'plain_text_input',
+        action_id: maintainHoursActionDescription
       },
-      {
-        type: 'input',
-        block_id: maintainHoursBlockDate,
-        element: {
-          type: 'datepicker',
-          placeholder: {
-            type: 'plain_text',
-            text: 'Datum auswählen',
-            emoji: true
-          },
-          action_id: maintainHoursActionDate
-        },
-        label: {
-          type: 'plain_text',
-          text: 'Datum des Arbeitseinsatzes',
-          emoji: true
-        }
-      },
-      {
-        type: 'input',
-        block_id: maintainHoursBlockHours,
-        element: {
-          type: 'plain_text_input',
-          action_id: maintainHoursActionHours,
-          initial_value: '0,5'
-        },
-        label: {
-          type: 'plain_text',
-          text: 'Stunden',
-          emoji: true
-        }
+      label: {
+        type: 'plain_text',
+        text: 'Kurzbeschreibung',
+        emoji: true
       }
-    ]
-  }
+    },
+    {
+      type: 'input',
+      block_id: maintainHoursBlockDate,
+      element: {
+        type: 'datepicker',
+        placeholder: {
+          type: 'plain_text',
+          text: 'Datum auswählen',
+          emoji: true
+        },
+        action_id: maintainHoursActionDate
+      },
+      label: {
+        type: 'plain_text',
+        text: 'Datum des Arbeitseinsatzes',
+        emoji: true
+      }
+    },
+    {
+      type: 'input',
+      block_id: maintainHoursBlockHours,
+      element: {
+        type: 'plain_text_input',
+        action_id: maintainHoursActionHours,
+        initial_value: '0,5'
+      },
+      label: {
+        type: 'plain_text',
+        text: 'Stunden',
+        emoji: true
+      }
+    }
+  ]
 };
 
 /** @type {import("@slack/web-api").ChatPostMessageArguments} */
 const basicConfirmDialogView = {
   channel: '',
   text: '', // Text in the notification, set in the method
-  emoji: true,
   unfurl_links: false,
   blocks: [
     {
@@ -183,7 +176,7 @@ const basicConfirmDialogView = {
   ]
 };
 
-/** @type {import("@slack/bolt").KnownBlock[]} */
+/** @type {import("@slack/types").KnownBlock[]} */
 const homeView = [
   {
     type: 'header',
@@ -266,14 +259,13 @@ const homeView = [
  */
 export async function getRegisterView(triggerId) {
   const view = util.deepCopy(registerView);
-  view.trigger_id = triggerId;
 
-  const element = /** @type {import("@slack/bolt").InputBlock} */ (
-    view.view.blocks[0]
+  const element = /** @type {import("@slack/types").InputBlock} */ (
+    view.blocks[0]
   ).element;
 
   for (const user of await sheet.getAllUsers()) {
-    /** @type {import("@slack/bolt").StaticSelect} */ (element).options.push({
+    /** @type {import("@slack/types").StaticSelect} */ (element).options.push({
       text: {
         type: 'plain_text',
         text: `${user.firstname} ${user.lastname}`,
@@ -283,7 +275,7 @@ export async function getRegisterView(triggerId) {
     });
   }
 
-  return view;
+  return { trigger_id: triggerId, view };
 }
 
 /**
@@ -295,21 +287,27 @@ export async function getAutoRegisterMessage(slackId) {
   const view = util.deepCopy(basicConfirmDialogView);
   view.channel = await sheet.getAdminChannel();
 
-  view.text = /** @type {import('@slack/bolt').SectionBlock} */ (
-    view.blocks[0]
-  ).text.text = `<@${slackId}> ist beigetreten und noch nicht registriert. Bitte wähle den Namen aus:`;
+  // required for typing
+  if (!('blocks' in view)) {
+    return;
+  }
 
-  const actionBlock = /** @type {import('@slack/bolt').ActionsBlock} */ (
+  view.text = /** @type {import('@slack/types').SectionBlock} */ (
+    view.blocks[0]
+  ).text.text =
+    `<@${slackId}> ist beigetreten und noch nicht registriert. Bitte wähle den Namen aus:`;
+
+  const actionBlock = /** @type {import('@slack/types').ActionsBlock} */ (
     view.blocks[1]
   );
 
-  /** @type {import('@slack/bolt').Button} */
+  /** @type {import('@slack/types').Button} */
   (actionBlock.elements[0]).value = slackId;
 
-  /** @type {import('@slack/bolt').Button} */
+  /** @type {import('@slack/types').Button} */
   (actionBlock.elements[0]).text.text = 'Submit';
 
-  /** @type {import('@slack/bolt').Button} */
+  /** @type {import('@slack/types').Button} */
   (actionBlock.elements[0]).action_id = 'auto-register-submit-button';
   actionBlock.block_id = autoregisterInputBlock;
 
@@ -339,19 +337,25 @@ export async function getRegisterConfirmDialog(registerObj) {
   const view = util.deepCopy(basicConfirmDialogView);
   view.channel = await sheet.getAdminChannel();
 
-  view.text = /** @type {import('@slack/bolt').SectionBlock} */ (
-    view.blocks[0]
-  ).text.text = `<@${registerObj.slackId}> möchte sich als ${registerObj.name} registrieren`;
+  // required for correct typing
+  if (!('blocks' in view)) {
+    return;
+  }
 
-  const actionBlock = /** @type {import('@slack/bolt').ActionsBlock} */ (
+  view.text = /** @type {import('@slack/types').SectionBlock} */ (
+    view.blocks[0]
+  ).text.text =
+    `<@${registerObj.slackId}> möchte sich als ${registerObj.name} registrieren`;
+
+  const actionBlock = /** @type {import('@slack/types').ActionsBlock} */ (
     view.blocks[1]
   );
 
-  const btn1 = /** @type {import('@slack/bolt').Button} */ (
+  const btn1 = /** @type {import('@slack/types').Button} */ (
     actionBlock.elements[0]
   );
 
-  const btn2 = /** @type {import('@slack/bolt').Button} */ (
+  const btn2 = /** @type {import('@slack/types').Button} */ (
     actionBlock.elements[1]
   );
 
@@ -398,9 +402,8 @@ export function getUserRegisterEndMessage({ slackId, name, approved }) {
  */
 export function getMaintainHoursView(triggerId) {
   const view = util.deepCopy(maintainHoursView);
-  view.trigger_id = triggerId;
 
-  return view;
+  return { trigger_id: triggerId, view };
 }
 
 /**
@@ -411,12 +414,17 @@ export function getMaintainHoursView(triggerId) {
 export async function getMaintainConfirmDialog(hoursObjMaint) {
   const view = util.deepCopy(basicConfirmDialogView);
 
+  // required for correct typing
+  if (!('blocks' in view)) {
+    return;
+  }
+
   const [year, month, day] = hoursObjMaint.date.split('-');
   const dateObj = new Date(Number(year), Number(month) - 1, Number(day));
 
   view.channel = await sheet.getAdminChannel();
 
-  view.text = /** @type {import('@slack/bolt').SectionBlock} */ (
+  view.text = /** @type {import('@slack/types').SectionBlock} */ (
     view.blocks[0]
   ).text.text = `<@${
     hoursObjMaint.slackId
@@ -426,15 +434,15 @@ export async function getMaintainConfirmDialog(hoursObjMaint) {
     dateObj
   )}`;
 
-  const actionBlock = /** @type {import('@slack/bolt').ActionsBlock} */ (
+  const actionBlock = /** @type {import('@slack/types').ActionsBlock} */ (
     view.blocks[1]
   );
 
-  const btn1 = /** @type {import('@slack/bolt').Button} */ (
+  const btn1 = /** @type {import('@slack/types').Button} */ (
     actionBlock.elements[0]
   );
 
-  const btn2 = /** @type {import('@slack/bolt').Button} */ (
+  const btn2 = /** @type {import('@slack/types').Button} */ (
     actionBlock.elements[1]
   );
 
@@ -489,7 +497,7 @@ export function getUserMaintainEndMessage(hoursMaintFinalizer) {
 
 /**
  * Get part of the home view
- * @returns {import("@slack/bolt").KnownBlock[]}
+ * @returns {import("@slack/types").KnownBlock[]}
  */
 export function getHomeView() {
   const view = util.deepCopy(homeView);
@@ -497,12 +505,12 @@ export function getHomeView() {
   // add year options
   let year = new Date().getFullYear();
 
-  const actionBlock = /** @type {import('@slack/bolt').ActionsBlock} */ (
+  const actionBlock = /** @type {import('@slack/types').ActionsBlock} */ (
     view[2]
   );
 
   while (year >= 2022) {
-    /** @type {import('@slack/bolt').StaticSelect} */ (
+    /** @type {import('@slack/types').StaticSelect} */ (
       actionBlock.elements[1]
     ).options.push({
       text: {
@@ -515,9 +523,9 @@ export function getHomeView() {
     year--;
   }
 
-  /** @type {import('@slack/bolt').StaticSelect} */ (
+  /** @type {import('@slack/types').StaticSelect} */ (
     actionBlock.elements[1]
-  ).initial_option = /** @type {import('@slack/bolt').StaticSelect} */ (
+  ).initial_option = /** @type {import('@slack/types').StaticSelect} */ (
     actionBlock.elements[1]
   ).options[0];
 
