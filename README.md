@@ -116,6 +116,7 @@ Die zentrale App verarbeitet das Event `app_home_opened`.
 2. [Staette](#2-staette)
 3. [Arbeitsstunden](#3-arbeitsstunden)
 4. [Stammdaten](#4-stammdaten)
+5. [Rechnungen](#5-rechnungen)
 
 ### **1. Pollz**
 
@@ -160,6 +161,10 @@ Das erste valide Jahr ist 2022. Sollte ein User eine Abfrage für ein Jahr start
 
 Stammdaten hat aktuell nur eine Funktion und die ist das Kommando `/stammdaten`. Diese Funktion baut auf die Funktionen von [Arbeitsstunden](#3-arbeitsstunden) auf. Das Setup ist genau das gleiche. Die Stammdaten werden im Sheet `Allg Daten` gelesen und geändert.
 Auch hier laufen die Genehmigungen alle über den Admin Channel, welcher im Sheet Sheet `Summe Stunden x` (siehe unten) im aktuellen Jahr hinterlegt ist.
+
+### **5. Rechnungen**
+
+**_WIP_** Rechnungen werden über den Workflow Builder eingereicht. Der Bot implementiert einen Custom Workflow Step, welcher die Rechnung automatisch in Google Drive hochlädt, wo diese nur noch manuell sortiert werden muss.
 
 ## Upgrades & Contribution
 

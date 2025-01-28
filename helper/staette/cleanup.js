@@ -25,9 +25,8 @@ export async function run(event, context) {
   if (!process.env.CRONJOB_LOG_TO_ADMIN) return;
 
   // log deleted messages
-  app.client.files.upload({
-    token: process.env.SLACK_BOT_TOKEN,
-    channels: process.env.APP_ADMIN,
+  await app.client.filesUploadV2({
+    channel_id: process.env.APP_ADMIN_CHANNEL,
     filetype: 'javascript',
     initial_comment: `Job ran at ${util.formatDate(
       new Date()

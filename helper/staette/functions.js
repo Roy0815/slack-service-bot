@@ -2,7 +2,7 @@
 /**
  * Cleanup old messages
  * @param {import('@slack/bolt').App} app
- * @returns {Promise<import('@slack/web-api/dist/response/ConversationsHistoryResponse').Message[]>}
+ * @returns {Promise<import('@slack/web-api/dist/types/response/ConversationsHistoryResponse').MessageElement[]>}
  */
 export async function cleanup({ client }) {
   // get bot ID
@@ -31,7 +31,7 @@ export async function cleanup({ client }) {
   const cutoffDate = new Date();
   cutoffDate.setDate(cutoffDate.getDate() - 1);
 
-  /** @type {import('@slack/web-api/dist/response/ConversationsHistoryResponse').Message[]} */
+  /** @type {import('@slack/web-api/dist/types/response/ConversationsHistoryResponse').MessageElement[]} */
   const returnObj = [];
 
   filtered.forEach((msg) => {

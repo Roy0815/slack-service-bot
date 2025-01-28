@@ -5,13 +5,13 @@
 
 /**
  * @callback fnHomeView
- * @returns {import("@slack/bolt").KnownBlock[]}
+ * @returns {import("@slack/types").KnownBlock[]}
  */
 
 /**
  * @typedef {object} appComponent
  * @property {fnSetup} setupApp
- * @property {fnHomeView} getHomeView
+ * @property {fnHomeView|null} getHomeView
  */
 
 export {};

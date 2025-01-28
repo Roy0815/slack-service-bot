@@ -49,7 +49,7 @@ export function deepCopy(source) {
  * Check if bot is member in channel
  * @param {string} channelName
  * @param {import('@slack/web-api').WebClient} client
- * @returns {Promise<import('@slack/web-api/dist/response/ConversationsListResponse').Channel | null>} channel
+ * @returns {Promise<import('@slack/web-api/dist/types/response/ConversationsListResponse').Channel|null>} channel
  */
 export async function getChannelInfo(channelName, client) {
   const channels = (

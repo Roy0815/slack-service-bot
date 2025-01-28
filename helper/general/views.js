@@ -28,7 +28,7 @@ const homeView = {
 //* ******************* Functions ********************//
 /**
  *
- * @param {import("@slack/bolt").AppHomeOpenedEvent} event
+ * @param {import("@slack/types").AppHomeOpenedEvent} event
  * @returns {import("@slack/web-api").ViewsPublishArguments}
  */
 export function getHomeView({ user }) {
@@ -38,6 +38,8 @@ export function getHomeView({ user }) {
 
   // add homeviews of apps
   apps.forEach((element) => {
+    if (!element.getHomeView) return;
+
     view.view.blocks.push({
       type: 'divider'
     });
