@@ -39,6 +39,17 @@ app.action(new RegExp('.*'), async ({ ack }) => {
   } catch (err) {} // ReceiverMultipleAckError
 });
 
+app.command('/test', async ({ ack, respond, command, client }) => {
+  await ack();
+
+  if (command.user_id !== process.env.APP_ADMIN) {
+    await respond('Sorry, nur der Admin darf diesen Befehl ausführen.');
+    return;
+  }
+
+  await respond('Test erfolgreich!');
+});
+
 //* ******************* Error notifies Admin ********************//
 // @ts-ignore
 app.error(async ({ error, context, body }) => {
@@ -59,17 +70,15 @@ app.error(async ({ error, context, body }) => {
   // no admin maintained: no message
   if (!process.env.APP_ADMIN) return;
 
-  await app.client.files.upload({
-    token: process.env.SLACK_BOT_TOKEN,
-    channels: process.env.APP_ADMIN,
+  await app.client.filesUploadV2({
+    channel_id: process.env.APP_ADMIN_CHANNEL,
     filetype: 'javascript',
     initial_comment: `Error:\n${error}`,
     title: 'Context',
     content: JSON.stringify(context, null, '\t')
   });
-  await app.client.files.upload({
-    token: process.env.APP_ADMIN,
-    channels: process.env.APP_ADMIN,
+  await app.client.filesUploadV2({
+    channel_id: process.env.APP_ADMIN_CHANNEL,
     filetype: 'javascript',
     title: 'Body',
     content: JSON.stringify(body, null, '\t')
