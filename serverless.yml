@@ -2,7 +2,6 @@
 org: schwerathletikmannheim2018ev
 # "service" is the name of this project. This will also be added to your AWS resource names.
 service: slack-service-bot
-frameworkVersion: '4'
 
 provider:
   name: aws
