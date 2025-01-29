@@ -61,7 +61,7 @@ Default region name [None]: eu-central-1
 Default output format [None]: json
 ```
 
-- [serverless](serverless.com) installieren und einloggen mit Free-Plan Konto bei Serverless (Keine Lizenz benötigt!)
+- [serverless](https://www.serverless.com/framework/docs/getting-started) installieren und einloggen mit Free-Plan Konto bei Serverless (Keine Lizenz benötigt!)
 - app.js adaptieren und serverless.yml anlegen
 - "serverless offline" installieren zum lokalen testen
 - AWS Lambda Funktion deployen
@@ -165,15 +165,15 @@ Auch hier laufen die Genehmigungen alle über den Admin Channel, welcher im Shee
 ### **5. Rechnungen**
 
 **_WIP_** Rechnungen werden über den Workflow Builder eingereicht. Der Bot implementiert einen Custom Workflow Step, welcher die Rechnung automatisch in Google Drive hochlädt, wo diese nur noch manuell sortiert werden muss.
+_UPDATE_ basierend auf Fehlermeldungen bei der Konfiguration und bestätigt durchs Slack Team unterstützen Custom Workflow Steps im Moment keine Dateien, wodurch diese Funktion vorerst auf Eis gelegt ist.
 
 ## Upgrades & Contribution
 
 1. [Generelle Projektstruktur](#1-generelle-projektstruktur)
 2. [Slack App Entwicklung](#2-slack-app-entwicklung)
    1. [Testen mit Glitch (Live Webserver)](#21-testen-mit-glitch)
-   1. [Testen mit lokalem Docker Container](#22-testen-mit-lokalem-docker-container)
-3. [Docker Image Deployment](#3-docker-image-deployment)
-4. [Contribution Guidelines](#4-contribution-guidelines)
+   1. [Testen mit lokalem Docker Container](#22-testen-mit-lokalem-server)
+3. [Contribution Guidelines](#3-contribution-guidelines)
 
 ### **1. Generelle Projektstruktur**
 
@@ -211,7 +211,7 @@ Dieser Server / diese Funktion muss dann öffentlich im Internet verfügbar gema
 .\ngrok.exe http http://localhost:8080
 ```
 
-### **4. Contribution Guidelines**
+### **3. Contribution Guidelines**
 
 Die [generelle Projektstruktur](#1-generelle-projektstruktur) sollte beibehalten werden.
 
