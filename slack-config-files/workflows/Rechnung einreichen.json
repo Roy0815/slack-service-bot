@@ -1,0 +1,499 @@
+{
+  "workflow": {
+    "title": "Rechnung einreichen",
+    "description": "Rechnungen zur Erstattung einreichen",
+    "icon": "https://avatars.slack-edge.com/2024-12-22/8232876419488_b19db8d1721ac06ac46c_192.png",
+    "input_parameters": {
+      "Ft085RERHX5M__interactivity": {
+        "type": "slack#/types/interactivity",
+        "name": "Ft085RERHX5M__interactivity",
+        "description": "Interactivity context",
+        "title": "Interactivity context",
+        "is_hidden": true
+      },
+      "Ft085RERHX5M__user_id": {
+        "type": "slack#/types/user_id",
+        "name": "Ft085RERHX5M__user_id",
+        "description": "Person who used this workflow",
+        "title": "Person who used this workflow"
+      },
+      "Ft085RERHX5M__channel_id": {
+        "type": "slack#/types/channel_id",
+        "name": "Ft085RERHX5M__channel_id",
+        "description": "Channel where the workflow was used, if available",
+        "title": "Channel, in dem der Workflow verwendet wurde"
+      }
+    },
+    "steps": [
+      {
+        "id": "964e0b42-8804-467b-8ea3-1ee6198cd539",
+        "function_id": "Fn010N",
+        "inputs": {
+          "title": {
+            "hidden": false,
+            "locked": false,
+            "value": "Rechnung einreichen"
+          },
+          "fields": {
+            "hidden": false,
+            "locked": false,
+            "value": {
+              "elements": [
+                {
+                  "name": "2568827b-28eb-4040-8840-2b6c0bfb072a",
+                  "type": "slack#/types/date",
+                  "title": "Datum der Ausgabe",
+                  "description": ""
+                },
+                {
+                  "name": "6b47642e-e193-4f36-a722-ae1d7aebc3fe",
+                  "type": "string",
+                  "title": "Titel der Ausgabe",
+                  "description": "für was war die Ausgabe?"
+                },
+                {
+                  "name": "b0abe6bf-d070-447b-a63e-c6bc9b40b89d",
+                  "type": "string",
+                  "title": "dein Paypal Konto (Bankverbindung haben wir)",
+                  "description": ""
+                },
+                {
+                  "name": "6dcbc10a-eab9-4e45-aa4b-33ec46548d7f",
+                  "type": "array",
+                  "items": {
+                    "type": "slack#/types/file_id",
+                    "allowed_filetypes_group": "ALL"
+                  },
+                  "title": "Rechnungsbeleg",
+                  "maxItems": 1,
+                  "description": ""
+                }
+              ],
+              "required": [
+                "2568827b-28eb-4040-8840-2b6c0bfb072a",
+                "6b47642e-e193-4f36-a722-ae1d7aebc3fe",
+                "b0abe6bf-d070-447b-a63e-c6bc9b40b89d",
+                "6dcbc10a-eab9-4e45-aa4b-33ec46548d7f"
+              ]
+            }
+          },
+          "interactivity": {
+            "hidden": false,
+            "locked": false,
+            "value": "{{inputs.Ft085RERHX5M__interactivity}}"
+          }
+        }
+      },
+      {
+        "id": "14360138-feb3-471e-84c1-27cc99d62c49",
+        "function_id": "Fn010F",
+        "inputs": {
+          "message": {
+            "hidden": false,
+            "locked": false,
+            "value": [
+              {
+                "type": "rich_text",
+                "elements": [
+                  {
+                    "type": "rich_text_section",
+                    "elements": [
+                      {
+                        "text": "Deine Ausgabe wurde eingereicht. Du wirst benachrichtigt, wenn sie genehmigt wurde ",
+                        "type": "text"
+                      },
+                      {
+                        "name": "slightly_smiling_face",
+                        "type": "emoji",
+                        "unicode": "1f642"
+                      }
+                    ]
+                  }
+                ]
+              }
+            ]
+          },
+          "user_id": {
+            "hidden": false,
+            "locked": false,
+            "value": "{{inputs.Ft085RERHX5M__user_id}}"
+          },
+          "channel_id": {
+            "hidden": false,
+            "locked": false,
+            "value": "{{inputs.Ft085RERHX5M__channel_id}}"
+          }
+        }
+      },
+      {
+        "id": "0ef80f0c-6982-46dc-a2d1-c8c19eb203ca",
+        "function_id": "Fn0102",
+        "inputs": {
+          "files": {
+            "hidden": false,
+            "locked": false,
+            "value": "{{steps.964e0b42-8804-467b-8ea3-1ee6198cd539.fields.6dcbc10a-eab9-4e45-aa4b-33ec46548d7f}}"
+          },
+          "message": {
+            "hidden": false,
+            "locked": false,
+            "value": [
+              {
+                "type": "rich_text",
+                "elements": [
+                  {
+                    "type": "rich_text_section",
+                    "elements": [
+                      {
+                        "id": "{{steps.964e0b42-8804-467b-8ea3-1ee6198cd539.submit_user}}",
+                        "type": "workflowtoken",
+                        "style": { "bold": true },
+                        "property": "",
+                        "data_type": "slack#/types/user_id"
+                      },
+                      {
+                        "text": " hat eine neue Rechnung eingereicht:",
+                        "type": "text",
+                        "style": { "bold": true }
+                      },
+                      { "text": "\n\n", "type": "text" },
+                      {
+                        "text": "Datum der Ausgabe",
+                        "type": "text",
+                        "style": { "bold": true }
+                      },
+                      { "text": "\n", "type": "text" },
+                      {
+                        "id": "{{steps.964e0b42-8804-467b-8ea3-1ee6198cd539.fields.2568827b-28eb-4040-8840-2b6c0bfb072a}}",
+                        "type": "workflowtoken",
+                        "property": "",
+                        "data_type": "slack#/types/date"
+                      },
+                      { "text": "\n", "type": "text" },
+                      {
+                        "text": "Titel der Ausgabe",
+                        "type": "text",
+                        "style": { "bold": true }
+                      },
+                      { "text": "\n", "type": "text" },
+                      {
+                        "id": "{{steps.964e0b42-8804-467b-8ea3-1ee6198cd539.fields.6b47642e-e193-4f36-a722-ae1d7aebc3fe}}",
+                        "type": "workflowtoken",
+                        "property": "",
+                        "data_type": "string"
+                      },
+                      { "text": "\n", "type": "text" },
+                      {
+                        "text": "Paypal Konto",
+                        "type": "text",
+                        "style": { "bold": true }
+                      },
+                      { "text": "\n", "type": "text" },
+                      {
+                        "id": "{{steps.964e0b42-8804-467b-8ea3-1ee6198cd539.fields.b0abe6bf-d070-447b-a63e-c6bc9b40b89d}}",
+                        "type": "workflowtoken",
+                        "property": "",
+                        "data_type": "string"
+                      }
+                    ]
+                  }
+                ]
+              }
+            ]
+          },
+          "channel_id": {
+            "hidden": false,
+            "locked": false,
+            "value": "GG7HSFU3B"
+          },
+          "interactive_blocks": {
+            "hidden": false,
+            "locked": false,
+            "value": [
+              {
+                "type": "actions",
+                "elements": [
+                  {
+                    "text": {
+                      "text": "Genehmigen",
+                      "type": "plain_text",
+                      "emoji": true
+                    },
+                    "type": "button",
+                    "style": "primary",
+                    "value": "button",
+                    "action_id": "1165a0af-8d83-4b89-8057-a3efc73e9342"
+                  }
+                ]
+              }
+            ]
+          },
+          "interactivity_configuration": {
+            "hidden": false,
+            "locked": false,
+            "value": {
+              "actions": {
+                "1165a0af-8d83-4b89-8057-a3efc73e9342": {
+                  "is_button_multi_click": false
+                }
+              }
+            }
+          }
+        }
+      },
+      {
+        "id": "8c0f2894-de96-4ba4-882e-c9ab0ec9e35b",
+        "function_id": "Fn010N",
+        "inputs": {
+          "title": {
+            "hidden": false,
+            "locked": false,
+            "value": "Anfrage bearbeiten"
+          },
+          "fields": {
+            "hidden": false,
+            "locked": false,
+            "value": {
+              "elements": [
+                {
+                  "enum": [
+                    [
+                      {
+                        "type": "rich_text",
+                        "elements": [
+                          {
+                            "type": "rich_text_section",
+                            "elements": [{ "text": "Paypal", "type": "text" }]
+                          }
+                        ]
+                      }
+                    ],
+                    [
+                      {
+                        "type": "rich_text",
+                        "elements": [
+                          {
+                            "type": "rich_text_section",
+                            "elements": [
+                              { "text": "Banküberweisung", "type": "text" }
+                            ]
+                          }
+                        ]
+                      }
+                    ]
+                  ],
+                  "name": "8bc9f3c0-6917-4140-a0d8-83dc9aad0567",
+                  "type": "slack#/types/rich_text",
+                  "title": "Wie wird bezahlt?",
+                  "choices": [
+                    {
+                      "title": "Paypal",
+                      "value": [
+                        {
+                          "type": "rich_text",
+                          "elements": [
+                            {
+                              "type": "rich_text_section",
+                              "elements": [{ "text": "Paypal", "type": "text" }]
+                            }
+                          ]
+                        }
+                      ],
+                      "description": "Paypal"
+                    },
+                    {
+                      "title": "Banküberweisung",
+                      "value": [
+                        {
+                          "type": "rich_text",
+                          "elements": [
+                            {
+                              "type": "rich_text_section",
+                              "elements": [
+                                { "text": "Banküberweisung", "type": "text" }
+                              ]
+                            }
+                          ]
+                        }
+                      ],
+                      "description": "Banküberweisung"
+                    }
+                  ],
+                  "default": "",
+                  "description": ""
+                }
+              ],
+              "required": ["8bc9f3c0-6917-4140-a0d8-83dc9aad0567"]
+            }
+          },
+          "interactivity": {
+            "hidden": false,
+            "locked": false,
+            "value": "{{steps.0ef80f0c-6982-46dc-a2d1-c8c19eb203ca.interactivity}}"
+          }
+        }
+      },
+      {
+        "id": "be58ea3c-963e-431e-b5af-dc0d59e00712",
+        "function_id": "Fn010M",
+        "inputs": {
+          "message": {
+            "hidden": false,
+            "locked": false,
+            "value": [
+              {
+                "type": "rich_text",
+                "elements": [
+                  {
+                    "type": "rich_text_section",
+                    "elements": [
+                      { "text": "Deine Ausgabe ", "type": "text" },
+                      {
+                        "id": "{{steps.964e0b42-8804-467b-8ea3-1ee6198cd539.fields.6b47642e-e193-4f36-a722-ae1d7aebc3fe}}",
+                        "type": "workflowtoken",
+                        "property": "",
+                        "data_type": "string"
+                      },
+                      {
+                        "text": " wurde genehmigt.\nSie wird dir zeitnah per\n",
+                        "type": "text"
+                      }
+                    ]
+                  },
+                  {
+                    "id": "{{steps.8c0f2894-de96-4ba4-882e-c9ab0ec9e35b.fields.8bc9f3c0-6917-4140-a0d8-83dc9aad0567}}",
+                    "type": "workflowtoken",
+                    "property": "",
+                    "data_type": "slack#/types/rich_text"
+                  },
+                  {
+                    "type": "rich_text_section",
+                    "elements": [
+                      { "text": "\ngutgeschrieben ", "type": "text" },
+                      {
+                        "name": "slightly_smiling_face",
+                        "type": "emoji",
+                        "unicode": "1f642"
+                      }
+                    ]
+                  }
+                ]
+              }
+            ]
+          },
+          "user_id": {
+            "hidden": false,
+            "locked": false,
+            "value": "{{inputs.Ft085RERHX5M__user_id}}"
+          }
+        }
+      },
+      {
+        "id": "87d8ef35-db61-442f-9bc7-32d0faa08e62",
+        "function_id": "Fn0102",
+        "inputs": {
+          "message": {
+            "hidden": false,
+            "locked": false,
+            "value": [
+              {
+                "type": "rich_text",
+                "elements": [
+                  {
+                    "type": "rich_text_section",
+                    "elements": [
+                      { "text": "Ausgabe von ", "type": "text" },
+                      {
+                        "id": "{{inputs.Ft085RERHX5M__user_id}}",
+                        "type": "workflowtoken",
+                        "property": "",
+                        "data_type": "slack#/types/user_id"
+                      },
+                      { "text": ":\n", "type": "text" },
+                      {
+                        "id": "{{steps.964e0b42-8804-467b-8ea3-1ee6198cd539.fields.6b47642e-e193-4f36-a722-ae1d7aebc3fe}}",
+                        "type": "workflowtoken",
+                        "property": "",
+                        "data_type": "string"
+                      },
+                      { "text": " - ", "type": "text" },
+                      {
+                        "id": "{{steps.964e0b42-8804-467b-8ea3-1ee6198cd539.fields.2568827b-28eb-4040-8840-2b6c0bfb072a}}",
+                        "type": "workflowtoken",
+                        "property": "",
+                        "data_type": "slack#/types/date"
+                      },
+                      { "text": "\n\n", "type": "text" },
+                      {
+                        "text": "Bezahlung per",
+                        "type": "text",
+                        "style": { "bold": true }
+                      },
+                      { "text": "\n", "type": "text" }
+                    ]
+                  },
+                  {
+                    "id": "{{steps.8c0f2894-de96-4ba4-882e-c9ab0ec9e35b.fields.8bc9f3c0-6917-4140-a0d8-83dc9aad0567}}",
+                    "type": "workflowtoken",
+                    "property": "",
+                    "data_type": "slack#/types/rich_text"
+                  },
+                  {
+                    "type": "rich_text_section",
+                    "elements": [
+                      { "text": "\n\nPaypal Konto\n", "type": "text" },
+                      {
+                        "id": "{{steps.964e0b42-8804-467b-8ea3-1ee6198cd539.fields.b0abe6bf-d070-447b-a63e-c6bc9b40b89d}}",
+                        "type": "workflowtoken",
+                        "property": "",
+                        "data_type": "string"
+                      },
+                      {
+                        "text": "\n\nRechnung liegt hier (bitte noch sortieren):\n",
+                        "type": "text"
+                      },
+                      {
+                        "url": "https://drive.google.com/drive/folders/1GRji4qvNvGNMgV8oJBOU2s0h731hdRQV?usp=drive_link",
+                        "text": "Google Drive",
+                        "type": "link"
+                      }
+                    ]
+                  }
+                ]
+              }
+            ]
+          },
+          "channel_id": {
+            "hidden": false,
+            "locked": false,
+            "value": "C0789FQF0QJ"
+          }
+        }
+      }
+    ]
+  },
+  "triggers": [
+    {
+      "name": "Rechnung einreichen",
+      "type": "shortcut",
+      "inputs": {
+        "Ft085RERHX5M__user_id": {
+          "value": "{{data.user_id}}",
+          "locked": false,
+          "hidden": false
+        },
+        "Ft085RERHX5M__channel_id": {
+          "value": "{{data.channel_id}}",
+          "locked": false,
+          "hidden": false
+        },
+        "Ft085RERHX5M__interactivity": {
+          "value": "{{data.interactivity}}",
+          "locked": false,
+          "hidden": false
+        }
+      },
+      "shortcut": { "schema": {} }
+    }
+  ]
+}

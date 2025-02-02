@@ -16,21 +16,23 @@ Ich habe in diesem Dokument versucht das Setup des Bots von Infrastrukutur, Slac
 
 **Wo immer möglich habe ich Links zu Guides eingefügt. Trotzdem kann hier oder auch an anderen Stellen eine kurze Google Recherche notwendig sein.**
 
-1. [Google Sheets einrichten](#1-google-sheets-einrichten)
+1. [Google APIs einrichten](#1-google-apis-einrichten)
 1. [Google und Slack Zugangsdaten holen](#2-google-und-slack-zugangsdaten-holen)
 1. [AWS Lambda aufsetzen](#3-aws-lambda-aufsetzen) **(die aktuelle Version des Bots ist für AWS Lambda ausgelegt, die Docker Version des Bots ist in [Release v2](https://github.com/Roy0815/slack-service-bot/releases/tag/v2.1.0) zu finden)**
 1. [Slack App Konfiguration](#4-slack-app-konfiguration)
 
-### **1. Google Sheets einrichten**
+### **1. Google APIs einrichten**
 
-Für die Integration mit Google Sheets wird die offizielle Google Sheets API genutzt, die über eine sehr gute [Dokumentation](https://developers.google.com/sheets/api/guides/concepts) verfügt.
-In der [Google Cloud Console](console.cloud.google.com/welcome) können die persönlichen Projekte eingesehen werden. Ich habe das Projekt aktuell auf meinem persönlichen Gmail Account. Mitarbeiter hinzufügen geht dort nicht. Hier könnte man in Zukunft schauen es auf einen Schwerathletik-Organisationsaccount umzuhängen.
+Für die Integration mit Google Sheets und Google Drive werden die offiziellen Google APIs genutzt, die über eine sehr gute [Dokumentation](https://developers.google.com/) verfügt.
+In der [Google Cloud Console](console.cloud.google.com/welcome) können die persönlichen Projekte eingesehen werden. Das Projekt hängt in der Schwerathletik Mannheim Organisation und mehrere Nutzer von uns sind Inhaber.
 
-Danach muss die Google Sheets API im Projekt [aktiviert](https://console.cloud.google.com/flows/enableapi?apiid=sheets.googleapis.com&hl=de) werden.
+Die benötigten APIs müssen im Projekt aktiviert werden:
+[Google Sheets API](https://console.cloud.google.com/apis/api/sheets.googleapis.com)
+[Google Drive API](https://console.cloud.google.com/apis/api/drive.googleapis.com)
 
 Nun wird noch ein Dienstkonto benötigt. Das kann [hier](https://console.cloud.google.com/iam-admin/serviceaccounts?hl=de) errstellt werden.
 
-Die Email des Dienstkontos muss als Bearbeiter bei der Google Sheet Datei hinzugefügt werden.
+Die Email des Dienstkontos muss als Bearbeiter bei den relevanten Google Ressourcen hinzugefügt werden (Google Sheet für Arbeitsstunden und Rechnungsordner für Rechnungen).
 
 ### **2. Google und Slack Zugangsdaten holen**
 
@@ -40,9 +42,9 @@ Wenn du aktuell in deinem Workspace angemeldet bist kommst du [hier](https://api
 
 Google
 
-Wenn du allen Schritten im Punkt [1. Google Sheets einrichten](#1-google-sheets-einrichten) gefolgt bist kannst du jetzt zum angelegten Dienstkonto navigieren. Hier kannst du in den Details einen Schlüssel erstellen, den du beim einrichten der [Arbeitsstunden](#3-arbeitsstunden) Funktion brauchst.
+Wenn du allen Schritten im Punkt [1. Google APIs einrichten](#1-google-apis-einrichten) gefolgt bist kannst du jetzt zum angelegten Dienstkonto navigieren. Hier kannst du in den Details einen Schlüssel erstellen, den du beim einrichten der [Arbeitsstunden](#3-arbeitsstunden) Funktion brauchst.
 
-### **3 AWS Lambda aufsetzen**
+### **3. AWS Lambda aufsetzen**
 
 Bevor mit dem AWS Lambda Setup gestartet wird, muss eine lokale .env Datei angelegt werden. Eine Vorlage werde ich noch nachreichen. Hier werden alle Variablen definiert, die früher in der docker-compose.yml gepflegt wurden. Zusätzlich werden auch die Daten des Bot Benutzers für Google Sheets ab jetzt als Environment Variablen (Beispiel in [`example.env`](example.env)) gespeichert und nicht in der secrets.json Datei.
 
@@ -89,6 +91,7 @@ Wenn du in deinem Slack Workspace angemeldet bist kannst du [hier](https://api.s
   |`chat:write`|Send messages as @Schwerathletik Mannheim Service|
   |`chat:write.public`|Send messages to channels @Schwerathletik Mannheim Service isn't a member of|
   |`commands`|Add shortcuts and/or slash commands that people can use|
+  |`files:read`|View files shared in channels and conversations that Schwerathletik Mannheim Service has been added to|
   |`files:write`|Upload, edit, and delete files as Schwerathletik Mannheim Service|
   |`groups:history`|View messages and other content in private channels that Schwerathletik Mannheim Service has been added to|
   |`groups:read`|View basic information about private channels that Schwerathletik Mannheim Service has been added to|
@@ -164,8 +167,15 @@ Auch hier laufen die Genehmigungen alle über den Admin Channel, welcher im Shee
 
 ### **5. Rechnungen**
 
-**_WIP_** Rechnungen werden über den Workflow Builder eingereicht. Der Bot implementiert einen Custom Workflow Step, welcher die Rechnung automatisch in Google Drive hochlädt, wo diese nur noch manuell sortiert werden muss.
-_UPDATE_ basierend auf Fehlermeldungen bei der Konfiguration und bestätigt durchs Slack Team unterstützen Custom Workflow Steps im Moment keine Dateien, wodurch diese Funktion vorerst auf Eis gelegt ist.
+Rechnungen werden über den Workflow Builder eingereicht. Der Bot implementiert einen Custom Workflow Step, welcher die Rechnung automatisch in Google Drive hochlädt, wo diese nur noch manuell sortiert werden muss.
+
+Wie im Kapitel [1. Google APIs einrichten](#1-google-apis-einrichten) beschrieben, muss der Service Account dem Google Drive Ordner als Bearbeiter hinzugefügt werden.
+
+Der Workflow kann zu Slack mit Hilfe der Datei [Rechnung einreichen.json](/slack-config-files/workflows/Rechnung%20einreichen.json) hinzugefügt werden. Da zum Zeitpunkt der Implementierung Custom steps noch nicht über eine solche Konfig-Datei exportiert werden können, muss noch folgende manuelle Aktion erfolgen.
+
+in Schritt 6 den custom Step einfügen wie hier zu sehen (Bei File ID Dropdown "File ID" auswählen und die ID des Google Drive Ordners auswählen, in den die Datein gelegt werden sollen):
+
+![Konfiguration Workflow Schritt](/images/[RECHNUNGEN]%20Custom%20workflow%20step.png)
 
 ## Upgrades & Contribution
 
