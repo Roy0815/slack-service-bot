@@ -44,4 +44,17 @@
  * @typedef {registerObj & approvedProperty} registerObjectFinalizer
  */
 
+/**
+ * @typedef {object} userContactCard
+ * @property {string} firstname
+ * @property {string} lastname
+ * @property {string} email
+ * @property {string} phone
+ * @property {string} street
+ * @property {string} houseNumber
+ * @property {string} zip
+ * @property {string} city
+ * @property {string} [vCardContent]
+ */
+
 export {};

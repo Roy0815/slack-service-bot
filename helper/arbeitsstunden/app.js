@@ -303,6 +303,16 @@ function setupApp(app) {
         id: Number(selOpt.value),
         slackId: btnAction.value
       });
+
+      // provide admins the contact
+      const contact = await sheet.getContactCardFromId(Number(selOpt.value));
+
+      await app.client.filesUploadV2({
+        channel_id: await sheet.getAdminChannel(),
+        filename: `${contact.firstname} ${contact.lastname}.vcf`,
+        title: `${contact.firstname} ${contact.lastname}`,
+        content: contact.vCardContent
+      });
     }
   );
 
