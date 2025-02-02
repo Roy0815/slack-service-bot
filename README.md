@@ -80,6 +80,8 @@ _Hier gehe ich nur auf die technische und nicht die optische Konfiguration der A
 
 Wenn du in deinem Slack Workspace angemeldet bist kannst du [hier](https://api.slack.com/apps) deine Slack Apps sehen. Hast du deine App ausgewählt kannst du die Details bearbeiten.
 
+Unten findet man die manuellen Schritte um die App zu konfigurieren. Alternativ kann man auch das [`manifest.json`](/slack-config-files/manifest.json) nutzen. Das kann in der Slack App ganz einfach modifiziert werden. Die einzige Anpassung, die bei der Pflege erfolgen muss ist, dass alle Platzhalter `"PUT REQUEST URL HERE"` mit der URL ersetzt werden, unter der die [Lambda Funktion](#3-aws-lambda-aufsetzen) erreichbar ist.
+
 - **App Home**: `Home Tab`, `Messages Tab` und `Allow users to send Slash commands and messages from the messages tab` aktivieren
 - **Interactivity & Shortcuts**: `Interactivity` aktivieren. `Request URL` und `Options Load URL` auf die URL setzen, unter der die [Lambda Funktion](#3-aws-lambda-aufsetzen) erreichbar ist (+ /slack/events ans Ende der URL)
 - **Slash Commands**: Hier müssen alle Kommandos hinzugefügt werden, die von der App zur Verfügung gestellt werden. Wichtig ist `Escape channels, users, and links sent to your app` immer zu aktivieren. Auch hier sollte die URL auf die URL gesetzt werden, unter der die [Lambda Funktion](#3-aws-lambda-aufsetzen) erreichbar ist (+ /slack/events ans Ende der URL)

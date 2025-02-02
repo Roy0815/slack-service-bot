@@ -1,0 +1,134 @@
+{
+  "display_information": {
+    "name": "Schwerathletik Mannheim Service",
+    "description": "Services rund um den Verein",
+    "background_color": "#000000"
+  },
+  "features": {
+    "app_home": {
+      "home_tab_enabled": true,
+      "messages_tab_enabled": false,
+      "messages_tab_read_only_enabled": false
+    },
+    "bot_user": {
+      "display_name": "Schwerathletik Mannheim Service",
+      "always_online": true
+    },
+    "slash_commands": [
+      {
+        "command": "/arbeitsstunden_anzeigen",
+        "url": "PUT REQUEST URL HERE",
+        "description": "Stunden anzeigen",
+        "usage_hint": "details [Jahr]",
+        "should_escape": true
+      },
+      {
+        "command": "/arbeitsstunden_erfassen",
+        "url": "PUT REQUEST URL HERE",
+        "description": "Stunden erfassen",
+        "should_escape": true
+      },
+      {
+        "command": "/test",
+        "url": "PUT REQUEST URL HERE",
+        "description": "Testkommando, nur für Entwickler",
+        "should_escape": false
+      },
+      {
+        "command": "/weristda",
+        "url": "PUT REQUEST URL HERE",
+        "description": "Wer ist heute in der Stätte?",
+        "usage_hint": "01.01.2022",
+        "should_escape": true
+      },
+      {
+        "command": "/umfrage",
+        "url": "PUT REQUEST URL HERE",
+        "description": "Erstelle Umfrage",
+        "usage_hint": "[Frage]",
+        "should_escape": true
+      }
+    ]
+  },
+  "oauth_config": {
+    "scopes": {
+      "bot": [
+        "channels:history",
+        "channels:join",
+        "channels:read",
+        "chat:write",
+        "chat:write.public",
+        "commands",
+        "files:write",
+        "groups:history",
+        "groups:read",
+        "im:history",
+        "im:read",
+        "im:write",
+        "mpim:read",
+        "users:read",
+        "files:read"
+      ]
+    }
+  },
+  "settings": {
+    "event_subscriptions": {
+      "request_url": "PUT REQUEST URL HERE",
+      "bot_events": ["app_home_opened", "function_executed", "team_join"]
+    },
+    "interactivity": {
+      "is_enabled": true,
+      "request_url": "PUT REQUEST URL HERE",
+      "message_menu_options_url": "PUT REQUEST URL HERE"
+    },
+    "org_deploy_enabled": true,
+    "socket_mode_enabled": false,
+    "token_rotation_enabled": false,
+    "hermes_app_type": "remote",
+    "function_runtime": "remote"
+  },
+  "functions": {
+    "uploadFileToGoogleDrive": {
+      "title": "Datei zu Google Drive hochladen",
+      "description": "Die Datei muss in einem Channel mit dem Bot verfügbar sein, bevor diese Funktion gerufen werden kann. Input ist die File ID, die in einem Workflow Input Form gesammelt wurde, sowie die Ordner ID.",
+      "input_parameters": {
+        "fileID": {
+          "type": "slack#/types/rich_text",
+          "title": "File ID in Slack",
+          "description": "File ID aus Workflow Input Form",
+          "is_required": true,
+          "name": "fileID"
+        },
+        "driveFolderID": {
+          "type": "string",
+          "title": "Ordner ID, in dem die Datei abgelegt werden soll",
+          "description": "",
+          "is_required": true,
+          "name": "driveFolderID"
+        },
+        "fileDate": {
+          "type": "slack#/types/date",
+          "title": "Datum der Datei",
+          "description": "",
+          "is_required": true,
+          "name": "fileDate"
+        },
+        "fileName": {
+          "type": "string",
+          "title": "Name der Datei",
+          "description": "",
+          "is_required": true,
+          "name": "fileName"
+        },
+        "approverChannel": {
+          "type": "slack#/types/channel_id",
+          "title": "Genehmiger Channel",
+          "description": "Channel, in dem die Ausgaben genehmigt werden",
+          "is_required": true,
+          "name": "approverChannel"
+        }
+      },
+      "output_parameters": {}
+    }
+  }
+}
