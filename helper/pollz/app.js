@@ -3,7 +3,7 @@ import * as views from './views.js';
 import * as functions from './functions.js';
 import * as util from '../general/util.js';
 
-import * as awsRtAPI from '../general/aws-runtime-api.js';
+import * as awsRtAPI from '../general/google-amazon-utility/aws-runtime-api.js';
 
 /** @type {import('../general/types').appComponent} */
 export const pollzApp = { setupApp, getHomeView: views.getHomeView };

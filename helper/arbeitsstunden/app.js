@@ -4,7 +4,7 @@ import * as sheet from './sheet.js';
 import * as util from '../general/util.js';
 import * as types from './types.js';
 
-import * as awsRtAPI from '../general/aws-runtime-api.js';
+import * as awsRtAPI from '../general/google-amazon-utility/aws-runtime-api.js';
 
 /** @type {import('../general/types').appComponent} */
 export const asApp = { setupApp, getHomeView: views.getHomeView };

@@ -4,7 +4,7 @@ import * as slack from '@slack/bolt';
 // local references
 import * as views from './helper/general/views.js';
 import { apps } from './helper/general/apps.js';
-import * as awsRtAPI from './helper/general/aws-runtime-api.js';
+import * as awsRtAPI from './helper/general/google-amazon-utility/aws-runtime-api.js';
 
 // Create AWS Lambda Receiver
 /** @type {import('@slack/bolt').AwsLambdaReceiver} */
