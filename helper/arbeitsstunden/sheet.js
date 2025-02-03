@@ -89,7 +89,7 @@ function moveUserLineToContactCard(userLine) {
 }
 
 /**
- * Copies base sheet (2022) to a new sheet for requested year
+ * Copies previous year sheet to a new sheet for requested year
  * @param {string} nameBase
  * @param {number} year
  */
