@@ -1,6 +1,7 @@
 // local references
 import * as sheet from './sheet.js';
 import * as util from '../general/util.js';
+import * as views from '../general/views.js';
 import * as types from './types.js';
 
 // constants
@@ -133,49 +134,6 @@ const maintainHoursView = {
   ]
 };
 
-/** @type {import("@slack/web-api").ChatPostMessageArguments} */
-const basicConfirmDialogView = {
-  channel: '',
-  text: '', // Text in the notification, set in the method
-  unfurl_links: false,
-  blocks: [
-    {
-      type: 'section',
-      text: {
-        type: 'mrkdwn',
-        text: '' // set in method
-      }
-    },
-    {
-      type: 'actions',
-      elements: [
-        {
-          type: 'button',
-          text: {
-            type: 'plain_text',
-            text: 'Genehmigen',
-            emoji: true
-          },
-          style: 'primary',
-          value: '', // set in method
-          action_id: '' // set in method
-        },
-        {
-          type: 'button',
-          text: {
-            type: 'plain_text',
-            text: 'Ablehnen',
-            emoji: true
-          },
-          style: 'danger',
-          value: '', // set in method
-          action_id: '' // set in method
-        }
-      ]
-    }
-  ]
-};
-
 /** @type {import("@slack/types").KnownBlock[]} */
 const homeView = [
   {
@@ -284,7 +242,7 @@ export async function getRegisterView(triggerId) {
  * @returns {Promise<import("@slack/web-api").ChatPostMessageArguments>}
  */
 export async function getAutoRegisterMessage(slackId) {
-  const view = util.deepCopy(basicConfirmDialogView);
+  const view = util.deepCopy(views.basicConfirmDialogView);
   view.channel = await sheet.getAdminChannel();
 
   // required for typing
@@ -334,7 +292,7 @@ export async function getAutoRegisterMessage(slackId) {
  * @returns {Promise<import("@slack/web-api").ChatPostMessageArguments>}
  */
 export async function getRegisterConfirmDialog(registerObj) {
-  const view = util.deepCopy(basicConfirmDialogView);
+  const view = util.deepCopy(views.basicConfirmDialogView);
   view.channel = await sheet.getAdminChannel();
 
   // required for correct typing
@@ -412,7 +370,7 @@ export function getMaintainHoursView(triggerId) {
  * @returns {Promise<import("@slack/web-api").ChatPostMessageArguments>}
  */
 export async function getMaintainConfirmDialog(hoursObjMaint) {
-  const view = util.deepCopy(basicConfirmDialogView);
+  const view = util.deepCopy(views.basicConfirmDialogView);
 
   // required for correct typing
   if (!('blocks' in view)) {

@@ -25,6 +25,49 @@ const homeView = {
   }
 };
 
+/** @type {import("@slack/web-api").ChatPostMessageArguments} */
+export const basicConfirmDialogView = {
+  channel: '',
+  text: '', // Text in the notification, set in the method
+  unfurl_links: false,
+  blocks: [
+    {
+      type: 'section',
+      text: {
+        type: 'mrkdwn',
+        text: '' // set in method
+      }
+    },
+    {
+      type: 'actions',
+      elements: [
+        {
+          type: 'button',
+          text: {
+            type: 'plain_text',
+            text: 'Genehmigen',
+            emoji: true
+          },
+          style: 'primary',
+          value: '', // set in method
+          action_id: '' // set in method
+        },
+        {
+          type: 'button',
+          text: {
+            type: 'plain_text',
+            text: 'Ablehnen',
+            emoji: true
+          },
+          style: 'danger',
+          value: '', // set in method
+          action_id: '' // set in method
+        }
+      ]
+    }
+  ]
+};
+
 //* ******************* Functions ********************//
 /**
  *
