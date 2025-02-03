@@ -100,7 +100,12 @@ async function copySheetToNewYear(nameBase, year) {
   } else {
     currYear = new Date().getFullYear();
   }
-  const oldYear = 2022;
+
+  // get previous year to the one requested
+  const oldYear = currYear - 1;
+
+  // recursive call to check if it exists, if not it will be created
+  await checkYearSheetsExists(oldYear);
 
   const copiedName = await sheet.copySheet(`${nameBase} ${oldYear}`);
   const newName = `${nameBase} ${currYear}`;
@@ -108,7 +113,8 @@ async function copySheetToNewYear(nameBase, year) {
   await sheet.renameSheet(copiedName, newName);
 
   if (nameBase === sheetNames.stundenSumme) {
-    sheet.updateCell({
+    // update year field in sheet
+    await sheet.updateCell({
       range: `'${newName}'!${util.convertNumberToColumn(
         stundenSummeColumns.year
       )}1`,
@@ -118,8 +124,8 @@ async function copySheetToNewYear(nameBase, year) {
   }
 
   if (nameBase === sheetNames.stunden) {
-    // clear function
-    sheet.clearCell({
+    // clear all hours
+    await sheet.clearCell({
       range: `'${newName}'!$A2:${stundenColumns.lastColumn}`
     });
   }
