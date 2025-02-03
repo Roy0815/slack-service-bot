@@ -154,23 +154,6 @@ export async function getUserFromSlackId(id) {
 }
 
 /**
- * Get a user line from sheet file by slack id
- * @param {number} id ID of user (line)
- * @returns {Promise<masterdataTypes.userContactCard|undefined>}
- */
-export async function getUserContactCard(id) {
-  /** @type {string[][]} */
-  const data = await sheet.getCells(masterdataSheet.sheetNames.allgDaten);
-  if (!data) return undefined;
-
-  if (data.length < id + 1) return undefined;
-
-  const user = data[id];
-
-  return masterdataSheet.moveUserLineToContactCard(user);
-}
-
-/**
  * Get worked hours for a specific year. Optionally get details.
  * @param {object} getHours
  * @param {string} getHours.id user id to get
@@ -340,7 +323,7 @@ export async function getNameFromSlackId({ slackId }) {
  * @returns {Promise<masterdataTypes.userContactCard|undefined>}
  */
 export async function getContactCardFromId(id) {
-  const contactCard = await getUserContactCard(id);
+  const contactCard = await masterdataSheet.getUserContactCard({ id });
   if (contactCard === undefined) return undefined;
 
   // build vcard

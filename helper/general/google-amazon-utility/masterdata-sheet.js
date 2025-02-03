@@ -1,4 +1,5 @@
 import * as types from './types.js';
+import * as sheet from './sheet.js';
 
 /**
  * @readonly
@@ -60,4 +61,33 @@ export function moveUserLineToContactCard(userLine) {
     zip: userLine[allgDatenColumns.zip - 1],
     city: userLine[allgDatenColumns.city - 1]
   };
+}
+
+/**
+ * Get a user line from sheet file by slack id
+ * @param {object} ids
+ * @param {number} [ids.id] ID of user (line)
+ * @param {string} [ids.slackId] Slack ID of user
+ * @returns {Promise<types.userContactCard|undefined>}
+ */
+export async function getUserContactCard({ id, slackId }) {
+  if (!id && !slackId) return undefined;
+
+  /** @type {string[][]} */
+  const data = await sheet.getCells(sheetNames.allgDaten);
+  if (!data) return undefined;
+
+  // get by line or slack ID
+  let user;
+  try {
+    user = id
+      ? data[id]
+      : data.filter(
+          (line) => line[allgDatenColumns.slackId - 1] === slackId
+        )[0];
+  } catch (e) {
+    return undefined;
+  }
+
+  return moveUserLineToContactCard(user);
 }
