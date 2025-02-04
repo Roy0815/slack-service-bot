@@ -72,14 +72,14 @@ app.error(async ({ error, context, body }) => {
 
   await app.client.filesUploadV2({
     channel_id: process.env.APP_ADMIN_CHANNEL,
-    filetype: 'javascript',
+    filename: 'Context.js',
     initial_comment: `Error:\n${error}`,
     title: 'Context',
     content: JSON.stringify(context, null, '\t')
   });
   await app.client.filesUploadV2({
     channel_id: process.env.APP_ADMIN_CHANNEL,
-    filetype: 'javascript',
+    filename: 'body.js',
     title: 'Body',
     content: JSON.stringify(body, null, '\t')
   });
