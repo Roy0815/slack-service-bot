@@ -4,7 +4,7 @@ import * as slack from '@slack/bolt';
 // local references
 import * as views from './helper/general/views.js';
 import { apps } from './helper/general/apps.js';
-import * as awsRtAPI from './helper/general/aws-runtime-api.js';
+import * as awsRtAPI from './helper/general/google-amazon-utility/aws-runtime-api.js';
 
 // Create AWS Lambda Receiver
 /** @type {import('@slack/bolt').AwsLambdaReceiver} */
@@ -72,14 +72,14 @@ app.error(async ({ error, context, body }) => {
 
   await app.client.filesUploadV2({
     channel_id: process.env.APP_ADMIN_CHANNEL,
-    filetype: 'javascript',
+    filename: 'Context.js',
     initial_comment: `Error:\n${error}`,
     title: 'Context',
     content: JSON.stringify(context, null, '\t')
   });
   await app.client.filesUploadV2({
     channel_id: process.env.APP_ADMIN_CHANNEL,
-    filetype: 'javascript',
+    filename: 'body.js',
     title: 'Body',
     content: JSON.stringify(body, null, '\t')
   });

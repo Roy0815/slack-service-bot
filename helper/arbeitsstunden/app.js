@@ -3,8 +3,9 @@ import * as views from './views.js';
 import * as sheet from './sheet.js';
 import * as util from '../general/util.js';
 import * as types from './types.js';
+import * as masterdataSheet from '../general/google-amazon-utility/masterdata-sheet.js';
 
-import * as awsRtAPI from '../general/aws-runtime-api.js';
+import * as awsRtAPI from '../general/google-amazon-utility/aws-runtime-api.js';
 
 /** @type {import('../general/types').appComponent} */
 export const asApp = { setupApp, getHomeView: views.getHomeView };
@@ -112,7 +113,9 @@ function setupApp(app) {
     await awsRtAPI.sendResponse();
 
     // check user is registered
-    if ((await sheet.getUserFromSlackId(command.user_id)) === undefined) {
+    if (
+      (await masterdataSheet.getUserFromSlackId(command.user_id)) === undefined
+    ) {
       // not registered: start dialog
       await client.views.open(await views.getRegisterView(command.trigger_id));
       return;
@@ -210,7 +213,9 @@ function setupApp(app) {
     const blckAction = /** @type {import("@slack/bolt").BlockAction} */ (body);
 
     // check user is registered
-    if ((await sheet.getUserFromSlackId(body.user.id)) === undefined) {
+    if (
+      (await masterdataSheet.getUserFromSlackId(body.user.id)) === undefined
+    ) {
       // not registered: start dialog
 
       await client.views.open(
@@ -302,6 +307,16 @@ function setupApp(app) {
       await sheet.saveSlackId({
         id: Number(selOpt.value),
         slackId: btnAction.value
+      });
+
+      // provide admins the contact
+      const contact = await sheet.getContactCardFromId(Number(selOpt.value));
+
+      await app.client.filesUploadV2({
+        channel_id: await sheet.getAdminChannel(),
+        filename: `${contact.firstname} ${contact.lastname}.vcf`,
+        title: `${contact.firstname} ${contact.lastname}`,
+        content: contact.vCardContent
       });
     }
   );

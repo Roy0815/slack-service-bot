@@ -20,15 +20,6 @@
  */
 
 /**
- * @typedef {object} user
- * @property {number} id
- * @property {string} firstname
- * @property {string} lastname
- * @property {string} leaveDate
- * @property {string} slackId
- */
-
-/**
  * @typedef {object} registerObj
  * @property {number} id
  * @property {string} slackId

@@ -5,7 +5,7 @@
  * @returns {string} formatted time
  */
 export function formatTime(date) {
-  return `${date.getUTCHours() + 2 < 10 ? '0' : ''}${date.getUTCHours() + 2}:${
+  return `${date.getHours() < 10 ? '0' : ''}${date.getHours()}:${
     date.getMinutes() < 10 ? '0' : ''
   }${date.getMinutes()}`;
 }

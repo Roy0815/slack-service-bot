@@ -1,6 +1,6 @@
 {
   "name": "slack-service-bot",
-  "version": "3.2.0",
+  "version": "3.3.0",
   "description": "A service for the Slack Bot used by the non profit Schwerathletik Mannheim 2018 e.V.",
   "main": "app.js",
   "type": "module",
