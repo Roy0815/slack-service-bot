@@ -47,6 +47,12 @@
         "description": "Erstelle Umfrage",
         "usage_hint": "[Frage]",
         "should_escape": true
+      },
+      {
+        "command": "/stammdaten",
+        "url": "https://3mw9amwa4f.execute-api.eu-central-1.amazonaws.com/dev/slack/events",
+        "description": "Stammdaten ändern",
+        "should_escape": true
       }
     ]
   },
