@@ -137,23 +137,6 @@ async function getDetails({ fullname, year }) {
 
 //* ******************* Public functions ********************//
 /**
- * Get a user line from sheet file by slack id
- * @param {string} id
- * @returns {Promise<masterdataTypes.user|undefined>}
- */
-export async function getUserFromSlackId(id) {
-  const data = await sheet.getCells(masterdataSheet.sheetNames.allgDaten);
-  if (!data) return undefined;
-
-  const user = data.find(
-    (element) => element[masterdataSheet.allgDatenColumns.slackId - 1] === id
-  );
-  if (!user) return undefined;
-
-  return masterdataSheet.moveUserLineToObject(user);
-}
-
-/**
  * Get worked hours for a specific year. Optionally get details.
  * @param {object} getHours
  * @param {string} getHours.id user id to get
@@ -168,7 +151,7 @@ export async function getUserFromSlackId(id) {
  * @returns {Promise<workedHours|undefined>}
  */
 export async function getHoursFromSlackId({ id, year, details }) {
-  const user = await getUserFromSlackId(id);
+  const user = await masterdataSheet.getUserFromSlackId(id);
   if (user === undefined) return undefined;
 
   if (year === undefined) year = new Date().getFullYear();
@@ -287,7 +270,7 @@ export async function saveSlackId({ id, slackId }) {
  * @param {types.hoursObjMaint} hoursObjMaint
  */
 export async function saveHours({ slackId, description, hours, date }) {
-  const user = await getUserFromSlackId(slackId);
+  const user = await masterdataSheet.getUserFromSlackId(slackId);
   await checkYearSheetsExists(Number(date.split('-')[0]));
 
   await sheet.appendRow({
@@ -311,7 +294,7 @@ export async function saveHours({ slackId, description, hours, date }) {
  * @returns {Promise<string|undefined>}
  */
 export async function getNameFromSlackId({ slackId }) {
-  const user = await getUserFromSlackId(slackId);
+  const user = await masterdataSheet.getUserFromSlackId(slackId);
   if (user === undefined) return undefined;
 
   return `${user.firstname} ${user.lastname}`;
