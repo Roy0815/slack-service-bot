@@ -162,7 +162,7 @@ export function setupApp(app) {
       // notify requestor
       await client.chat.postMessage({
         channel: maintObj.slackId,
-        text: `Deine Stammdatenänderungen wurden ${approved ? '`freigegeben`' : '`abgelehnt`'}:${changeMessage}"`
+        text: `Deine Stammdatenänderungen wurden ${approved ? '`freigegeben`' : '`abgelehnt`'}:${changeMessage}`
       });
 
       if (!approved) return;
