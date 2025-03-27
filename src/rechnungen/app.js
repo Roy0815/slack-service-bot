@@ -1,7 +1,7 @@
 import * as functions from './functions.js';
 import * as types from './types.js';
 
-/** @type {import('../general/types').appComponent} */
+/** @type {import('../../general/types.js').appComponent} */
 export const rechnungenApp = { setupApp, getHomeView: null };
 
 /**

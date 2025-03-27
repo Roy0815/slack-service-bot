@@ -1,11 +1,11 @@
 // local imports
 import * as views from './views.js';
-import * as functions from './functions.js';
+import * as controller from './controller.js';
 import * as util from '../general/util.js';
 
-import * as awsRtAPI from '../general/google-amazon-utility/aws-runtime-api.js';
+import * as awsRtAPI from '../general/aws-runtime-api.js';
 
-/** @type {import('../general/types').appComponent} */
+/** @type {import('../general/types.js').appComponent} */
 export const pollzApp = { setupApp, getHomeView: views.getHomeView };
 
 /**
@@ -151,7 +151,7 @@ function setupApp(app) {
     }
 
     const channel = await util.getChannelInfo(
-      functions.getChannelFromView(body),
+      controller.getChannelFromView(body),
       client
     );
 
@@ -162,7 +162,7 @@ function setupApp(app) {
       // try to join channel if public
       if (channel && channel.is_channel) {
         joinSuccess = await util.joinChannel(
-          functions.getChannelFromView(body),
+          controller.getChannelFromView(body),
           client
         );
       }

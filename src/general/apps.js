@@ -4,5 +4,5 @@ import { pollzApp } from '../pollz/app.js';
 import { stammdatenApp } from '../stammdaten/app.js';
 import { rechnungenApp } from '../rechnungen/app.js';
 
-/** @type {import('./types').appComponent[]} */
+/** @type {import('./types.js').appComponent[]} */
 export const apps = [asApp, staetteApp, pollzApp, stammdatenApp, rechnungenApp];

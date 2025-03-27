@@ -35,4 +35,11 @@
  * @typedef {registerObj & approvedProperty} registerObjectFinalizer
  */
 
+/**
+ * @typedef {object} workedHours
+ * @property {number} workedHours hours that were actually worked
+ * @property {number} targetHours target hours to fulfill
+ * @property {hoursObj[]} details lines of working hours
+ */
+
 export {};

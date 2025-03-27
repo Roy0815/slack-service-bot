@@ -1,9 +1,9 @@
 // imports
-import * as util from '../general/util.js';
+import * as util from '../../general/util.js';
 import * as views from './views.js';
 import * as functions from './functions.js';
 
-/** @type {import('../general/types').appComponent} */
+/** @type {import('../../general/types.js').appComponent} */
 export const staetteApp = { setupApp, getHomeView: views.getHomeView };
 
 /**

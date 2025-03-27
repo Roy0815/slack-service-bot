@@ -1,9 +1,9 @@
 // imports
-import * as util from '../general/util.js';
-import * as views from '../general/views.js';
-import * as asSheet from '../arbeitsstunden/sheet.js';
-import * as masterdataSheet from '../general/google-amazon-utility/masterdata-sheet.js';
-import * as types from '../general/google-amazon-utility/types.js';
+import * as util from '../../general/util.js';
+import * as views from '../../general/views.js';
+import * as asSheet from '../../arbeitsstunden/sheet.js';
+import * as masterdataSheet from '../../general/google-amazon-utility/masterdata-sheet.js';
+import * as types from '../../general/google-amazon-utility/types.js';
 
 //* ******************* Constants ********************//
 export const homeViewCommand = 'stammdaten-home-command';

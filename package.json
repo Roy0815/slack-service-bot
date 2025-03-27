@@ -6,8 +6,8 @@
   "type": "module",
   "scripts": {
     "start": "node app.js",
-    "lint": "eslint app.js helper/",
-    "prettier-format": "prettier --config .prettierrc app.js helper/"
+    "lint": "eslint src/",
+    "prettier-format": "prettier --config .prettierrc src/"
   },
   "dependencies": {
     "@slack/bolt": "^4.2.0",

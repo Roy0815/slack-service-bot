@@ -1,8 +1,8 @@
-import * as util from '../general/util.js';
-import * as sheet from '../general/google-amazon-utility/sheet.js';
-import * as masterdataSheet from '../general/google-amazon-utility/masterdata-sheet.js';
 import * as types from './types.js';
-import * as masterdataTypes from '../general/google-amazon-utility/types.js';
+import * as util from '../general/util.js';
+import * as sheet from '../general/sheet.js';
+import * as masterdataSheet from '../general/masterdata/sheet.js';
+import * as masterdataTypes from '../general/masterdata/types.js';
 
 /**
  * @readonly
@@ -143,12 +143,7 @@ async function getDetails({ fullname, year }) {
  * @param {number} [getHours.year] year to get
  * @param {boolean} [getHours.details] get lines of working hours
  *
- * @typedef {object} workedHours
- * @property {number} workedHours hours that were actually worked
- * @property {number} targetHours target hours to fulfill
- * @property {types.hoursObj[]} details lines of working hours
- *
- * @returns {Promise<workedHours|undefined>}
+ * @returns {Promise<types.workedHours|undefined>}
  */
 export async function getHoursFromSlackId({ id, year, details }) {
   const user = await masterdataSheet.getUserFromSlackId(id);
@@ -164,9 +159,7 @@ export async function getHoursFromSlackId({ id, year, details }) {
 
   if (!dataSum) return undefined;
 
-  /**
-   * @type {workedHours}
-   */
+  /** @type {types.workedHours} */
   const returnObj = {
     workedHours: dataSum[user.id][stundenSummeColumns.workedHours - 1],
     targetHours: dataSum[user.id][stundenSummeColumns.targetHours - 1].includes(

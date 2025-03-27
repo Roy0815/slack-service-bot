@@ -1,72 +1,9 @@
 // local imports
 import * as util from '../general/util.js';
 
-//* ******************* Constants ********************//
-/**
- * @readonly
- * @enum {string}
- */
-export const viewNames = {
-  creationModal: 'pollz-pollView',
-  addAnswerModal: 'pollz-addAnswerView'
-};
-
-// Creation Modal
-/**
- * @readonly
- * @enum {string}
- */
-export const creationModalBlocks = {
-  question: 'pollz-questionBlock',
-  conversationSelect: 'pollz-conversationSelectBlock',
-  options: 'pollz-optionsBlock',
-  newAnswer: 'pollz-newAnswerBlock'
-};
-
-/**
- * @readonly
- * @enum {string}
- */
-export const creationModalActions = {
-  questionInput: 'pollz-question_input-action',
-  conversationSelect: 'pollz-conversations_select-action',
-  options: 'pollz-options-action',
-  newAnswerInput: 'pollz-newAnswerInput-action',
-  addAnswer: 'pollz-add-answer',
-  deleteSingleAnswer: 'pollz-delete-single-answer',
-  deleteAllAnswers: 'pollz-delete-all-answers'
-};
-
-/**
- * @readonly
- * @enum {string}
- */
-const optionCheckboxes = {
-  addAllowed: 'addoptions',
-  multipleSelect: 'multiplechoice',
-  anonym: 'anon'
-};
-
-// Poll Message
-/**
- * @readonly
- * @enum {string}
- */
-export const pollMessageActions = {
-  addAnswer: 'pollz-message-add-answer',
-  deleteAnswer: 'pollz-message-delete-answer',
-  overflow: 'pollz-message-overflow',
-  overflowDelete: 'delete',
-  voteButton: 'pollz-vote',
-  addAnswerViewTextInput: 'pollz-addAnswerViewTextInput'
-};
-
-// home view
-export const homeViewCommand = 'pollz-home-command';
-
 //* ******************* Views ********************//
 /** @type {import("@slack/types").View} */
-const pollView = {
+export const pollView = {
   type: 'modal',
   callback_id: viewNames.creationModal,
   title: {
@@ -213,7 +150,7 @@ const pollView = {
 };
 
 /** @type {import('@slack/types').SectionBlock} */
-const answerView = {
+export const answerView = {
   type: 'section',
   text: {
     type: 'mrkdwn',
@@ -233,7 +170,7 @@ const answerView = {
 };
 
 /** @type {import("@slack/types").AnyBlock[]} */
-const pollMessageBlocks = [
+export const pollMessageBlocks = [
   {
     type: 'section',
     text: {
@@ -298,7 +235,7 @@ const pollMessageBlocks = [
   }
 ];
 /** @type {import("@slack/types").SectionBlock} */
-const answerBlockMessage = {
+export const answerBlockMessage = {
   type: 'section',
   text: {
     type: 'mrkdwn',
@@ -317,7 +254,7 @@ const answerBlockMessage = {
 };
 
 /** @type {import("@slack/types").View} */
-const addAnswerView = {
+export const addAnswerView = {
   type: 'modal',
   private_metadata: '', // set in method, contains message info
   callback_id: viewNames.addAnswerModal,
@@ -354,7 +291,7 @@ const addAnswerView = {
 };
 
 /** @type {import("@slack/types").ContextBlock} */
-const resultBlockMessage = {
+export const resultBlockMessage = {
   type: 'context',
   elements: [
     {
@@ -365,7 +302,7 @@ const resultBlockMessage = {
 };
 
 /** @type {import("@slack/types").KnownBlock[]} */
-const homeView = [
+export const homeView = [
   {
     type: 'header',
     text: {

@@ -1,13 +1,13 @@
 // imports
 import * as views from './views.js';
-import * as masterdataSheet from '../general/google-amazon-utility/masterdata-sheet.js';
-import * as asViews from '../arbeitsstunden/views.js';
-import * as types from '../general/google-amazon-utility/types.js';
-import * as util from '../general/util.js';
+import * as masterdataSheet from '../../general/google-amazon-utility/masterdata-sheet.js';
+import * as asViews from '../../arbeitsstunden/views.js';
+import * as types from '../../general/google-amazon-utility/types.js';
+import * as util from '../../general/util.js';
 
-import * as awsRtAPI from '../general/google-amazon-utility/aws-runtime-api.js';
+import * as awsRtAPI from '../../general/google-amazon-utility/aws-runtime-api.js';
 
-/** @type {import('../general/types').appComponent} */
+/** @type {import('../../general/types.js').appComponent} */
 export const stammdatenApp = { setupApp, getHomeView: views.getHomeView };
 
 /**

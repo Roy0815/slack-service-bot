@@ -1,6 +1,6 @@
 import * as types from './types.js';
-import * as sheet from './sheet.js';
-import * as util from '../../general/util.js';
+import * as sheet from '../sheet.js';
+import * as util from '../util.js';
 
 /**
  * @readonly
@@ -126,17 +126,28 @@ export async function saveMasterdataChanges(maintObj) {
 
 /**
  * Get a user line from sheet file by slack id
- * @param {string} id
+ * @param {string} slackId
  * @returns {Promise<types.user|undefined>}
  */
-export async function getUserFromSlackId(id) {
+export async function getUserFromSlackId(slackId) {
   const data = await sheet.getCells(sheetNames.allgDaten);
   if (!data) return undefined;
 
   const user = data.find(
-    (element) => element[allgDatenColumns.slackId - 1] === id
+    (element) => element[allgDatenColumns.slackId - 1] === slackId
   );
   if (!user) return undefined;
 
   return moveUserLineToObject(user);
+}
+
+/**
+ * check if user is registered
+ * @param {string} slackId
+ * @returns {Promise<boolean>}
+ */
+export async function isUserRegistered(slackId) {
+  const user = await getUserFromSlackId(slackId);
+
+  return !!user;
 }

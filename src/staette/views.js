@@ -1,5 +1,5 @@
 // imports
-import * as util from '../general/util.js';
+import * as util from '../../general/util.js';
 
 // constants
 export const whoIsThereInputBlockName = 'staette-whoIsThereBlock';

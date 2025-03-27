@@ -31,7 +31,7 @@ package:
 
 functions:
   slack-service-bot:
-    handler: app.handler
+    handler: ./src/app.handler
     events:
       - http:
           path: slack/events
