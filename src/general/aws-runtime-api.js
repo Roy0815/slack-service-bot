@@ -13,7 +13,7 @@ export const globalData = {
  * process further calls without shutting down the lambda function
  */
 export async function sendResponse() {
-  if (globalData.awsRequestId === '' && process.env.AWS_LAMBDA_RUNTIME_API)
+  if (globalData.awsRequestId === '' || !process.env.AWS_LAMBDA_RUNTIME_API)
     return;
 
   await fetch(
