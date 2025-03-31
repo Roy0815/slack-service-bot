@@ -1,6 +1,8 @@
 // local imports
 import * as controller from './controller.js';
 
+import * as awsRtAPI from '../general/aws-runtime-api.js';
+
 /** @type {import('../general/types.js').appComponent} */
 export const meldungenApp = { setupApp, getHomeView: controller.getHomeView };
 
@@ -8,45 +10,19 @@ export const meldungenApp = { setupApp, getHomeView: controller.getHomeView };
  * @param {import("@slack/bolt").App} app
  */
 function setupApp(app) {
-// Listen for a slash command invocation
-app.command('/meldungen-test', async ({ ack, payload, context }) => {
-  // Acknowledge the command request
-  ack();
+  // Allow a user to register for a competition
+  app.command('/wettkampf-meldung', async ({ ack, command, client }) => {
+    await ack();
+    // already send HTTP 200 that slack does not time out
+    await awsRtAPI.sendResponse();
 
-  try {
-    const result = await app.client.chat.postMessage({
-      token: context.botToken,
-      // Channel to send message to
-      channel: payload.channel_id,
-      // Include a button in the message (or whatever blocks you want!)
-      blocks: [
-        {
-          type: 'section',
-          text: {
-            type: 'mrkdwn',
-            text: 'Hello'
-          }
-        }
-      ],
-      // Text in the notification
-      text: 'Message from Test App'
-    });
-    console.log(result);
-  }
-  catch (error) {
-    console.error(error);
-  }
-});
+    /**
+     * @todo Check if user is registered. Error or forward to registration if
+     * not
+     */
 
-app.function('43496e', async ({ client, inputs, fail, complete }) => {
-  try {
-  // set workflow step to complete
-  await complete();
-  console.log(client);
-  } catch (error) {
-    console.error(error);
-  }
-}
-);
-
+    await client.views.open(
+      controller.getCompetitionRegistrationView(command.trigger_id)
+    );
+  });
 }
