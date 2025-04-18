@@ -2,12 +2,12 @@ import * as types from './types.js';
 import * as sheet from './sheet.js';
 import * as constants from './constants.js';
 import { homeView, maintainHoursView, registerView } from './views.js';
+
 import * as util from '../general/util.js';
 import { basicConfirmDialogView } from '../general/views.js';
 import { SlackViewSubmissionError } from '../general/types.js';
 
 export * from './sheet.js';
-export { isUserRegistered } from '../general/masterdata/sheet.js';
 
 /**
  * Get message for admin channel user registration

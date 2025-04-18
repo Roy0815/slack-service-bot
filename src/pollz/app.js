@@ -1,12 +1,13 @@
 // local imports
-import * as views from './views.js';
 import * as controller from './controller.js';
-import * as util from '../general/util.js';
+import * as constants from './constants.js';
+// import * as util from '../general/util.js';
+import { SlackViewSubmissionError } from '../general/types.js';
 
 import * as awsRtAPI from '../general/aws-runtime-api.js';
 
 /** @type {import('../general/types.js').appComponent} */
-export const pollzApp = { setupApp, getHomeView: views.getHomeView };
+export const pollzApp = { setupApp, getHomeView: controller.getHomeView };
 
 /**
  * @param {import("@slack/bolt").App} app
@@ -17,23 +18,24 @@ function setupApp(app) {
     await ack();
 
     // open modal
-    await client.views.open(views.getPollsView(command));
+    await client.views.open(controller.getPollsView(command));
   });
 
   //* ******************* Actions ********************//
-  app.action(views.homeViewCommand, async ({ ack, client, body }) => {
+  app.action(constants.homeViewCommand, async ({ ack, client, body }) => {
     await ack();
 
     // open modal
     await client.views.open(
-      views.getPollsView(
+      controller.getPollsView(
         /** @type {import('@slack/bolt').BlockAction} */ (body)
       )
     );
   });
 
+  // add answer to question in creation modal
   app.action(
-    views.creationModalActions.addAnswer,
+    constants.creationModalActions.addAnswer,
     async ({ ack, client, body }) => {
       await ack();
 
@@ -41,27 +43,29 @@ function setupApp(app) {
         /** @type {import('@slack/bolt').BlockButtonAction} */
         (body);
 
+      // do nothing if answer text is empty
       if (
-        action.view.state.values[views.creationModalBlocks.newAnswer][
-          views.creationModalActions.newAnswerInput
+        action.view.state.values[constants.creationModalBlocks.newAnswer][
+          constants.creationModalActions.newAnswerInput
         ].value == null
       ) {
         return;
       }
 
-      await client.views.update(views.addAnswer(action.view));
+      await client.views.update(controller.addAnswer(action.view));
     }
   );
 
+  // delete single or all answers
   app.action(
     new RegExp(
-      `^(${views.creationModalActions.deleteSingleAnswer})*(${views.creationModalActions.deleteAllAnswers})*$`
+      `^(${constants.creationModalActions.deleteSingleAnswer})*(${constants.creationModalActions.deleteAllAnswers})*$`
     ),
     async ({ ack, action, body, client }) => {
       await ack();
 
       await client.views.update(
-        views.deleteAnswer(
+        controller.deleteAnswer(
           /** @type {import('@slack/bolt').BlockButtonAction} */ (body).view,
           /** @type {import('@slack/bolt').ButtonAction } */ (action)
         )
@@ -69,13 +73,14 @@ function setupApp(app) {
     }
   );
 
+  // Vote / remove vote
   app.action(
-    views.pollMessageActions.voteButton,
+    constants.pollMessageActions.voteButton,
     async ({ ack, action, body, respond }) => {
       await ack();
 
       await respond(
-        views.vote(
+        controller.vote(
           /** @type {import('@slack/bolt').BlockButtonAction} */ (body),
           /** @type {import('@slack/bolt').ButtonAction } */ (action)
         )
@@ -83,31 +88,34 @@ function setupApp(app) {
     }
   );
 
+  // delete all votes of current user
   app.action(
-    views.pollMessageActions.deleteAnswer,
+    constants.pollMessageActions.deleteAnswer,
     async ({ ack, body, respond }) => {
       await ack();
 
       await respond(
-        views.vote(
+        controller.vote(
           /** @type {import('@slack/bolt').BlockButtonAction} */ (body)
         )
       );
     }
   );
 
+  // options from the overflow menu
   app.action(
-    views.pollMessageActions.overflow,
+    constants.pollMessageActions.overflow,
     async ({ ack, body, respond, action, client }) => {
       await ack();
 
       const overflowAction =
         /** @type {import('@slack/bolt').OverflowAction } */ (action);
 
+      // if poll should be deleted, check if requestor has clicked the button
       if (
         !overflowAction.selected_option ||
         overflowAction.selected_option.value.split('-')[0] !==
-          views.pollMessageActions.overflowDelete ||
+          constants.pollMessageActions.overflowDelete ||
         overflowAction.selected_option.value.split('-')[1] !== body.user.id
       ) {
         await client.chat.postEphemeral({
@@ -123,13 +131,14 @@ function setupApp(app) {
     }
   );
 
+  // add an answer option to the poll after it was already posted
   app.action(
-    views.pollMessageActions.addAnswer,
+    constants.pollMessageActions.addAnswer,
     async ({ ack, client, body }) => {
       await ack();
 
       client.views.open(
-        views.getAddAnswerView(
+        controller.getAddAnswerView(
           /** @type {import('@slack/bolt').BlockButtonAction} */ (body)
         )
       );
@@ -137,46 +146,16 @@ function setupApp(app) {
   );
 
   //* ******************* View Submissions ********************//
-  app.view(views.viewNames.creationModal, async ({ body, ack, client }) => {
-    // no answer options provided and no adding of answers allowed
-    if (!views.answerOptionsValid(body)) {
-      await ack({
-        response_action: 'errors',
-        errors: {
-          [views.creationModalBlocks.newAnswer]:
-            'Bitte Antwortmöglichkeiten eingeben oder hinzufügen erlauben'
-        }
-      });
-      return;
-    }
-
-    const channel = await util.getChannelInfo(
-      controller.getChannelFromView(body),
-      client
-    );
-
-    // bot is not in channel
-    if (!channel || channel.is_member === false) {
-      let joinSuccess = false;
-
-      // try to join channel if public
-      if (channel && channel.is_channel) {
-        joinSuccess = await util.joinChannel(
-          controller.getChannelFromView(body),
-          client
-        );
-      }
-
-      if (!joinSuccess) {
-        await ack({
-          response_action: 'errors',
-          errors: {
-            [views.creationModalBlocks.conversationSelect]:
-              'Bitte den Bot in diesen Channel hinzufügen'
-          }
-        });
+  app.view(constants.viewNames.creationModal, async ({ body, ack, client }) => {
+    // validate user inputs
+    try {
+      controller.validateInputs(body, client);
+    } catch (error) {
+      if (error instanceof SlackViewSubmissionError) {
+        await ack(error.getAckObject());
         return;
       }
+      throw error;
     }
 
     await ack();
@@ -185,21 +164,27 @@ function setupApp(app) {
     await awsRtAPI.sendResponse();
 
     // send poll
-    await client.chat.postMessage(views.getPollMessage(body));
+    await client.chat.postMessage(controller.getPollMessage(body));
   });
 
-  app.view(views.viewNames.addAnswerModal, async ({ view, ack, client }) => {
-    await ack();
+  // add answer to already posted poll
+  app.view(
+    constants.viewNames.addAnswerModal,
+    async ({ view, ack, client }) => {
+      await ack();
 
-    // get source message
-    const result = await client.conversations.history({
-      token: process.env.SLACK_BOT_TOKEN,
-      channel: view.private_metadata.split('-')[0],
-      latest: view.private_metadata.split('-')[1],
-      inclusive: true,
-      limit: 1
-    });
+      // get source message
+      const result = await client.conversations.history({
+        token: process.env.SLACK_BOT_TOKEN,
+        channel: view.private_metadata.split('-')[0],
+        latest: view.private_metadata.split('-')[1],
+        inclusive: true,
+        limit: 1
+      });
 
-    await client.chat.update(views.addAnswerMessage(view, result.messages[0]));
-  });
+      await client.chat.update(
+        controller.addAnswerMessage(view, result.messages[0])
+      );
+    }
+  );
 }

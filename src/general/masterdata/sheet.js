@@ -4,23 +4,20 @@ import * as util from '../util.js';
 
 /**
  * @readonly
- * @enum {string}
+ * @type {string}
  */
-export const sheetNames = {
-  allgDaten: 'Allg Daten',
-  stunden: 'Arbeitseinsätze',
-  stundenSumme: 'Summe Stunden'
-};
+export const allgDatenSheetName = 'Allg Daten';
 
 /**
  * @readonly
  * @enum {number}
  */
-export const allgDatenColumns = {
+const allgDatenColumns = {
   id: 1,
   firstname: 2,
   lastname: 3,
   leaveDate: 5,
+  birthday: 7,
   email: 10,
   street: 11,
   houseNumber: 12,
@@ -30,52 +27,81 @@ export const allgDatenColumns = {
   slackId: 16
 };
 
-//* ******************* Public functions ********************//
+//* ******************* Private functions ********************//
 /**
- *
+ * TODO: refactor to dynamic keys
  * @param {string[]} userLine
  * @returns {types.user}
  */
-export function moveUserLineToObject(userLine) {
+function moveUserLineToObject(userLine) {
   return {
     id: Number(userLine[allgDatenColumns.id - 1]),
     firstname: userLine[allgDatenColumns.firstname - 1],
     lastname: userLine[allgDatenColumns.lastname - 1],
     leaveDate: userLine[allgDatenColumns.leaveDate - 1],
+    birthday: userLine[allgDatenColumns.birthday - 1],
+    email: userLine[allgDatenColumns.email - 1],
+    phone: userLine[allgDatenColumns.phone - 1],
     slackId: userLine[allgDatenColumns.slackId - 1]
   };
 }
 
 /**
- *
+ * TODO: refactor to dynamic keys
  * @param {string[]} userLine
  * @returns {types.userContactCard}
  */
-export function moveUserLineToContactCard(userLine) {
+function moveUserLineToContactCard(userLine) {
   return {
+    id: Number(userLine[allgDatenColumns.id - 1]),
     firstname: userLine[allgDatenColumns.firstname - 1],
     lastname: userLine[allgDatenColumns.lastname - 1],
+    leaveDate: userLine[allgDatenColumns.leaveDate - 1],
+    birthday: userLine[allgDatenColumns.birthday - 1],
     email: userLine[allgDatenColumns.email - 1],
     phone: userLine[allgDatenColumns.phone - 1],
-    street: userLine[allgDatenColumns.street - 1],
-    houseNumber: userLine[allgDatenColumns.houseNumber - 1],
-    zip: userLine[allgDatenColumns.zip - 1],
-    city: userLine[allgDatenColumns.city - 1]
+    slackId: userLine[allgDatenColumns.slackId - 1]
   };
+}
+
+//* ******************* Public section ********************//
+/**
+ * Get a user line from sheet file by slack id
+ * @param {types.ids} ids
+ * @returns {Promise<types.user|undefined>}
+ */
+async function getUserFromId({ id, slackId }) {
+  if (!id && !slackId) return undefined;
+
+  const data = await sheet.getCells(allgDatenSheetName);
+  if (!data) return undefined;
+
+  // search by ID
+  if (id && data.length > id) {
+    return moveUserLineToObject(data[id]);
+  }
+
+  // search by slack ID
+  if (!slackId) return undefined;
+
+  const user = data.find(
+    (element) => element[allgDatenColumns.slackId - 1] === slackId
+  );
+  if (!user) return undefined;
+
+  return moveUserLineToObject(user);
 }
 
 /**
  * Get a user line from sheet file by slack id
- * @param {object} ids
- * @param {number} [ids.id] ID of user (line)
- * @param {string} [ids.slackId] Slack ID of user
+ * @param {types.ids} ids
  * @returns {Promise<types.userContactCard|undefined>}
  */
-export async function getUserContactCard({ id, slackId }) {
+async function getUserContactCardFromId({ id, slackId }) {
   if (!id && !slackId) return undefined;
 
   /** @type {string[][]} */
-  const data = await sheet.getCells(sheetNames.allgDaten);
+  const data = await sheet.getCells(allgDatenSheetName);
   if (!data) return undefined;
 
   // get by line or slack ID
@@ -97,9 +123,9 @@ export async function getUserContactCard({ id, slackId }) {
  * get text for changes
  * @param {types.approvalObject} maintObj
  */
-export async function saveMasterdataChanges(maintObj) {
+async function saveMasterdataChanges(maintObj) {
   // get id
-  const user = await getUserFromSlackId(maintObj.slackId);
+  const user = await getUserFromId({ slackId: maintObj.slackId });
 
   // if phone starts with +, modify so that sheets does not interprets it as formula
   if (maintObj.phone && maintObj.phone !== '' && /^\+\d+$/.test(maintObj.phone))
@@ -115,7 +141,7 @@ export async function saveMasterdataChanges(maintObj) {
   await Promise.all(
     updatedFields.map(async (key) => {
       await sheet.updateCell({
-        range: `'${sheetNames.allgDaten}'!${util.convertNumberToColumn(
+        range: `'${allgDatenSheetName}'!${util.convertNumberToColumn(
           allgDatenColumns[key]
         )}${user.id + 1}`,
         values: [[maintObj[key]]]
@@ -125,29 +151,75 @@ export async function saveMasterdataChanges(maintObj) {
 }
 
 /**
- * Get a user line from sheet file by slack id
- * @param {string} slackId
- * @returns {Promise<types.user|undefined>}
- */
-export async function getUserFromSlackId(slackId) {
-  const data = await sheet.getCells(sheetNames.allgDaten);
-  if (!data) return undefined;
-
-  const user = data.find(
-    (element) => element[allgDatenColumns.slackId - 1] === slackId
-  );
-  if (!user) return undefined;
-
-  return moveUserLineToObject(user);
-}
-
-/**
  * check if user is registered
- * @param {string} slackId
+ * @param {types.ids} ids
  * @returns {Promise<boolean>}
  */
-export async function isUserRegistered(slackId) {
-  const user = await getUserFromSlackId(slackId);
+async function isUserRegistered(ids) {
+  const user = await getUserFromId(ids);
 
   return !!user;
 }
+
+/**
+ * Get all active users from sheet
+ * @returns {Promise<types.user[]>}
+ */
+async function getAllActiveUsers() {
+  const array = await sheet.getCells(allgDatenSheetName);
+  if (!array) return [];
+
+  array.shift();
+
+  /** @type {types.user[]} */
+  const activeUsers = [];
+  const today = new Date();
+
+  for (const user of array) {
+    const userObject = moveUserLineToObject(user);
+
+    // firstname and lastname empty: skip
+    if (userObject.firstname === '' && userObject.lastname === '') {
+      continue;
+    }
+
+    // if leave date empty: active
+    if (userObject.leaveDate === '') {
+      activeUsers.push(userObject);
+      continue;
+    }
+
+    if (util.convertStringToDate(userObject.leaveDate) > today) {
+      activeUsers.push(userObject);
+    }
+  }
+
+  return activeUsers;
+}
+
+/**
+ * save slack id to google sheet
+ * @param {number} id
+ * @param {string} slackId
+ */
+async function saveSlackId(id, slackId) {
+  await sheet.updateCell({
+    range: `'${allgDatenSheetName}'!${util.convertNumberToColumn(
+      allgDatenColumns.slackId
+    )}${id}`,
+    values: [[slackId]]
+  });
+}
+
+/**
+ * object with all masterdata functions
+ * @type {types.userService}
+ */
+export const googleSheetMasterdataService = {
+  getUserFromId,
+  getUserContactCardFromId,
+  saveMasterdataChanges,
+  isUserRegistered,
+  getAllActiveUsers,
+  saveSlackId
+};

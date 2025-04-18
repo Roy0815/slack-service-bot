@@ -3,9 +3,10 @@ import * as controller from './controller.js';
 import * as constants from './constants.js';
 import * as util from '../general/util.js';
 import * as types from './types.js';
-import { SlackViewSubmissionError } from '../general/types.js';
 
 import * as awsRtAPI from '../general/aws-runtime-api.js';
+import { SlackViewSubmissionError } from '../general/types.js';
+import { masterdataService } from '../general/masterdata/service.js';
 
 /** @type {import('../general/types.js').appComponent} */
 export const asApp = { setupApp, getHomeView: controller.getHomeView };
@@ -66,7 +67,9 @@ function setupApp(app) {
     await awsRtAPI.sendResponse();
 
     // check user is registered
-    if (!(await controller.isUserRegistered(command.user_id))) {
+    if (
+      !(await masterdataService.isUserRegistered({ slackId: command.user_id }))
+    ) {
       // not registered: start dialog
       await client.views.open(
         await controller.getRegisterView(command.trigger_id)
@@ -135,7 +138,9 @@ function setupApp(app) {
       );
 
       // check user is registered
-      if (!(await controller.isUserRegistered(body.user.id))) {
+      if (
+        !(await masterdataService.isUserRegistered({ slackId: body.user.id }))
+      ) {
         // not registered: start dialog
 
         await client.views.open(

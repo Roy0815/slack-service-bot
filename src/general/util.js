@@ -72,3 +72,13 @@ export async function getChannelInfo(channelName, client) {
 export async function joinChannel(channelName, client) {
   return (await client.conversations.join({ channel: channelName })).ok;
 }
+
+/**
+ * convert string date to Date object
+ * @param {string} dateString
+ * @returns {Date} date
+ */
+export function convertStringToDate(dateString) {
+  const [year, month, day] = dateString.split('.');
+  return new Date(Number(year), Number(month) - 1, Number(day));
+}

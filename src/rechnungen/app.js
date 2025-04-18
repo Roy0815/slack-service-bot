@@ -1,7 +1,9 @@
-import * as functions from './functions.js';
+import * as controller from './controller.js';
 import * as types from './types.js';
 
-/** @type {import('../../general/types.js').appComponent} */
+import * as awsRtAPI from '../general/aws-runtime-api.js';
+
+/** @type {import('../general/types.js').appComponent} */
 export const rechnungenApp = { setupApp, getHomeView: null };
 
 /**
@@ -28,11 +30,14 @@ function setupApp(app) {
         // set workflow step to complete
         await complete();
 
+        // post 200 already to not wait for drive upload
+        awsRtAPI.sendResponse();
+
         // download file from slack
-        await functions.getFileInfoFromSlack(client, file);
+        await controller.getFileInfoFromSlack(client, file);
 
         // upload to drive
-        await functions.uploadFileToDriveFolder(file);
+        await controller.uploadFileToDriveFolder(file);
       } catch (error) {
         // on error notify admins
         await app.client.filesUploadV2({

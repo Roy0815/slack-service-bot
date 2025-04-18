@@ -8,7 +8,7 @@ import * as types from './types.js';
 
 //* ******************* Private functions ********************//
 /**
- * Authenticates with the Google Sheets API
+ * Authenticates with the Google Drive API
  * @returns {Promise<drive_v3.Drive>}
  */
 async function auth() {
@@ -40,6 +40,7 @@ export async function getFileInfoFromSlack(client, file) {
     file: file.fileID
   });
 
+  // add infos to file object
   // find extension in filename in slack and add to filename
   file.fileName += `.${/[^.]*$/.exec(fileInfo.file.name)[0]}`;
 

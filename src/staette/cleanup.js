@@ -1,7 +1,7 @@
 // References
 import * as functions from './functions.js';
 import * as slack from '@slack/bolt';
-import * as util from '../../general/util.js';
+import * as util from '../general/util.js';
 
 // Create Bolt App
 // @ts-ignore

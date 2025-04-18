@@ -1,6 +1,8 @@
 // local imports
 import * as views from './views.js';
+import * as constants from './constants.js';
 import * as util from '../general/util.js';
+import { SlackViewSubmissionError } from '../general/types.js';
 
 /**
  * Get channel from submitted view
@@ -8,8 +10,8 @@ import * as util from '../general/util.js';
  * @returns {string}
  */
 export function getChannelFromView({ view }) {
-  return view.state.values[views.creationModalBlocks.conversationSelect][
-    views.creationModalActions.conversationSelect
+  return view.state.values[constants.creationModalBlocks.conversationSelect][
+    constants.creationModalActions.conversationSelect
   ].selected_conversation;
 }
 
@@ -24,13 +26,12 @@ export function getChannelFromView({ view }) {
 export function getPollsView({ trigger_id, text }) {
   const view = util.deepCopy(views.pollView);
 
+  // pre-fill question text from prompt
   if (!text || text !== '') {
-    const element = /** @type {import('@slack/types').InputBlock} */ (
-      view.blocks[0]
-    ).element;
-
     /** @type {import('@slack/types').PlainTextInput } */
-    (element).initial_value = text;
+    (
+      /** @type {import('@slack/types').InputBlock} */ (view.blocks[0]).element
+    ).initial_value = text;
   }
 
   // eslint-disable-next-line camelcase
@@ -38,20 +39,22 @@ export function getPollsView({ trigger_id, text }) {
 }
 
 /**
- * Add answer to popup poll
+ * Add answer to creation modal
  * @param {import('@slack/bolt').ViewOutput} view
  * @returns {import('@slack/web-api').ViewsUpdateArguments}
  */
 export function addAnswer({ id, hash, blocks, state }) {
   const view = util.deepCopy(views.pollView);
 
+  // take over existing blocks
   view.blocks = blocks;
 
+  // create new block for the answer
   const newAnswerView = util.deepCopy(views.answerView);
 
   newAnswerView.text.text =
-    state.values[creationModalBlocks.newAnswer][
-      creationModalActions.newAnswerInput
+    state.values[constants.creationModalBlocks.newAnswer][
+      constants.creationModalActions.newAnswerInput
     ].value;
 
   /** @type {import('@slack/types').Button } */
@@ -63,7 +66,7 @@ export function addAnswer({ id, hash, blocks, state }) {
 }
 
 /**
- * delete one or all answers from popup poll
+ * delete one or all answers from creation modal
  * @param {import('@slack/bolt').ViewOutput} view
  * @param {import('@slack/bolt').ButtonAction  } action
  * @returns {import('@slack/web-api').ViewsUpdateArguments}
@@ -82,7 +85,7 @@ export function deleteAnswer({ id, hash, blocks }, { value }) {
         !sectionBlock.accessory ||
         /** @type {import('@slack/types').Button } */
         (sectionBlock.accessory).action_id !==
-          creationModalActions.deleteSingleAnswer
+          constants.creationModalActions.deleteSingleAnswer
       );
     });
   } else {
@@ -109,7 +112,7 @@ export function deleteAnswer({ id, hash, blocks }, { value }) {
         sectionBlock.accessory &&
         /** @type {import('@slack/types').Button } */
         (sectionBlock.accessory).action_id ===
-          creationModalActions.deleteSingleAnswer
+          constants.creationModalActions.deleteSingleAnswer
       ) {
         /** @type {import('@slack/types').Button } */
         (sectionBlock.accessory).value = `${index + 1}`;
@@ -122,6 +125,7 @@ export function deleteAnswer({ id, hash, blocks }, { value }) {
 
 /**
  * Get initial poll message after sending poll
+
  * @param {import('@slack/bolt').SlackViewAction} viewAction
  * @returns {import('@slack/web-api').ChatPostMessageArguments}
  */
@@ -149,8 +153,8 @@ export function getPollMessage({ user, view }) {
   // set text in Message
   /** @type {import('@slack/types').SectionBlock} */
   (retViewBlocks[0]).text.text = `Neue Umfrage von <@${user.id}>\n*${
-    view.state.values[creationModalBlocks.question][
-      creationModalActions.questionInput
+    view.state.values[constants.creationModalBlocks.question][
+      constants.creationModalActions.questionInput
     ].value
   }*`;
 
@@ -160,39 +164,41 @@ export function getPollMessage({ user, view }) {
 
   // -- set options --//
   // anonymous
-  let option = view.state.values[creationModalBlocks.options][
-    creationModalActions.options
-  ].selected_options.find((option) => option.value === optionCheckboxes.anonym);
+  let option = view.state.values[constants.creationModalBlocks.options][
+    constants.creationModalActions.options
+  ].selected_options.find(
+    (option) => option.value === constants.optionCheckboxes.anonym
+  );
 
   // set text
   contextElement.text = option ? 'Anonym' : 'nicht Anonym';
   if (option) {
     // set value to store
-    actionsElementIdx1.value = optionCheckboxes.anonym;
+    actionsElementIdx1.value = constants.optionCheckboxes.anonym;
   }
 
   // multiple select
-  option = view.state.values[creationModalBlocks.options][
-    creationModalActions.options
+  option = view.state.values[constants.creationModalBlocks.options][
+    constants.creationModalActions.options
   ].selected_options.find(
-    (option) => option.value === optionCheckboxes.multipleSelect
+    (option) => option.value === constants.optionCheckboxes.multipleSelect
   );
 
   if (option) {
     // set text
     contextElement.text += ', mehrere Antworten auswählbar';
     // set value to store
-    actionsElementIdx1.value += optionCheckboxes.multipleSelect;
+    actionsElementIdx1.value += constants.optionCheckboxes.multipleSelect;
   } else contextElement.text += ', eine Antwort auswählbar';
 
   // make sure value is not initial
   if (actionsElementIdx1.value === '') actionsElementIdx1.value = '_';
 
   // add answers
-  option = view.state.values[creationModalBlocks.options][
-    creationModalActions.options
+  option = view.state.values[constants.creationModalBlocks.options][
+    constants.creationModalActions.options
   ].selected_options.find(
-    (option) => option.value === optionCheckboxes.addAllowed
+    (option) => option.value === constants.optionCheckboxes.addAllowed
   );
 
   if (!option) actionsBlock.elements.shift(); // remove button if not selected
@@ -208,7 +214,7 @@ export function getPollMessage({ user, view }) {
         sectionBlock.accessory &&
         /** @type {import('@slack/types').Button} */
         (sectionBlock.accessory).action_id ===
-          creationModalActions.deleteSingleAnswer
+          constants.creationModalActions.deleteSingleAnswer
       );
     })
     .forEach((block, index) => {
@@ -230,20 +236,20 @@ export function getPollMessage({ user, view }) {
   // set channel and text in notification here
   return {
     channel:
-      view.state.values[creationModalBlocks.conversationSelect][
-        creationModalActions.conversationSelect
+      view.state.values[constants.creationModalBlocks.conversationSelect][
+        constants.creationModalActions.conversationSelect
       ].selected_conversation,
-    text: view.state.values[creationModalBlocks.question][
-      creationModalActions.questionInput
+    text: view.state.values[constants.creationModalBlocks.question][
+      constants.creationModalActions.questionInput
     ].value,
     blocks: retViewBlocks
   };
 }
 
 /**
- *
+ * check if the creator provided answer options or enabled adding of answers
  * @param {import('@slack/bolt').SlackViewAction} viewAction
- * @returns {boolean} check if answers exist if no adding is allowed
+ * @returns {boolean} answer is valid
  */
 export function answerOptionsValid({ view }) {
   const answers = view.blocks.filter((block) => {
@@ -255,16 +261,16 @@ export function answerOptionsValid({ view }) {
       sectionBlock.accessory &&
       /** @type {import('@slack/types').Button} */
       (sectionBlock.accessory).action_id ===
-        creationModalActions.deleteSingleAnswer
+        constants.creationModalActions.deleteSingleAnswer
     );
   });
 
   if (answers.length === 0) {
     // check options
-    const addAnswers = view.state.values[creationModalBlocks.options][
-      creationModalActions.options
+    const addAnswers = view.state.values[constants.creationModalBlocks.options][
+      constants.creationModalActions.options
     ].selected_options.filter(
-      (option) => option.value === optionCheckboxes.addAllowed
+      (option) => option.value === constants.optionCheckboxes.addAllowed
     );
 
     // add Options not selected: error
@@ -276,11 +282,11 @@ export function answerOptionsValid({ view }) {
   return true;
 }
 
-// action = undefined means delete all answers of user
 /**
  * vote, remove vote and remove all votes of user
+
  * @param {import("@slack/bolt").BlockAction} body
- * @param {import("@slack/bolt").ButtonAction} [action]
+ * @param {import("@slack/bolt").ButtonAction} [action] undefined means delete all answers of user
  * @returns {import("@slack/bolt").RespondArguments}
  */
 export function vote({ message, user }, action) {
@@ -297,7 +303,7 @@ export function vote({ message, user }, action) {
         /** @type {import('@slack/types').ActionsBlock} */
         (blocks[blocks.length - 1]).elements.length - 2
       ]
-    ).value; // - much readable, very wow
+    ).value;
 
   blocks.forEach((block, index) => {
     const sectionBlock =
@@ -350,7 +356,7 @@ export function vote({ message, user }, action) {
       // or if "single select" is enabled (all other blocks are cleared from user)
       if (
         accessory.value !== action.value &&
-        options.includes(optionCheckboxes.multipleSelect)
+        options.includes(constants.optionCheckboxes.multipleSelect)
       ) {
         return;
       }
@@ -373,7 +379,7 @@ export function vote({ message, user }, action) {
       accessory.value += `-${user}`;
 
       // fill text only if not anonymous
-      if (options.includes(optionCheckboxes.anonym)) return; // goes into next iteration
+      if (options.includes(constants.optionCheckboxes.anonym)) return; // goes into next iteration
 
       contextTextElement.text += `${idx !== 0 ? ', ' : ''}<@${user}>`;
     });
@@ -408,7 +414,7 @@ export function getAddAnswerView({ trigger_id, message, channel }) {
 }
 
 /**
- *
+ * Add answer to already posted poll
  * @param {import('@slack/bolt').ViewOutput} view
  * @param {import('@slack/web-api/dist/types/response/ConversationsHistoryResponse').MessageElement} message
  * @returns {import('@slack/web-api').ChatUpdateArguments}
@@ -441,16 +447,19 @@ export function addAnswerMessage(
   (answerView.accessory).value = `${idx}`;
 
   answerView.text.text = `*${
-    values[creationModalBlocks.newAnswer][
-      pollMessageActions.addAnswerViewTextInput
+    values[constants.creationModalBlocks.newAnswer][
+      constants.pollMessageActions.addAnswerViewTextInput
     ].value
   }*`;
 
-  const resultView = util.deepCopy(views.resultBlockMessage);
-
   // required for typing
   if ('blocks' in updateMessage)
-    updateMessage.blocks.splice(blocks.length - 2, 0, answerView, resultView);
+    updateMessage.blocks.splice(
+      blocks.length - 2,
+      0,
+      answerView,
+      util.deepCopy(views.resultBlockMessage)
+    );
 
   return updateMessage;
 }
@@ -461,4 +470,39 @@ export function addAnswerMessage(
  */
 export function getHomeView() {
   return util.deepCopy(views.homeView);
+}
+
+/**
+ * validate inputs from poll creation modal
+ * @param {import('@slack/bolt').SlackViewAction} body
+ * @param {import('@slack/web-api').WebClient} client
+ */
+export async function validateInputs(body, client) {
+  // no answer options provided and no adding of answers allowed
+  if (!answerOptionsValid(body)) {
+    throw new SlackViewSubmissionError(
+      constants.creationModalBlocks.newAnswer,
+      'Bitte Antwortmöglichkeiten eingeben oder hinzufügen erlauben'
+    );
+  }
+
+  const channel = await util.getChannelInfo(getChannelFromView(body), client);
+
+  // check bot is in channel
+  if (channel && channel.is_member === true) return;
+
+  let joinSuccess = false;
+
+  // try to join channel if public
+  if (channel && channel.is_channel) {
+    joinSuccess = await util.joinChannel(getChannelFromView(body), client);
+  }
+
+  if (joinSuccess) return;
+
+  // no success, issue message to user
+  throw new SlackViewSubmissionError(
+    constants.creationModalBlocks.conversationSelect,
+    'Bitte den Bot in diesen Channel hinzufügen'
+  );
 }

@@ -1,8 +1,17 @@
 import * as types from './types.js';
 import * as util from '../general/util.js';
 import * as sheet from '../general/sheet.js';
-import * as masterdataSheet from '../general/masterdata/sheet.js';
+import { masterdataService } from '../general/masterdata/service.js';
 import * as masterdataTypes from '../general/masterdata/types.js';
+
+/**
+ * @readonly
+ * @enum {string}
+ */
+const sheetNames = {
+  stunden: 'Arbeitseinsätze',
+  stundenSumme: 'Summe Stunden'
+};
 
 /**
  * @readonly
@@ -52,7 +61,7 @@ async function copySheetToNewYear(nameBase, year) {
 
   await sheet.renameSheet(copiedName, newName);
 
-  if (nameBase === masterdataSheet.sheetNames.stundenSumme) {
+  if (nameBase === sheetNames.stundenSumme) {
     // update year field in sheet
     await sheet.updateCell({
       range: `'${newName}'!${util.convertNumberToColumn(
@@ -63,7 +72,7 @@ async function copySheetToNewYear(nameBase, year) {
     return;
   }
 
-  if (nameBase === masterdataSheet.sheetNames.stunden) {
+  if (nameBase === sheetNames.stunden) {
     // clear all hours
     await sheet.clearCell({
       range: `'${newName}'!$A2:${stundenColumns.lastColumn}`
@@ -77,18 +86,14 @@ async function copySheetToNewYear(nameBase, year) {
  */
 async function checkYearSheetsExists(year) {
   try {
-    await sheet.getSheetID(
-      getSheetNameYear(masterdataSheet.sheetNames.stunden, year)
-    );
+    await sheet.getSheetID(getSheetNameYear(sheetNames.stunden, year));
   } catch (err) {
-    await copySheetToNewYear(masterdataSheet.sheetNames.stunden, year);
+    await copySheetToNewYear(sheetNames.stunden, year);
   }
   try {
-    await sheet.getSheetID(
-      getSheetNameYear(masterdataSheet.sheetNames.stundenSumme, year)
-    );
+    await sheet.getSheetID(getSheetNameYear(sheetNames.stundenSumme, year));
   } catch (err) {
-    await copySheetToNewYear(masterdataSheet.sheetNames.stundenSumme, year);
+    await copySheetToNewYear(sheetNames.stundenSumme, year);
   }
 }
 
@@ -112,7 +117,7 @@ function getSheetNameYear(name, year) {
  */
 async function getDetails({ fullname, year }) {
   const dataDetails = await sheet.getCells(
-    getSheetNameYear(masterdataSheet.sheetNames.stunden, year)
+    getSheetNameYear(sheetNames.stunden, year)
   );
 
   if (!dataDetails) return [];
@@ -146,7 +151,7 @@ async function getDetails({ fullname, year }) {
  * @returns {Promise<types.workedHours|undefined>}
  */
 export async function getHoursFromSlackId({ id, year, details }) {
-  const user = await masterdataSheet.getUserFromSlackId(id);
+  const user = await masterdataService.getUserFromId({ slackId: id });
   if (user === undefined) return undefined;
 
   if (year === undefined) year = new Date().getFullYear();
@@ -154,7 +159,7 @@ export async function getHoursFromSlackId({ id, year, details }) {
   await checkYearSheetsExists(year);
 
   const dataSum = await sheet.getCells(
-    getSheetNameYear(masterdataSheet.sheetNames.stundenSumme, year)
+    getSheetNameYear(sheetNames.stundenSumme, year)
   );
 
   if (!dataSum) return undefined;
@@ -185,39 +190,7 @@ export async function getHoursFromSlackId({ id, year, details }) {
  * @returns {Promise<masterdataTypes.user[]>}
  */
 export async function getAllUsers() {
-  const array = await sheet.getCells(masterdataSheet.sheetNames.allgDaten);
-  if (!array) return [];
-
-  array.shift();
-
-  /** @type {masterdataTypes.user[]} */
-  const activeUsers = [];
-  const today = new Date();
-
-  for (const user of array) {
-    const userObject = masterdataSheet.moveUserLineToObject(user);
-
-    // firstname and lastname empty: skip
-    if (userObject.firstname === '' && userObject.lastname === '') {
-      continue;
-    }
-
-    // if leave date empty: active
-    if (userObject.leaveDate === '') {
-      activeUsers.push(userObject);
-      continue;
-    }
-
-    // get leave date
-    const [year, month, day] = userObject.leaveDate.split('.');
-    const leaveDate = new Date(Number(year), Number(month) - 1, Number(day));
-
-    if (leaveDate > today) {
-      activeUsers.push(userObject);
-    }
-  }
-
-  return activeUsers;
+  return await masterdataService.getAllActiveUsers();
 }
 
 /**
@@ -227,7 +200,7 @@ export async function getAllUsers() {
 export async function getAdminChannel() {
   await checkYearSheetsExists(new Date().getFullYear());
   const sumData = await sheet.getCells(
-    getSheetNameYear(masterdataSheet.sheetNames.stundenSumme)
+    getSheetNameYear(sheetNames.stundenSumme)
   );
 
   if (!sumData) return '';
@@ -240,22 +213,7 @@ export async function getAdminChannel() {
  * @param {types.registerObj} registerObj
  */
 export async function saveSlackId({ id, slackId }) {
-  // find line with user
-  const data = await sheet.getCells(masterdataSheet.sheetNames.allgDaten);
-  if (!data) return;
-
-  const index =
-    data.findIndex(
-      (element) =>
-        element[masterdataSheet.allgDatenColumns.id - 1] === id.toString()
-    ) + 1;
-
-  sheet.updateCell({
-    range: `'${masterdataSheet.sheetNames.allgDaten}'!${util.convertNumberToColumn(
-      masterdataSheet.allgDatenColumns.slackId
-    )}${index}`,
-    values: [[slackId]]
-  });
+  masterdataService.saveSlackId(id, slackId);
 }
 
 /**
@@ -263,12 +221,12 @@ export async function saveSlackId({ id, slackId }) {
  * @param {types.hoursObjMaint} hoursObjMaint
  */
 export async function saveHours({ slackId, description, hours, date }) {
-  const user = await masterdataSheet.getUserFromSlackId(slackId);
+  const user = await masterdataService.getUserFromId({ slackId });
   await checkYearSheetsExists(Number(date.split('-')[0]));
 
   await sheet.appendRow({
     range: `'${getSheetNameYear(
-      masterdataSheet.sheetNames.stunden,
+      sheetNames.stunden,
       Number(date.split('-')[0])
     )}'!A:D`,
     values: [
@@ -287,7 +245,7 @@ export async function saveHours({ slackId, description, hours, date }) {
  * @returns {Promise<string|undefined>}
  */
 export async function getNameFromSlackId({ slackId }) {
-  const user = await masterdataSheet.getUserFromSlackId(slackId);
+  const user = await masterdataService.getUserFromId({ slackId });
   if (user === undefined) return undefined;
 
   return `${user.firstname} ${user.lastname}`;
@@ -299,11 +257,12 @@ export async function getNameFromSlackId({ slackId }) {
  * @returns {Promise<masterdataTypes.userContactCard|undefined>}
  */
 export async function getContactCardFromId(id) {
-  const contactCard = await masterdataSheet.getUserContactCard({ id });
+  const contactCard = await masterdataService.getUserContactCardFromId({ id });
   if (contactCard === undefined) return undefined;
 
   // build vcard
   // ADR;TYPE=postal:;;${contactCard.street} ${contactCard.houseNumber};${contactCard.city};;${contactCard.zip};
+  // BDAY:${contactCard.birthday}
   contactCard.vCardContent = `BEGIN:VCARD
 VERSION:3.0
 N:${contactCard.lastname};${contactCard.firstname}

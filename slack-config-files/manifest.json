@@ -50,7 +50,7 @@
       },
       {
         "command": "/stammdaten",
-        "url": "https://3mw9amwa4f.execute-api.eu-central-1.amazonaws.com/dev/slack/events",
+        "url": "PUT REQUEST URL HERE",
         "description": "Stammdaten ändern",
         "should_escape": true
       }
@@ -128,8 +128,8 @@
         },
         "approverChannel": {
           "type": "slack#/types/channel_id",
-          "title": "Genehmiger Channel",
-          "description": "Channel, in dem die Ausgaben genehmigt werden",
+          "title": "Channel für Fehler",
+          "description": "Channel, in dem mögliche Fehler mitgeteilt werden",
           "is_required": true,
           "name": "approverChannel"
         }
