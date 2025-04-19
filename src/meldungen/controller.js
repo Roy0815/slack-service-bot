@@ -1,6 +1,7 @@
 import { homeView, competitionRegistrationView } from './views.js';
 import * as util from '../general/util.js';
 import * as constants from './constants.js';
+import * as types from './types.js';
 
 /**
  * Get part of the home view
@@ -55,7 +56,7 @@ function fillCompetitionDropdown(block) {
   const competitions = getLiveCompetitions();
 
   // Map 'competitions' to the format expected by fillDropdownOptions()
-  /** @type {{text: string, value: string}[]} */
+  /** @type {types.dropdownOption[]} */
   const optionContents = competitions.map((competition) => ({
     text: competition.name,
     value: competition.id
@@ -95,7 +96,7 @@ function fillWeightClassDropdown(block) {
     (inputBlock.element);
 
   // Map 'weightClases' to the format expected by fillDropdownOptions()
-  /** @type {{text: string, value: string}[]} */
+  /** @type {types.dropdownOption[]} */
   const optionContents = weightClasses.map((weightClass) => ({
     text: weightClass,
     value: weightClass
@@ -107,9 +108,7 @@ function fillWeightClassDropdown(block) {
 /**
  *
  * @param {import('@slack/types').StaticSelect} dropdown
- * @param {{text: string, value: string}[]} optionContents Array of objects,
- * each representing the content of one dropdown option. 'text' is the visible
- * text on the dropdown option. 'value' is the value property of the option
+ * @param {types.dropdownOption[]} optionContents
  */
 function fillDropdownOptions(dropdown, optionContents) {
   // Dropping existing values from dropdown
