@@ -51,6 +51,6 @@ export const weightClassesFemale = {
  * @enum {types.HandlerNeeded}
  */
 export const handlerNeeded = {
-  yes: 'ja',
-  no: 'nein'
+  yes: 'Ja',
+  no: 'Nein'
 };

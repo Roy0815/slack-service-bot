@@ -13,6 +13,7 @@ export const meldungenApp = { setupApp, getHomeView: controller.getHomeView };
  */
 function setupApp(app) {
   // Allow a user to register for a competition
+  //* ****************** Commands ******************//
   app.command('/wettkampf-meldung', async ({ ack, command, client }) => {
     await ack();
     // already send HTTP 200 so slack does not time out
@@ -28,6 +29,7 @@ function setupApp(app) {
     );
   });
 
+  //* ****************** Views ******************//
   app.view(
     constants.competitionRegistrationView.viewName,
     async ({ body, ack, client }) => {
@@ -37,21 +39,30 @@ function setupApp(app) {
 
       const selectedValues = body.view.state.values;
 
-
       /** @type {types.competitionRegistrationData} */
       const competitionRegistrationData = {
+        /** @todo get name and birthyear from google sheet */
         first_name: 'test',
         last_name: 'test',
         birthyear: 1000,
 
-        competition: selectedValues[constants.competitionRegistrationView.blockCompetitionSelect]
-        [constants.competitionRegistrationView.actionCompetitionSelect].selected_option.value,
+        competition:
+          selectedValues[
+            constants.competitionRegistrationView.blockCompetitionSelect
+          ][constants.competitionRegistrationView.actionCompetitionSelect]
+            .selected_option.value,
 
-        weight_class: selectedValues[constants.competitionRegistrationView.blockWeightClassSelect]
-        [constants.competitionRegistrationView.actionWeightClassSelect].selected_option.value,
+        weight_class:
+          selectedValues[
+            constants.competitionRegistrationView.blockWeightClassSelect
+          ][constants.competitionRegistrationView.actionWeightClassSelect]
+            .selected_option.value,
 
-        handler_needed: selectedValues[constants.competitionRegistrationView.blockHandlerNeededSelect]
-        [constants.competitionRegistrationView.actionHandlerNeededSelect].selected_option.value
+        handler_needed:
+          selectedValues[
+            constants.competitionRegistrationView.blockHandlerNeededSelect
+          ][constants.competitionRegistrationView.actionHandlerNeededSelect]
+            .selected_option.value
       };
 
       console.log(competitionRegistrationData);
