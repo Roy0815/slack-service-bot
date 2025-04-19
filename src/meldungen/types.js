@@ -17,6 +17,7 @@
 /**
  * @typedef {object} competitionRegistrationData all the data of one athlete's
  * registration for a competition
+ * @property {string} slackID
  * @property {string} first_name
  * @property {string} last_name
  * @property {number} birthyear

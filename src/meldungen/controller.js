@@ -142,3 +142,18 @@ function fillDropdownOptions(dropdown, optionContents) {
     dropdown.options.push(newDropdownOption);
   });
 }
+
+/**
+ * Message to notify user that competition registration has been requested
+ * @param {types.competitionRegistrationData} competitionRegistrationData
+ * @returns {import("@slack/web-api").ChatPostMessageArguments}
+ */
+export function getUserConfirmMessage(competitionRegistrationData) {
+  /** @todo Make prettier */
+  return {
+    channel: competitionRegistrationData.slackID,
+    text: `Deine Meldeanfrage wurde mit folgenden Daten erfasst:
+    ${JSON.stringify(competitionRegistrationData)}
+    Die Anfrage wurde zur Freigabe weitergeleitet.`
+  };
+}
