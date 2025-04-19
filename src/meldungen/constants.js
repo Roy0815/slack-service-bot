@@ -1,34 +1,56 @@
+import * as types from './types.js';
+
 /**
  * @readonly
  * @enum {string}
  */
 export const competitionRegistrationView = {
   viewName: 'competitionregistrationview',
-  blockCompetition: 'competition',
-  blockWeightClass: 'weight_class',
-  blockHandlerNeeded: 'handler_needed'
+  blockCompetitionSelect: 'competition_select_block',
+  actionCompetitionSelect: 'competition_select',
+  blockWeightClassSelect: 'weight_class_select_block',
+  actionWeightClassSelect: 'weight_class_select',
+  blockHandlerNeededSelect: 'handler_needed_select_block',
+  actionHandlerNeededSelect: 'handler_needed_select'
 };
 
-export const weightClassesMale = [
-  '-53kg',
-  '-59kg',
-  '-66kg',
-  '-74kg',
-  '-83kg',
-  '-93kg',
-  '-105kg',
-  '-120kg',
-  '+120kg'
-];
+/**
+ * @readonly
+ * @enum {types.WeightClass}
+ */
+export const weightClassesMale = {
+  minus53kg: '-53kg',
+  minus59kg: '-59kg',
+  minus66kg: '-66kg',
+  minus74kg: '-74kg',
+  minus83kg: '-83kg',
+  minus93kg: '-93kg',
+  minus105kg: '-105kg',
+  minus120kg: '-120kg',
+  plus120kg: '+120kg'
+};
 
-export const weightClassesFemale = [
-  '-43kg',
-  '-47kg',
-  '-52kg',
-  '-57kg',
-  '-63kg',
-  '-69kg',
-  '-76kg',
-  '-84kg',
-  '+84kg'
-];
+/**
+ * @readonly
+ * @enum {types.WeightClass}
+ */
+export const weightClassesFemale = {
+  minus43kg: '-43kg',
+  minus47kg: '-47kg',
+  minus52kg: '-52kg',
+  minus57kg: '-57kg',
+  minus63kg: '-63kg',
+  minus69kg: '-69kg',
+  minus76kg: '-76kg',
+  minus84kg: '-84kg',
+  plus84kg: '+84kg'
+};
+
+/**
+ * @readonly
+ * @enum {types.HandlerNeeded}
+ */
+export const handlerNeeded = {
+  yes: 'ja',
+  no: 'nein'
+};

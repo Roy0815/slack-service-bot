@@ -27,11 +27,11 @@ export function getCompetitionRegistrationView(triggerId) {
   // iterate over blocks to make changes e.g. add options to dropdowns
   view.blocks.forEach((block) => {
     switch (block.block_id) {
-      case constants.competitionRegistrationView.blockCompetition:
+      case constants.competitionRegistrationView.blockCompetitionSelect:
         fillCompetitionDropdown(block);
         break;
       /** @todo case weightClass -> Fill dropdown with weight classes for athletes sex */
-      case constants.competitionRegistrationView.blockWeightClass:
+      case constants.competitionRegistrationView.blockWeightClassSelect:
         fillWeightClassDropdown(block);
         break;
       default:
@@ -86,7 +86,7 @@ function fillWeightClassDropdown(block) {
 
   /** @todo get weight class array depending on sex */
 
-  const weightClasses = constants.weightClassesMale;
+  const weightClasses = Object.values(constants.weightClassesMale);
   /** @todo fill dropdown with values from weight class dropdown */
   const inputBlock =
     /** @type {import('@slack/types').InputBlock} */
