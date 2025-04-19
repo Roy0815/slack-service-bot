@@ -32,7 +32,7 @@ Die benötigten APIs müssen im Projekt aktiviert werden:
 [Google Sheets API](https://console.cloud.google.com/apis/api/sheets.googleapis.com)
 [Google Drive API](https://console.cloud.google.com/apis/api/drive.googleapis.com)
 
-Nun wird noch ein Dienstkonto benötigt. Das kann [hier](https://console.cloud.google.com/iam-admin/serviceaccounts?hl=de) errstellt werden.
+Nun wird noch ein Dienstkonto benötigt. Das kann [hier](https://console.cloud.google.com/iam-admin/serviceaccounts?hl=de) erstellt werden.
 
 Die Email des Dienstkontos muss als Bearbeiter bei den relevanten Google Ressourcen hinzugefügt werden (Google Sheet für Arbeitsstunden und Rechnungsordner für Rechnungen).
 
