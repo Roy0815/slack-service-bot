@@ -1,0 +1,6 @@
+# define which files should always have linux linebreaks
+*.js text eol=lf
+*.md text eol=lf
+*.yml text eol=lf
+*.json text eol=lf
+*.env text eol=lf
