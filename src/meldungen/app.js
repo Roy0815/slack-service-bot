@@ -41,7 +41,9 @@ function setupApp(app) {
 
       /** @type {types.competitionRegistrationData} */
       const competitionRegistrationData = {
-        /** @todo get name and birthyear from google sheet */
+
+        slackID: body.user.id,
+        /** @todo get user data from google sheet */
         first_name: 'firstname',
         last_name: 'lastname',
         birthyear: 1000,
@@ -76,11 +78,11 @@ function setupApp(app) {
       await client.chat.postMessage(
         await controller.getAdminConfirmationDialog(competitionRegistrationData)
       );
-
+      */
       await client.chat.postMessage(
         await controller.getUserConfirmMessage(competitionRegistrationData)
       );
-      */
+
       console.log(competitionRegistrationData);
     }
   );
