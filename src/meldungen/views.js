@@ -44,7 +44,7 @@ export const competitionRegistrationView = {
   blocks: [
     {
       type: 'input',
-      block_id: constants.competitionRegistrationView.blockCompetition,
+      block_id: constants.competitionRegistrationView.blockCompetitionSelect,
       element: {
         type: 'static_select',
         placeholder: {
@@ -52,17 +52,9 @@ export const competitionRegistrationView = {
           text: 'Wähle einen Wettkampf',
           emoji: true
         },
-        // Will be overwritten dynamically
-        options: [
-          {
-            text: {
-              type: 'plain_text',
-              text: 'Testwettkampf',
-              emoji: true
-            },
-            value: 'value-0'
-          }
-        ]
+
+        options: [],
+        action_id: constants.competitionRegistrationView.actionCompetitionSelect
       },
       label: {
         type: 'plain_text',
@@ -72,7 +64,7 @@ export const competitionRegistrationView = {
     },
     {
       type: 'input',
-      block_id: constants.competitionRegistrationView.blockWeightClass,
+      block_id: constants.competitionRegistrationView.blockWeightClassSelect,
       element: {
         type: 'static_select',
         placeholder: {
@@ -81,16 +73,8 @@ export const competitionRegistrationView = {
           emoji: true
         },
         // Will be overwritten dynamically
-        options: [
-          {
-            text: {
-              type: 'plain_text',
-              text: '-105kg',
-              emoji: true
-            },
-            value: 'value-0'
-          }
-        ]
+        options: [],
+        action_id: constants.competitionRegistrationView.actionWeightClassSelect
       },
       label: {
         type: 'plain_text',
@@ -100,7 +84,7 @@ export const competitionRegistrationView = {
     },
     {
       type: 'input',
-      block_id: constants.competitionRegistrationView.blockHandlerNeeded,
+      block_id: constants.competitionRegistrationView.blockHandlerNeededSelect,
       element: {
         type: 'static_select',
         placeholder: {
@@ -125,7 +109,8 @@ export const competitionRegistrationView = {
             },
             value: 'false'
           }
-        ]
+        ],
+        action_id: constants.competitionRegistrationView.actionHandlerNeededSelect
       },
       label: {
         type: 'plain_text',
