@@ -23,6 +23,7 @@
  * @property {string} competition
  * @property {WeightClass} weight_class
  * @property {HandlerNeeded} handler_needed
+ * @property {string} payment_record_file_permalink
  */
 
 export {};

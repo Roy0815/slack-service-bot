@@ -42,8 +42,8 @@ function setupApp(app) {
       /** @type {types.competitionRegistrationData} */
       const competitionRegistrationData = {
         /** @todo get name and birthyear from google sheet */
-        first_name: 'test',
-        last_name: 'test',
+        first_name: 'firstname',
+        last_name: 'lastname',
         birthyear: 1000,
 
         competition:
@@ -62,9 +62,25 @@ function setupApp(app) {
           selectedValues[
             constants.competitionRegistrationView.blockHandlerNeededSelect
           ][constants.competitionRegistrationView.actionHandlerNeededSelect]
-            .selected_option.value
+            .selected_option.value,
+
+        payment_record_file_permalink:
+          selectedValues[
+            constants.competitionRegistrationView.blockPaymentRecordUpload
+          ][constants.competitionRegistrationView.actionPaymentRecordUpload]
+            .files[0].permalink
       };
 
+      /** @todo */
+      /*
+      await client.chat.postMessage(
+        await controller.getAdminConfirmationDialog(competitionRegistrationData)
+      );
+
+      await client.chat.postMessage(
+        await controller.getUserConfirmMessage(competitionRegistrationData)
+      );
+      */
       console.log(competitionRegistrationData);
     }
   );

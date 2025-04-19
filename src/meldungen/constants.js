@@ -11,7 +11,9 @@ export const competitionRegistrationView = {
   blockWeightClassSelect: 'weight_class_select_block',
   actionWeightClassSelect: 'weight_class_select',
   blockHandlerNeededSelect: 'handler_needed_select_block',
-  actionHandlerNeededSelect: 'handler_needed_select'
+  actionHandlerNeededSelect: 'handler_needed_select',
+  blockPaymentRecordUpload: 'payment_record_upload_block',
+  actionPaymentRecordUpload: 'payment_record_upload'
 };
 
 /**
