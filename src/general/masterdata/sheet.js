@@ -52,6 +52,9 @@ function moveUserLineToObject(userLine) {
  * @returns {types.userContactCard}
  */
 function moveUserLineToContactCard(userLine) {
+  if (typeof userLine === 'undefined'){
+    return undefined;
+  }
   return {
     id: Number(userLine[allgDatenColumns.id - 1]),
     firstname: userLine[allgDatenColumns.firstname - 1],
