@@ -29,13 +29,14 @@ async function auth() {
 //* ******************* Public functions ********************//
 /**
  * gets an array of all cells
+ * @param {string} spreadsheetID
  * @param {string} sheetname
  * @returns {Promise<any[][]>}
  */
-export async function getCells(sheetname) {
+export async function getCells(spreadsheetID, sheetname) {
   const sheets = await auth();
   const request = {
-    spreadsheetId: process.env.SHEET_ID,
+    spreadsheetId: spreadsheetID,
     range: sheetname
   };
 
@@ -44,14 +45,15 @@ export async function getCells(sheetname) {
 
 /**
  * Update one or more cells
+ * @param {string} spreadsheetID
  * @param {updateCellsObj} updateCellsObj
  */
-export async function updateCell({ range, values }) {
+export async function updateCell(spreadsheetID, { range, values }) {
   const sheets = await auth();
 
   // Value needs to be an array holding arrays with 1 value each
   const request = {
-    spreadsheetId: process.env.SHEET_ID,
+    spreadsheetId: spreadsheetID,
     range,
     valueInputOption: 'USER_ENTERED',
     resource: { range, values }
@@ -62,13 +64,14 @@ export async function updateCell({ range, values }) {
 
 /**
  * Clear one or more cells
+ * @param {string} spreadsheetID
  * @param {updateCellsObj} updateCellsObj
  */
-export async function clearCell({ range }) {
+export async function clearCell(spreadsheetID, { range }) {
   const sheets = await auth();
 
   const request = {
-    spreadsheetId: process.env.SHEET_ID,
+    spreadsheetId: spreadsheetID,
     range
   };
 
@@ -77,14 +80,15 @@ export async function clearCell({ range }) {
 
 /**
  * Append row
+ * @param {string} spreadsheetID
  * @param {updateCellsObj} updateCellsObj
  */
-export async function appendRow({ range, values }) {
+export async function appendRow(spreadsheetID, { range, values }) {
   const sheets = await auth();
 
   // Value needs to be an array holding arrays with 1 value each
   const request = {
-    spreadsheetId: process.env.SHEET_ID,
+    spreadsheetId: spreadsheetID,
     range,
     valueInputOption: 'USER_ENTERED',
     resource: { range, values, majorDimension: 'COLUMNS' }
@@ -95,30 +99,32 @@ export async function appendRow({ range, values }) {
 
 /**
  * gets the sheets in a spreadsheet
+ * @param {string} spreadsheetID
  * @returns {Promise<sheets_v4.Schema$Sheet[]>}
  */
-export async function getSheets() {
+export async function getSheets(spreadsheetID) {
   const sheets = await auth();
   const request = {
-    spreadsheetId: process.env.SHEET_ID
+    spreadsheetId: spreadsheetID
   };
   return (await sheets.spreadsheets.get(request)).data.sheets;
 }
 
 /**
  * creates a copy of a sheet
+ * @param {string} spreadsheetID
  * @param {string} sheetName
  * @returns {Promise<string>} title of the new sheet
  */
-export async function copySheet(sheetName) {
+export async function copySheet(spreadsheetID, sheetName) {
   const sheets = await auth();
   const sheetID = await getSheetID(sheetName);
   const request = {
-    spreadsheetId: process.env.SHEET_ID,
+    spreadsheetId: spreadsheetID,
     sheetId: sheetID,
     resource: {
       // The ID of the spreadsheet to copy the sheet to.
-      destinationSpreadsheetId: process.env.SHEET_ID
+      destinationSpreadsheetId: spreadsheetID
     }
   };
 
@@ -132,17 +138,18 @@ export async function copySheet(sheetName) {
  * @returns {Promise<number>}
  */
 export async function getSheetID(sheetName) {
-  const sheetArray = await getSheets();
+  const sheetArray = await getSheets(process.env.SPREADSHEET_ID_MASTERDATA);
   const sheet = sheetArray.find((s) => s.properties.title === sheetName);
   return sheet.properties.sheetId;
 }
 
 /**
  * renames a sheet
+ * @param {string} spreadsheetID
  * @param {string} oldName
  * @param {string} newName
  */
-export async function renameSheet(oldName, newName) {
+export async function renameSheet(spreadsheetID, oldName, newName) {
   const sheets = await auth();
   const sheetID = await getSheetID(oldName);
 
@@ -157,7 +164,7 @@ export async function renameSheet(oldName, newName) {
     }
   });
 
-  const spreadsheetId = process.env.SHEET_ID;
+  const spreadsheetId = spreadsheetID;
   const batchUpdateRequest = { requests };
 
   // @ts-ignore

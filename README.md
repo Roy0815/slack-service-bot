@@ -142,9 +142,9 @@ Die [`serverless.yml`](serverless.yml) ist außerdem so konfiguriert, dass eine 
 Arbeitsstunden stellt die Kommandos `/arbeitsstunden_anzeigen` und `/arbeitsstunden_erfassen` zur Verfügung. Außerdem konsumiert dieser Teil das Event `team_join` um die Verknüpfung zwischen Slack-ID und Mitglieder-Excel herzustellen.
 Alle Genehmigungen laufen über den Admin Channel, welcher im Sheet Sheet `Summe Stunden x` (siehe unten) im aktuellen Jahr hinterlegt ist.
 
-Für diesen Bereich müssen die Environment Variablen `SHEET_ID`, `GOOGLE_SERVICE_ACC_EMAIL` und `GOOGLE_SERVICE_ACC_PRIVATE_KEY` gefüllt werden (Beispiel [`example.env`](example.env)).
+Für diesen Bereich müssen die Environment Variablen `SPREADSHEET_ID_MASTERDATA`, `GOOGLE_SERVICE_ACC_EMAIL` und `GOOGLE_SERVICE_ACC_PRIVATE_KEY` gefüllt werden (Beispiel [`example.env`](example.env)).
 
-Die `SHEET_ID` findet man in der URL der Tabelle um die es geht. Sie steht zwischen `docs.google.com/spreadsheets/d/` und dem nächsten `/`.
+Die `SPREADSHEET_ID_MASTERDATA` findet man in der URL der Tabelle um die es geht. Sie steht zwischen `docs.google.com/spreadsheets/d/` und dem nächsten `/`.
 
 Bei die beiden Variablen `GOOGLE_SERVICE_ACC_EMAIL` und `GOOGLE_SERVICE_ACC_PRIVATE_KEY` findet man in der Datei aus dem Schritt [Google Zugangsdaten holen](#2-google-und-slack-zugangsdaten-holen).
 
