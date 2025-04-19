@@ -101,6 +101,21 @@ export const competitionRegistrationView = {
         text: 'Betreuung Benötigt',
         emoji: true
       }
+    },
+    {
+      type: 'input',
+      block_id: constants.competitionRegistrationView.blockPaymentRecordUpload,
+      element: {
+        type: 'file_input',
+        action_id:
+          constants.competitionRegistrationView.actionPaymentRecordUpload,
+        filetypes: ['jpg', 'png', 'pdf'],
+        max_files: 1
+      },
+      label: {
+        type: 'plain_text',
+        text: 'Zahlungsnachweis'
+      }
     }
   ]
 };
