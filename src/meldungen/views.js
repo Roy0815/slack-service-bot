@@ -92,25 +92,9 @@ export const competitionRegistrationView = {
           text: 'Ja/Nein',
           emoji: true
         },
-        options: [
-          {
-            text: {
-              type: 'plain_text',
-              text: 'ja',
-              emoji: true
-            },
-            value: 'true'
-          },
-          {
-            text: {
-              type: 'plain_text',
-              text: 'nein',
-              emoji: true
-            },
-            value: 'false'
-          }
-        ],
-        action_id: constants.competitionRegistrationView.actionHandlerNeededSelect
+        options: [],
+        action_id:
+          constants.competitionRegistrationView.actionHandlerNeededSelect
       },
       label: {
         type: 'plain_text',

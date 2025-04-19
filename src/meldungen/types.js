@@ -1,6 +1,6 @@
 //* ******************* Types ********************//
 /**
- * @typedef {object} dropdownOption Object representing the content of one
+ * @typedef {object} dropdownOptionPlainText Object representing the content of one
  * dropdown option
  * @property {string} text visible text on the dropdown option
  * @property {string} value literal value property of the option
@@ -24,7 +24,5 @@
  * @property {WeightClass} weight_class
  * @property {HandlerNeeded} handler_needed
  */
-
-
 
 export {};

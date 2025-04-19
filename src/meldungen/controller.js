@@ -19,20 +19,17 @@ export function getHomeView() {
  */
 export function getCompetitionRegistrationView(triggerId) {
   const view = util.deepCopy(competitionRegistrationView);
-  /**
-   * @todo get athlete information: Full name, Birthday, Sex.
-   * Maybe do that in app.js, since it will be required again later in the
-   * process
-   */
   // iterate over blocks to make changes e.g. add options to dropdowns
   view.blocks.forEach((block) => {
     switch (block.block_id) {
       case constants.competitionRegistrationView.blockCompetitionSelect:
         fillCompetitionDropdown(block);
         break;
-      /** @todo case weightClass -> Fill dropdown with weight classes for athletes sex */
       case constants.competitionRegistrationView.blockWeightClassSelect:
         fillWeightClassDropdown(block);
+        break;
+      case constants.competitionRegistrationView.blockHandlerNeededSelect:
+        fillHandlerNeededDropdown(block);
         break;
       default:
         break;
@@ -56,7 +53,7 @@ function fillCompetitionDropdown(block) {
   const competitions = getLiveCompetitions();
 
   // Map 'competitions' to the format expected by fillDropdownOptions()
-  /** @type {types.dropdownOption[]} */
+  /** @type {types.dropdownOptionPlainText[]} */
   const optionContents = competitions.map((competition) => ({
     text: competition.name,
     value: competition.id
@@ -70,7 +67,7 @@ function fillCompetitionDropdown(block) {
  * @returns {{id: string, name: string}[]} Array of Competitions
  */
 function getLiveCompetitions() {
-  /** @todo Actually get from google sheet */
+  /** @todo Actually get from google sheet instead */
   return [
     { id: 'compID1', name: 'Test-Comp-1' },
     { id: 'compID2', name: 'Test-Comp-2' }
@@ -87,7 +84,6 @@ function fillWeightClassDropdown(block) {
   /** @todo get weight class array depending on sex */
 
   const weightClasses = Object.values(constants.weightClassesMale);
-  /** @todo fill dropdown with values from weight class dropdown */
   const inputBlock =
     /** @type {import('@slack/types').InputBlock} */
     (block);
@@ -96,7 +92,7 @@ function fillWeightClassDropdown(block) {
     (inputBlock.element);
 
   // Map 'weightClases' to the format expected by fillDropdownOptions()
-  /** @type {types.dropdownOption[]} */
+  /** @type {types.dropdownOptionPlainText[]} */
   const optionContents = weightClasses.map((weightClass) => ({
     text: weightClass,
     value: weightClass
@@ -106,9 +102,32 @@ function fillWeightClassDropdown(block) {
 }
 
 /**
+ * Fills the handler needed dropdown with the correct options
+ * @param {import('@slack/types').AnyBlock} block
+ */
+function fillHandlerNeededDropdown(block) {
+  const inputBlock =
+    /** @type {import('@slack/types').InputBlock} */
+    (block);
+  const dropdown =
+    /** @type {import('@slack/types').StaticSelect} */
+    (inputBlock.element);
+
+  const handlerNeededOptions = Object.values(constants.handlerNeeded);
+
+  // Map 'handlerNeededOptions' to the format expected by fillDropdownOptions()
+  /** @type {types.dropdownOptionPlainText[]} */
+  const optionContents = handlerNeededOptions.map((handlerNeededOption) => ({
+    text: handlerNeededOption,
+    value: handlerNeededOption
+  }));
+  fillDropdownOptions(dropdown, optionContents);
+}
+
+/**
  *
  * @param {import('@slack/types').StaticSelect} dropdown
- * @param {types.dropdownOption[]} optionContents
+ * @param {types.dropdownOptionPlainText[]} optionContents
  */
 function fillDropdownOptions(dropdown, optionContents) {
   // Dropping existing values from dropdown
