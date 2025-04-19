@@ -13,7 +13,7 @@ function setupApp(app) {
   // Allow a user to register for a competition
   app.command('/wettkampf-meldung', async ({ ack, command, client }) => {
     await ack();
-    // already send HTTP 200 that slack does not time out
+    // already send HTTP 200 so slack does not time out
     await awsRtAPI.sendResponse();
 
     /**
