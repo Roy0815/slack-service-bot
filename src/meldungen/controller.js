@@ -21,7 +21,7 @@ export function getCompetitionRegistrationView(triggerId) {
   /**
    * @todo get athlete information: Full name, Birthday, Sex.
    * Maybe do that in app.js, since it will be required again later in the
-   * proccess
+   * process
    */
   // iterate over blocks to make changes e.g. add options to dropdowns
   view.blocks.forEach((block) => {
@@ -30,6 +30,9 @@ export function getCompetitionRegistrationView(triggerId) {
         fillCompetitionDropdown(block);
         break;
       /** @todo case weightClass -> Fill dropdown with weight classes for athletes sex */
+      case constants.competitionRegistrationView.blockWeightClass:
+        fillWeightClassDropdown(block);
+        break;
       default:
         break;
     }
@@ -49,17 +52,16 @@ function fillCompetitionDropdown(block) {
     /** @type {import('@slack/types').StaticSelect} */
     (inputBlock.element);
 
-  // Dropping example values from view
-  dropdown.options = [];
   const competitions = getLiveCompetitions();
-  competitions.forEach((competition) => {
-    /** @type {import('@slack/types').PlainTextOption} */
-    const newDropdownOption = {
-      text: { type: 'plain_text', text: competition.name, emoji: true },
-      value: competition.id
-    };
-    dropdown.options.push(newDropdownOption);
-  });
+
+  // Map 'competitions' to the format expected by fillDropdownOptions()
+  /** @type {{text: string, value: string}[]} */
+  const optionContents = competitions.map((competition) => ({
+    text: competition.name,
+    value: competition.id
+  }));
+
+  fillDropdownOptions(dropdown, optionContents);
 }
 
 /**
@@ -72,4 +74,53 @@ function getLiveCompetitions() {
     { id: 'compID1', name: 'Test-Comp-1' },
     { id: 'compID2', name: 'Test-Comp-2' }
   ];
+}
+
+/**
+ * Fills the weight class dropdown with the weight classes for the athletes sex
+ * @param {import('@slack/types').AnyBlock} block
+ */
+function fillWeightClassDropdown(block) {
+  /** @todo get athlete sex */
+
+  /** @todo get weight class array depending on sex */
+
+  const weightClasses = constants.weightClassesMale;
+  /** @todo fill dropdown with values from weight class dropdown */
+  const inputBlock =
+    /** @type {import('@slack/types').InputBlock} */
+    (block);
+  const dropdown =
+    /** @type {import('@slack/types').StaticSelect} */
+    (inputBlock.element);
+
+  // Map 'weightClases' to the format expected by fillDropdownOptions()
+  /** @type {{text: string, value: string}[]} */
+  const optionContents = weightClasses.map((weightClass) => ({
+    text: weightClass,
+    value: weightClass
+  }));
+
+  fillDropdownOptions(dropdown, optionContents);
+}
+
+/**
+ *
+ * @param {import('@slack/types').StaticSelect} dropdown
+ * @param {{text: string, value: string}[]} optionContents Array of objects,
+ * each representing the content of one dropdown option. 'text' is the visible
+ * text on the dropdown option. 'value' is the value property of the option
+ */
+function fillDropdownOptions(dropdown, optionContents) {
+  // Dropping existing values from dropdown
+  dropdown.options = [];
+
+  optionContents.forEach((optionContent) => {
+    /** @type {import('@slack/types').PlainTextOption} */
+    const newDropdownOption = {
+      text: { type: 'plain_text', text: optionContent.text, emoji: true },
+      value: optionContent.value
+    };
+    dropdown.options.push(newDropdownOption);
+  });
 }
