@@ -73,7 +73,7 @@ function moveUserLineToContactCard(userLine) {
 async function getUserFromId({ id, slackId }) {
   if (!id && !slackId) return undefined;
 
-  const data = await sheet.getCells(allgDatenSheetName);
+  const data = await sheet.getCells(process.env.SPREADSHEET_ID_MASTERDATA, allgDatenSheetName);
   if (!data) return undefined;
 
   // search by ID
@@ -101,7 +101,7 @@ async function getUserContactCardFromId({ id, slackId }) {
   if (!id && !slackId) return undefined;
 
   /** @type {string[][]} */
-  const data = await sheet.getCells(allgDatenSheetName);
+  const data = await sheet.getCells(process.env.SPREADSHEET_ID_MASTERDATA, allgDatenSheetName);
   if (!data) return undefined;
 
   // get by line or slack ID
@@ -140,7 +140,7 @@ async function saveMasterdataChanges(maintObj) {
   // run all calls in parallel and wait until all finished
   await Promise.all(
     updatedFields.map(async (key) => {
-      await sheet.updateCell({
+      await sheet.updateCell(process.env.SPREADSHEET_ID_MASTERDATA, {
         range: `'${allgDatenSheetName}'!${util.convertNumberToColumn(
           allgDatenColumns[key]
         )}${user.id + 1}`,
@@ -166,7 +166,7 @@ async function isUserRegistered(ids) {
  * @returns {Promise<types.user[]>}
  */
 async function getAllActiveUsers() {
-  const array = await sheet.getCells(allgDatenSheetName);
+  const array = await sheet.getCells(process.env.SPREADSHEET_ID_MASTERDATA, allgDatenSheetName);
   if (!array) return [];
 
   array.shift();
@@ -203,7 +203,7 @@ async function getAllActiveUsers() {
  * @param {string} slackId
  */
 async function saveSlackId(id, slackId) {
-  await sheet.updateCell({
+  await sheet.updateCell(process.env.SPREADSHEET_ID_MASTERDATA, {
     range: `'${allgDatenSheetName}'!${util.convertNumberToColumn(
       allgDatenColumns.slackId
     )}${id}`,

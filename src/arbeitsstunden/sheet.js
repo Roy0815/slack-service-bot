@@ -56,14 +56,14 @@ async function copySheetToNewYear(nameBase, year) {
   // recursive call to check if it exists, if not it will be created
   await checkYearSheetsExists(oldYear);
 
-  const copiedName = await sheet.copySheet(`${nameBase} ${oldYear}`);
+  const copiedName = await sheet.copySheet(process.env.SPREADSHEET_ID_MASTERDATA, `${nameBase} ${oldYear}`);
   const newName = `${nameBase} ${currYear}`;
 
-  await sheet.renameSheet(copiedName, newName);
+  await sheet.renameSheet(process.env.SPREADSHEET_ID_MASTERDATA, copiedName, newName);
 
   if (nameBase === sheetNames.stundenSumme) {
     // update year field in sheet
-    await sheet.updateCell({
+    await sheet.updateCell(process.env.SPREADSHEET_ID_MASTERDATA, {
       range: `'${newName}'!${util.convertNumberToColumn(
         stundenSummeColumns.year
       )}1`,
@@ -74,7 +74,7 @@ async function copySheetToNewYear(nameBase, year) {
 
   if (nameBase === sheetNames.stunden) {
     // clear all hours
-    await sheet.clearCell({
+    await sheet.clearCell(process.env.SPREADSHEET_ID_MASTERDATA, {
       range: `'${newName}'!$A2:${stundenColumns.lastColumn}`
     });
   }
@@ -116,7 +116,8 @@ function getSheetNameYear(name, year) {
  * @returns {Promise<types.hoursObj[]>}
  */
 async function getDetails({ fullname, year }) {
-  const dataDetails = await sheet.getCells(
+  const dataDetails = await sheet.getCells(process.env.SPREADSHEET_ID_MASTERDATA,
+
     getSheetNameYear(sheetNames.stunden, year)
   );
 
@@ -158,7 +159,7 @@ export async function getHoursFromSlackId({ id, year, details }) {
 
   await checkYearSheetsExists(year);
 
-  const dataSum = await sheet.getCells(
+  const dataSum = await sheet.getCells(process.env.SPREADSHEET_ID_MASTERDATA,
     getSheetNameYear(sheetNames.stundenSumme, year)
   );
 
@@ -199,7 +200,7 @@ export async function getAllUsers() {
  */
 export async function getAdminChannel() {
   await checkYearSheetsExists(new Date().getFullYear());
-  const sumData = await sheet.getCells(
+  const sumData = await sheet.getCells(process.env.SPREADSHEET_ID_MASTERDATA,
     getSheetNameYear(sheetNames.stundenSumme)
   );
 
@@ -224,7 +225,7 @@ export async function saveHours({ slackId, description, hours, date }) {
   const user = await masterdataService.getUserFromId({ slackId });
   await checkYearSheetsExists(Number(date.split('-')[0]));
 
-  await sheet.appendRow({
+  await sheet.appendRow(process.env.SPREADSHEET_ID_MASTERDATA, {
     range: `'${getSheetNameYear(
       sheetNames.stunden,
       Number(date.split('-')[0])
