@@ -7,22 +7,27 @@ import * as general_sheets from '../general/sheet.js';
  * @param {types.competitionData} competitionData
  */
 export async function createNewCompetition(competitionData){
-    appendCompetitionDataToMainSheet(competitionData);
+
+    const newSheetData = await createNewCompetitionSheet(competitionData);
+    appendCompetitionDataToMainSheet(competitionData, newSheetData.sheetName, newSheetData.link);
     /** @todo */
-    createNewCompetitionSheet(competitionData);
+
 }
 
 /**
  * Appends competition data to the main sheet
  * @param {types.competitionData} competitionData
+ * @param {string} sheetLink Direct link to the new competition sheet
  */
-async function appendCompetitionDataToMainSheet(competitionData) {
+async function appendCompetitionDataToMainSheet(competitionData, sheetName, sheetLink) {
+    const googleSheetsLink = `=HYPERLINK("${sheetLink}"; "${sheetName}")`;
     general_sheets.appendRow(process.env.SPREADSHEET_ID_MELDUNGEN, {
-        range: 'Wettkämpfe!A:C',
+        range: 'Wettkämpfe!A:D',
         values: [
             [competitionData.competition_name],
             [competitionData.competition_date],
-            [competitionData.competition_location]
+            [competitionData.competition_location],
+            [googleSheetsLink],
         ]
     });
 }
@@ -30,6 +35,7 @@ async function appendCompetitionDataToMainSheet(competitionData) {
 /**
  * Creates a new competition sheet based on the template
  * @param {types.competitionData} competitionData
+ * @returns {Promise<{sheetName, link}>} Direct link to the new sheet
  */
 async function createNewCompetitionSheet(competitionData) {
     const newSheetName = getSheetNameFromCompetitionData(competitionData);
@@ -42,6 +48,17 @@ async function createNewCompetitionSheet(competitionData) {
         copyName,
         newSheetName
     );
+
+    const newSheetID = await general_sheets.getSheetID(
+        process.env.SPREADSHEET_ID_MELDUNGEN,
+        newSheetName
+    );
+
+    // return a tuple of the new sheet name and the link to the new sheet
+    return {
+        sheetName: newSheetName,
+        link: `https://docs.google.com/spreadsheets/d/1UnsTPwzZmMXe_gFXESLX4w4ZrGNZDyn_50ERF4_vi_w/edit#gid=${newSheetID}`
+    };
 }
 
 /**
