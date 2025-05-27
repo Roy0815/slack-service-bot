@@ -86,12 +86,12 @@ async function copySheetToNewYear(nameBase, year) {
  */
 async function checkYearSheetsExists(year) {
   try {
-    await sheet.getSheetID(getSheetNameYear(sheetNames.stunden, year));
+    await sheet.getSheetID(process.env.SPREADSHEET_ID_MASTERDATA, getSheetNameYear(sheetNames.stunden, year));
   } catch (err) {
     await copySheetToNewYear(sheetNames.stunden, year);
   }
   try {
-    await sheet.getSheetID(getSheetNameYear(sheetNames.stundenSumme, year));
+    await sheet.getSheetID(process.env.SPREADSHEET_ID_MASTERDATA, getSheetNameYear(sheetNames.stundenSumme, year));
   } catch (err) {
     await copySheetToNewYear(sheetNames.stundenSumme, year);
   }
