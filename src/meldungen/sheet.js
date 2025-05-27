@@ -9,7 +9,7 @@ import * as general_sheets from '../general/sheet.js';
 export async function createNewCompetition(competitionData){
     appendCompetitionDataToMainSheet(competitionData);
     /** @todo */
-    //createNewCompetitionSheet(competitionData);
+    createNewCompetitionSheet(competitionData);
 }
 
 /**
