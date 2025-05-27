@@ -119,3 +119,66 @@ export const competitionRegistrationView = {
     }
   ]
 };
+
+/** @type {import('@slack/types').View} */
+export const competitionCreationView = {
+  type: 'modal',
+  callback_id: constants.competitionCreationView.viewName,
+  title: {
+    type: 'plain_text',
+    text: 'Wettkampf erstellen',
+    emoji: true
+  },
+  submit: {
+    type: 'plain_text',
+    text: 'Erstellen',
+    emoji: true
+  },
+  close: {
+    type: 'plain_text',
+    text: 'Abbrechen',
+    emoji: true
+  },
+  blocks: [
+    // Blocks for competition creation will be added here
+    {
+      type: 'input',
+      block_id: 'competition_name_block',
+      element: {
+        type: 'plain_text_input',
+        action_id: 'competition_name_input'
+      },
+      label: {
+        type: 'plain_text',
+        text: 'Wettkampfname',
+        emoji: true
+      }
+    },
+    {
+      type: 'input',
+      block_id: 'competition_date_block',
+      element: {
+        type: 'datepicker',
+        action_id: 'competition_date_input'
+      },
+      label: {
+        type: 'plain_text',
+        text: 'Datum des Wettkampfs',
+        emoji: true
+      }
+    },
+    {
+      type: 'input',
+      block_id: 'competition_location_block',
+      element: {
+        type: 'plain_text_input',
+        action_id: 'competition_location_input'
+      },
+      label: {
+        type: 'plain_text',
+        text: 'Ort des Wettkampfs',
+        emoji: true
+      }
+    }
+  ]
+}

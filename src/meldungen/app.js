@@ -2,6 +2,8 @@
 import * as controller from './controller.js';
 import * as constants from './constants.js';
 import * as types from './types.js';
+import * as util from '../general/util.js';
+import * as meldungen_sheets from './sheet.js';
 import { masterdataService } from '../general/masterdata/service.js';
 import * as masterdataTypes from '../general/masterdata/types.js';
 
@@ -14,8 +16,9 @@ export const meldungenApp = { setupApp, getHomeView: controller.getHomeView };
  * @param {import("@slack/bolt").App} app
  */
 function setupApp(app) {
-  // Allow a user to register for a competition
+
   //* ****************** Commands ******************//
+  // Allow a user to register for a competition
   app.command('/wettkampf-meldung', async ({ ack, command, client }) => {
     await ack();
     // already send HTTP 200 so slack does not time out
@@ -29,6 +32,27 @@ function setupApp(app) {
     await client.views.open(
       controller.getCompetitionRegistrationView(command.trigger_id)
     );
+  });
+
+  // Create a new competition
+  app.command('/wettkampf-erstellen', async ({ ack, command, client }) => {
+    await ack();
+    // already send HTTP 200 so slack does not time out
+    await awsRtAPI.sendResponse();
+
+    // check if command was sent from meldungen admin channel
+    if (command.channel_id !== process.env.MELDUNGEN_ADMIN_CHANNEL) {
+      await client.chat.postMessage({
+        channel: command.user_id,
+        text: 'Dieser Befehl kann nur im <#' + process.env.MELDUNGEN_ADMIN_CHANNEL + '> Kanal verwendet werden.'
+      });
+      return;
+    }
+
+    await client.views.open(
+      controller.getCompetitionCreationView(command.trigger_id)
+    );
+
   });
 
   //* ****************** Views ******************//
@@ -84,11 +108,59 @@ function setupApp(app) {
         await controller.getAdminConfirmationDialog(competitionRegistrationData)
       );
       */
+
       await client.chat.postMessage(
-        await controller.getUserConfirmMessage(competitionRegistrationData)
+        await controller.getUserConfirmMessageCompetitionCreation(competitionRegistrationData)
       );
 
-      console.log(competitionRegistrationData);
     }
   );
+
+  app.view(
+    constants.competitionCreationView.viewName,
+    async ({ body, ack, client }) => {
+      await ack();
+      // already send HTTP 200 that slack does not time out
+      await awsRtAPI.sendResponse();
+
+      const selectedValues = body.view.state.values;
+      console.log(selectedValues);
+
+      // convert selected date to our format
+      const dateInput = selectedValues[constants.competitionCreationView.blockCompetitionDate]
+      [constants.competitionCreationView.actionCompetitionDate].selected_date;
+
+      const convertedCompetitionDate = util.formatDate(
+        /** @type {Date} */
+        new Date(dateInput)
+      );
+
+      /** @type {types.competitionData} */
+      const competitionData = {
+        competition_name:
+          selectedValues[constants.competitionCreationView.blockCompetitionName]
+            [constants.competitionCreationView.actionCompetitionName].value,
+        competition_date: convertedCompetitionDate,
+        competition_location:
+          selectedValues[
+            constants.competitionCreationView.blockCompetitionLocation
+          ][constants.competitionCreationView.actionCompetitionLocation].value
+      };
+
+      console.log(competitionData);
+
+      /** @todo */
+      await meldungen_sheets.createNewCompetition(competitionData);
+
+      // Notify admin channel about new competition and who created it
+      await client.chat.postMessage(
+        await controller.getAdminConfirmMessageCompetitionCreation(
+          competitionData,
+          body.user.id
+        )
+      );
+
+    }
+  );
+
 }

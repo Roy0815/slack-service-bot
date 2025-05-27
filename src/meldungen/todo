@@ -1,2 +1,6 @@
-- send to admin channel for approval
-- save registration data to sheet
+## Command wettkampf-erstellen
+- Create a sheet for a new competition
+
+## Command wettampf-meldung
+- Use actual competitions for registration modal dropdown instead of placeholders
+- save registration data to the coresponding wettkampf sheet

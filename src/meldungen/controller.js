@@ -1,4 +1,4 @@
-import { homeView, competitionRegistrationView } from './views.js';
+import { homeView, competitionRegistrationView, competitionCreationView } from './views.js';
 import * as util from '../general/util.js';
 import * as constants from './constants.js';
 import * as types from './types.js';
@@ -102,7 +102,7 @@ function fillWeightClassDropdown(block) {
 }
 
 /**
- * Fills the handler needed dropdown with the correct options
+ * Fills the "handler needed" dropdown with the correct options
  * @param {import('@slack/types').AnyBlock} block
  */
 function fillHandlerNeededDropdown(block) {
@@ -148,12 +148,42 @@ function fillDropdownOptions(dropdown, optionContents) {
  * @param {types.competitionRegistrationData} competitionRegistrationData
  * @returns {import("@slack/web-api").ChatPostMessageArguments}
  */
-export function getUserConfirmMessage(competitionRegistrationData) {
+export function getUserConfirmMessageCompetitionCreation(competitionRegistrationData) {
   /** @todo Make prettier */
   return {
     channel: competitionRegistrationData.slackID,
     text: `Deine Meldeanfrage wurde mit folgenden Daten erfasst:
     ${JSON.stringify(competitionRegistrationData)}
-    Die Anfrage wurde zur Freigabe weitergeleitet.`
+    Die Anfrage wird zur Freigabe weitergeleitet.`
+  };
+}
+
+/**
+ * Get pop up for competition creation
+ * @param {string} triggerId
+ * @returns {import("@slack/web-api").ViewsOpenArguments}
+ */
+export function getCompetitionCreationView(triggerId) {
+  const view = util.deepCopy(competitionCreationView);
+
+  return { trigger_id: triggerId, view };
+}
+
+/**
+ * Message to notify admin that a new competition has been created
+ * @param {types.competitionData} competitionData
+ * @param {string} userId
+ * @returns {import("@slack/web-api").ChatPostMessageArguments}
+ */
+export function getAdminConfirmMessageCompetitionCreation(
+  competitionData,
+  userId
+) {
+  return {
+    channel: process.env.MELDUNGEN_ADMIN_CHANNEL,
+    text: `Ein neuer Wettkampf wurde erstellt von <@${userId}>:` +
+      `\nName: ${competitionData.competition_name}` +
+      `\nDatum: ${competitionData.competition_date}` +
+      `\nOrt: ${competitionData.competition_location}`
   };
 }

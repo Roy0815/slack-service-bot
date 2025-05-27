@@ -56,3 +56,17 @@ export const handlerNeeded = {
   yes: 'Ja',
   no: 'Nein'
 };
+
+/**
+ * @readonly
+ * @enum {string}
+ */
+export const competitionCreationView = {
+  viewName: 'competitioncreationview',
+  blockCompetitionName: 'competition_name_block',
+  actionCompetitionName: 'competition_name_input',
+  blockCompetitionDate: 'competition_date_block',
+  actionCompetitionDate: 'competition_date_input',
+  blockCompetitionLocation: 'competition_location_block',
+  actionCompetitionLocation: 'competition_location_input'
+};
