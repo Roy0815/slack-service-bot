@@ -2,6 +2,8 @@
 import * as controller from './controller.js';
 import * as constants from './constants.js';
 import * as types from './types.js';
+import { masterdataService } from '../general/masterdata/service.js';
+import * as masterdataTypes from '../general/masterdata/types.js';
 
 import * as awsRtAPI from '../general/aws-runtime-api.js';
 
@@ -39,14 +41,17 @@ function setupApp(app) {
 
       const selectedValues = body.view.state.values;
 
+      /** @type {masterdataTypes.user} */
+      const user_data_from_sheet = await masterdataService.getUserFromId({slackId: body.user.id});
+
       /** @type {types.competitionRegistrationData} */
       const competitionRegistrationData = {
 
         slackID: body.user.id,
         /** @todo get user data from google sheet */
-        first_name: 'firstname',
-        last_name: 'lastname',
-        birthyear: 1000,
+        first_name: user_data_from_sheet.firstname,
+        last_name: user_data_from_sheet.lastname,
+        birthyear: Number(user_data_from_sheet.birthday.slice(-4)),
 
         competition:
           selectedValues[
