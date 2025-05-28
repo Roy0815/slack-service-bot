@@ -118,7 +118,7 @@ export async function getSheets(spreadsheetID) {
  */
 export async function copySheet(spreadsheetID, sheetName) {
   const sheets = await auth();
-  const sheetID = await getSheetID(sheetName);
+  const sheetID = await getSheetID(spreadsheetID, sheetName);
   const request = {
     spreadsheetId: spreadsheetID,
     sheetId: sheetID,
@@ -134,11 +134,12 @@ export async function copySheet(spreadsheetID, sheetName) {
 
 /**
  * returns sheetID
+ * @param {string} spreadsheetID
  * @param {string} sheetName
  * @returns {Promise<number>}
  */
-export async function getSheetID(sheetName) {
-  const sheetArray = await getSheets(process.env.SPREADSHEET_ID_MASTERDATA);
+export async function getSheetID(spreadsheetID, sheetName) {
+  const sheetArray = await getSheets(spreadsheetID);
   const sheet = sheetArray.find((s) => s.properties.title === sheetName);
   return sheet.properties.sheetId;
 }
@@ -151,7 +152,7 @@ export async function getSheetID(sheetName) {
  */
 export async function renameSheet(spreadsheetID, oldName, newName) {
   const sheets = await auth();
-  const sheetID = await getSheetID(oldName);
+  const sheetID = await getSheetID(spreadsheetID, oldName);
 
   const requests = [];
   requests.push({
