@@ -2,6 +2,9 @@ import { homeView, competitionRegistrationView, competitionCreationView } from '
 import * as util from '../general/util.js';
 import * as constants from './constants.js';
 import * as types from './types.js';
+import * as sheet from './sheet.js';
+import { masterdataService } from '../general/masterdata/service.js';
+import * as masterdataTypes from '../general/masterdata/types.js';
 
 /**
  * Get part of the home view
@@ -149,7 +152,6 @@ function fillDropdownOptions(dropdown, optionContents) {
  * @returns {import("@slack/web-api").ChatPostMessageArguments}
  */
 export function getUserConfirmMessageCompetitionCreation(competitionRegistrationData) {
-  /** @todo Make prettier */
   return {
     channel: competitionRegistrationData.slackID,
     text: `Deine Meldeanfrage wurde mit folgenden Daten erfasst:
@@ -182,6 +184,7 @@ export function getAdminConfirmMessageCompetitionCreation(
   return {
     channel: process.env.MELDUNGEN_ADMIN_CHANNEL,
     text: `Ein neuer Wettkampf wurde erstellt von <@${userId}>:` +
+      `\nID: ${competitionData.competition_id}` +
       `\nName: ${competitionData.competition_name}` +
       `\nDatum: ${competitionData.competition_date}` +
       `\nOrt: ${competitionData.competition_location}`

@@ -124,7 +124,6 @@ function setupApp(app) {
       await awsRtAPI.sendResponse();
 
       const selectedValues = body.view.state.values;
-      console.log(selectedValues);
 
       // convert selected date to our format
       const dateInput = selectedValues[constants.competitionCreationView.blockCompetitionDate]
@@ -144,10 +143,9 @@ function setupApp(app) {
         competition_location:
           selectedValues[
             constants.competitionCreationView.blockCompetitionLocation
-          ][constants.competitionCreationView.actionCompetitionLocation].value
+          ][constants.competitionCreationView.actionCompetitionLocation].value,
+        competition_id: '', // will be set later
       };
-
-      console.log(competitionData);
 
       /** @todo */
       await meldungen_sheets.createNewCompetition(competitionData);

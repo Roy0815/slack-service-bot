@@ -15,6 +15,14 @@
  */
 
 /**
+ * @typedef {object} competitionData all the data of one competition
+ * @property {string} competition_id
+ * @property {string} competition_name
+ * @property {string} competition_date
+ * @property {string} competition_location
+ */
+
+/**
  * @typedef {object} competitionRegistrationData all the data of one athlete's
  * registration for a competition
  * @property {string} slackID
@@ -27,11 +35,6 @@
  * @property {string} payment_record_file_permalink
  */
 
-/**
- * @typedef {object} competitionData all the data of one competition
- * @property {string} competition_name
- * @property {string} competition_date
- * @property {string} competition_location
- */
+
 
 export {};

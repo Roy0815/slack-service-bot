@@ -70,3 +70,20 @@ export const competitionCreationView = {
   blockCompetitionLocation: 'competition_location_block',
   actionCompetitionLocation: 'competition_location_input'
 };
+
+/**
+ * @readonly
+ */
+export const nameOfCompetitionSheet = 'Wettk\u00e4mpfe';
+
+/**
+ * @readonly
+ * @enum {string}
+ */
+export const competitionSheetColumns = {
+  competitionID: '0',
+  competitionName: '1',
+  competitionDate: '2',
+  competitionLocation: '3',
+  googleSheetsLink: '4'
+}

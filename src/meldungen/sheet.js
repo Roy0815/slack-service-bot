@@ -1,41 +1,21 @@
 import * as types from './types.js';
 import * as util from '../general/util.js';
 import * as general_sheets from '../general/sheet.js';
+import * as constants from './constants.js';
 
 /**
  * Creates a new competition in the spreadsheet
  * @param {types.competitionData} competitionData
  */
 export async function createNewCompetition(competitionData){
-
-    const newSheetData = await createNewCompetitionSheet(competitionData);
-    appendCompetitionDataToMainSheet(competitionData, newSheetData.sheetName, newSheetData.link);
-    /** @todo */
-
-}
-
-/**
- * Appends competition data to the main sheet
- * @param {types.competitionData} competitionData
- * @param {string} sheetLink Direct link to the new competition sheet
- */
-async function appendCompetitionDataToMainSheet(competitionData, sheetName, sheetLink) {
-    const googleSheetsLink = `=HYPERLINK("${sheetLink}"; "${sheetName}")`;
-    general_sheets.appendRow(process.env.SPREADSHEET_ID_MELDUNGEN, {
-        range: 'Wettkämpfe!A:D',
-        values: [
-            [competitionData.competition_name],
-            [competitionData.competition_date],
-            [competitionData.competition_location],
-            [googleSheetsLink],
-        ]
-    });
+    const newSheetName = await createNewCompetitionSheet(competitionData);
+    appendCompetitionDataToMainSheet(competitionData, newSheetName);
 }
 
 /**
  * Creates a new competition sheet based on the template
  * @param {types.competitionData} competitionData
- * @returns {Promise<{sheetName, link}>} Direct link to the new sheet
+ * @returns {Promise<string>} Name of the newly created sheet
  */
 async function createNewCompetitionSheet(competitionData) {
     const newSheetName = getSheetNameFromCompetitionData(competitionData);
@@ -55,10 +35,26 @@ async function createNewCompetitionSheet(competitionData) {
     );
 
     // return a tuple of the new sheet name and the link to the new sheet
-    return {
-        sheetName: newSheetName,
-        link: `https://docs.google.com/spreadsheets/d/1UnsTPwzZmMXe_gFXESLX4w4ZrGNZDyn_50ERF4_vi_w/edit#gid=${newSheetID}`
-    };
+    return newSheetName;
+}
+
+/**
+ * Appends competition data to the main sheet
+ * @param {types.competitionData} competitionData
+ * @param {string} sheetName
+ */
+async function appendCompetitionDataToMainSheet(competitionData, sheetName) {
+    const googleSheetsLink = `=HYPERLINK("https://docs.google.com/spreadsheets/d/${process.env.SPREADSHEET_ID_MELDUNGEN}/edit#gid=${competitionData.competition_id}"; "${sheetName}")`;
+    general_sheets.appendRow(process.env.SPREADSHEET_ID_MELDUNGEN, {
+        range: constants.nameOfCompetitionSheet + '!A:E',
+        values: [
+            [competitionData.competition_id],
+            [competitionData.competition_name],
+            [competitionData.competition_date],
+            [competitionData.competition_location],
+            [googleSheetsLink],
+        ]
+    });
 }
 
 /**
