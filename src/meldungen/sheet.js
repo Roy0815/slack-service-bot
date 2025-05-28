@@ -2,6 +2,8 @@ import * as types from './types.js';
 import * as util from '../general/util.js';
 import * as general_sheets from '../general/sheet.js';
 import * as constants from './constants.js';
+import { sheets } from 'googleapis/build/src/apis/sheets/index.js';
+import { sheets_v4 } from 'googleapis/build/src/apis/sheets/index.js';
 
 /**
  * Creates a new competition in the spreadsheet
@@ -79,12 +81,45 @@ export async function getLiveCompetitions() {
     // get IDs and names of competitions
     const competitions = [];
     for (let i = 1; i < cells.length; i++) {
-        const id = cells[i][constants.competitionSheetColumns.competitionID];
-        const name = cells[i][constants.competitionSheetColumns.competitionName];
+        const id = cells[i][constants.competitionMainSheetColumns.competitionID];
+        const name = cells[i][constants.competitionMainSheetColumns.competitionName];
         if (id && name) {
             competitions.push({ id, name });
         }
     }
 
     return competitions;
+}
+
+/**
+ * Saves a competition registration to the correct sheet for the competition
+ * with the initial state
+ * @param {types.competitionRegistrationData} competitionRegistrationData
+ */
+export async function saveInitialCompetitionRegistration(competitionRegistrationData){
+    // get name of the competition sheet
+    /** @type  {sheets_v4.Schema$Sheet[]} */
+    const allSheets = await general_sheets.getSheets(process.env.SPREADSHEET_ID_MELDUNGEN);
+
+    // find 'title' where 'sheetId' matches competitionRegistrationData.competition_id
+    const competitionSheet = allSheets.find(sheet => sheet.properties.sheetId.toString() === competitionRegistrationData.competition_id);
+
+    if (!competitionSheet) {
+        throw new Error(`Competition sheet with ID ${competitionRegistrationData.competition_id} not found.`);
+    }
+
+    const competitionSheetName = competitionSheet.properties.title;
+
+    await general_sheets.appendRow(process.env.SPREADSHEET_ID_MELDUNGEN, {
+        range: competitionSheetName + '!A:F',
+        values: [
+                [competitionRegistrationData.last_name],
+                [competitionRegistrationData.first_name],
+                [competitionRegistrationData.birthyear],
+                [competitionRegistrationData.weight_class],
+                [constants.competitionRegistrationState.inProgress],
+                [competitionRegistrationData.handler_needed]
+        ]
+    });
+
 }

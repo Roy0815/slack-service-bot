@@ -145,13 +145,17 @@ export function getUserConfirmMessageCompetitionCreation(competitionRegistration
   return {
     channel: competitionRegistrationData.slackID,
     text: `Deine Meldeanfrage wurde mit folgenden Daten erfasst:
-    \nWettkampf: ${competitionRegistrationData.competition}` +
+    \nWettkampf: ${competitionRegistrationData.competition_id}` +
       `\nGewichtsklasse: ${competitionRegistrationData.weight_class}` +
       `\nHandler benötigt: ${competitionRegistrationData.handler_needed}` +
       `\nZahlungsbeleg: <${competitionRegistrationData.payment_record_file_permalink}|Hier klicken>` +
       `\n\n` +
-      `Die Anfrage wird an die Admins weitergeleitet und geprüft. ` +
-      `Du wirst benachrichtigt, sobald die Anfrage freigegeben wurde.`
+      `\nDie Anfrage wird an die Admins weitergeleitet und geprüft. ` +
+      `\nBitte überprüfe den Status deiner Meldung unter ` +
+      `https://docs.google.com/spreadsheets/d/${process.env.SPREADSHEET_ID_MELDUNGEN}` +
+      `\nDirekter link zum sheet: https://docs.google.com/spreadsheets/d/${process.env.SPREADSHEET_ID_MELDUNGEN}/edit#gid=${competitionRegistrationData.competition_id}` +
+      `\nFalls der Bot deine Meldung nicht umgehend im Spreadsheet einträgt, oder etwas schief gelaufen ist, melde dich unbedingt per mail an ` +
+      `kdk@schwerathletik-mannheim.de`
   };
 }
 
@@ -184,4 +188,13 @@ export function getAdminConfirmMessageCompetitionCreation(
       `\nDatum: ${competitionData.competition_date}` +
       `\nOrt: ${competitionData.competition_location}`
   };
+}
+
+/**
+ * Saves a competition registration to the correct sheet for the competition
+ * with the initial state
+ * @param {types.competitionRegistrationData} competitionRegistrationData
+ */
+export async function saveCompetitionRegistration(competitionRegistrationData){
+  sheet.saveInitialCompetitionRegistration(competitionRegistrationData);
 }

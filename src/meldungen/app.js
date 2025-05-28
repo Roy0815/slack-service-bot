@@ -86,7 +86,7 @@ function setupApp(app) {
         last_name: user_data_from_sheet.lastname,
         birthyear: Number(user_data_from_sheet.birthday.slice(-4)),
 
-        competition:
+        competition_id:
           selectedValues[
             constants.competitionRegistrationView.blockCompetitionSelect
           ][constants.competitionRegistrationView.actionCompetitionSelect]
@@ -111,14 +111,19 @@ function setupApp(app) {
             .files[0].permalink
       };
 
-      if(competitionRegistrationData.competition === 'waiting_for_competitions'){
+      if(competitionRegistrationData.competition_id === 'waiting_for_competitions'){
         await client.chat.postMessage({
           channel: body.user.id,
           text: 'Es gibt aktuell keine Wettkämpfe, für die du dich anmelden kannst, oder es liegt ein technischer Fehler vor. Bitte versuche es später noch einmal.'});
         return;
       }
 
-      /** @todo */
+      /** @todo Save the registration to the corresponding sheet  */
+      controller.saveCompetitionRegistration(
+        competitionRegistrationData
+      );
+
+      /** @todo Send to admin channel for validation */
       /*
       await client.chat.postMessage(
         await controller.getAdminConfirmationDialog(competitionRegistrationData)

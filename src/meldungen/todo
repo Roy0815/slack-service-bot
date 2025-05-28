@@ -1,5 +1,3 @@
 ## Command wettampf-meldung
-- save registration data to the coresponding wettkampf sheet
-  - with state "in bearbeitung"
 - actually send to admin channel for confirmation
   - change state to "In ordnung" or "Problem!"

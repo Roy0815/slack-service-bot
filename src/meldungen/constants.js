@@ -80,10 +80,34 @@ export const nameOfCompetitionSheet = 'Wettk\u00e4mpfe';
  * @readonly
  * @enum {string}
  */
-export const competitionSheetColumns = {
+export const competitionMainSheetColumns = {
   competitionID: '0',
   competitionName: '1',
   competitionDate: '2',
   competitionLocation: '3',
   googleSheetsLink: '4'
+}
+
+/**
+ * @readonly
+ * @enum {string}
+ */
+export const competitionSheetColumns = {
+  lastName: '0',
+  firstName: '1',
+  birhtyear: '2',
+  weightClass: '3',
+  status: '4',
+  handlerNeeded: '5'
+}
+
+/**
+ * @readonly
+ * @enum {string}
+ */
+export const competitionRegistrationState = {
+  inProgress: 'In Bearbeitung',
+  okay: 'In Ordnung',
+  problem: 'Problem',
+  registered: 'Gemeldet'
 }

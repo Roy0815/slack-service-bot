@@ -29,7 +29,7 @@
  * @property {string} first_name
  * @property {string} last_name
  * @property {number} birthyear
- * @property {string} competition
+ * @property {string} competition_id
  * @property {WeightClass} weight_class
  * @property {HandlerNeeded} handler_needed
  * @property {string} payment_record_file_permalink
