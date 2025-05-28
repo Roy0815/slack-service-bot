@@ -3,6 +3,7 @@ import * as controller from './controller.js';
 import * as constants from './constants.js';
 import * as types from './types.js';
 import * as util from '../general/util.js';
+import * as asController from '../arbeitsstunden/controller.js';
 import * as meldungen_sheets from './sheet.js';
 import { masterdataService } from '../general/masterdata/service.js';
 import * as masterdataTypes from '../general/masterdata/types.js';
@@ -24,13 +25,22 @@ function setupApp(app) {
     // already send HTTP 200 so slack does not time out
     await awsRtAPI.sendResponse();
 
-    /**
-     * @todo Check if user is registered. Error or forward to registration if
-     * not
-     */
+    /** @type {masterdataTypes.userContactCard} */
+    const user = await masterdataService.getUserContactCardFromId({
+      slackId: command.user_id
+    })
+
+    // check if user is registered
+    if (!(user)) {
+      // send the register view to the user
+      await client.views.open(
+        await asController.getRegisterView(command.trigger_id)
+      );
+      return;
+    }
 
     await client.views.open(
-      controller.getCompetitionRegistrationView(command.trigger_id)
+      await controller.getCompetitionRegistrationView(command.trigger_id, user)
     );
   });
 
@@ -72,7 +82,6 @@ function setupApp(app) {
       const competitionRegistrationData = {
 
         slackID: body.user.id,
-        /** @todo get user data from google sheet */
         first_name: user_data_from_sheet.firstname,
         last_name: user_data_from_sheet.lastname,
         birthyear: Number(user_data_from_sheet.birthday.slice(-4)),
@@ -102,6 +111,13 @@ function setupApp(app) {
             .files[0].permalink
       };
 
+      if(competitionRegistrationData.competition === 'waiting_for_competitions'){
+        await client.chat.postMessage({
+          channel: body.user.id,
+          text: 'Es gibt aktuell keine Wettkämpfe, für die du dich anmelden kannst, oder es liegt ein technischer Fehler vor. Bitte versuche es später noch einmal.'});
+        return;
+      }
+
       /** @todo */
       /*
       await client.chat.postMessage(
@@ -124,6 +140,7 @@ function setupApp(app) {
       await awsRtAPI.sendResponse();
 
       const selectedValues = body.view.state.values;
+
 
       // convert selected date to our format
       const dateInput = selectedValues[constants.competitionCreationView.blockCompetitionDate]

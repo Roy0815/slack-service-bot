@@ -53,7 +53,16 @@ export const competitionRegistrationView = {
           emoji: true
         },
 
-        options: [],
+        options: [
+          {
+            text: {
+              type: 'plain_text',
+              text: 'Keine Wettkämpfe gefunden',
+              emoji: true
+            },
+            value: 'waiting_for_competitions'
+          }
+        ],
         action_id: constants.competitionRegistrationView.actionCompetitionSelect
       },
       label: {

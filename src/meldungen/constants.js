@@ -21,15 +21,15 @@ export const competitionRegistrationView = {
  * @enum {types.WeightClass}
  */
 export const weightClassesMale = {
-  minus53kg: '-53kg',
-  minus59kg: '-59kg',
-  minus66kg: '-66kg',
-  minus74kg: '-74kg',
-  minus83kg: '-83kg',
-  minus93kg: '-93kg',
-  minus105kg: '-105kg',
-  minus120kg: '-120kg',
-  plus120kg: '+120kg'
+  minus53kg: 'm-53kg',
+  minus59kg: 'm-59kg',
+  minus66kg: 'm-66kg',
+  minus74kg: 'm-74kg',
+  minus83kg: 'm-83kg',
+  minus93kg: 'm-93kg',
+  minus105kg: 'm-105kg',
+  minus120kg: 'm-120kg',
+  plus120kg: 'm+120kg'
 };
 
 /**
@@ -37,15 +37,15 @@ export const weightClassesMale = {
  * @enum {types.WeightClass}
  */
 export const weightClassesFemale = {
-  minus43kg: '-43kg',
-  minus47kg: '-47kg',
-  minus52kg: '-52kg',
-  minus57kg: '-57kg',
-  minus63kg: '-63kg',
-  minus69kg: '-69kg',
-  minus76kg: '-76kg',
-  minus84kg: '-84kg',
-  plus84kg: '+84kg'
+  minus43kg: 'w-43kg',
+  minus47kg: 'w-47kg',
+  minus52kg: 'w-52kg',
+  minus57kg: 'w-57kg',
+  minus63kg: 'w-63kg',
+  minus69kg: 'w-69kg',
+  minus76kg: 'w-76kg',
+  minus84kg: 'w-84kg',
+  plus84kg: 'w+84kg'
 };
 
 /**

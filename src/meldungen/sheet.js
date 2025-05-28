@@ -34,6 +34,8 @@ async function createNewCompetitionSheet(competitionData) {
         newSheetName
     );
 
+    competitionData.competition_id = newSheetID.toString();;
+
     // return a tuple of the new sheet name and the link to the new sheet
     return newSheetName;
 }
@@ -64,4 +66,25 @@ async function appendCompetitionDataToMainSheet(competitionData, sheetName) {
  */
 function getSheetNameFromCompetitionData(competitionData) {
     return `${competitionData.competition_name} (${competitionData.competition_date}) ${competitionData.competition_location}`;
+}
+
+/**
+ * Retrieves competition information from Google Sheet
+ * @returns {Promise<{id: string, name: string}[]>} Array of Competitions
+ */
+export async function getLiveCompetitions() {
+    /** @type {any[][]} */
+    const cells = await general_sheets.getCells(process.env.SPREADSHEET_ID_MELDUNGEN, constants.nameOfCompetitionSheet);
+
+    // get IDs and names of competitions
+    const competitions = [];
+    for (let i = 1; i < cells.length; i++) {
+        const id = cells[i][constants.competitionSheetColumns.competitionID];
+        const name = cells[i][constants.competitionSheetColumns.competitionName];
+        if (id && name) {
+            competitions.push({ id, name });
+        }
+    }
+
+    return competitions;
 }

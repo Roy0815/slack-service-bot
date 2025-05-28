@@ -1,6 +1,5 @@
-## Command wettkampf-erstellen
-- Link to competition sheet on main page
-
 ## Command wettampf-meldung
-- Use actual competitions for registration modal dropdown instead of placeholders
 - save registration data to the coresponding wettkampf sheet
+  - with state "in bearbeitung"
+- actually send to admin channel for confirmation
+  - change state to "In ordnung" or "Problem!"
