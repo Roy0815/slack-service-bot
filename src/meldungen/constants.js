@@ -18,6 +18,15 @@ export const competitionRegistrationView = {
 
 /**
  * @readonly
+ * @enum {string}
+ */
+export const competitionRegistrationAdminActions = {
+  confirm: 'competition_confirm',
+  deny: 'competition_deny'
+};
+
+/**
+ * @readonly
  * @enum {types.WeightClass}
  */
 export const weightClassesMale = {

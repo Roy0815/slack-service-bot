@@ -53,6 +53,18 @@
         "url": "PUT REQUEST URL HERE",
         "description": "Stammdaten ändern",
         "should_escape": true
+      },
+      {
+        "command": "/wettkampf-meldung",
+        "url": "PUT REQUEST URL HERE",
+        "description": "Als Athlet*in für einen Wettkampf anmelden",
+        "should_escape": true
+      },
+      {
+        "command": "/wettkampf-erstellen",
+        "url": "PUT REQUEST URL HERE",
+        "description": "Als Admin einen neuen Wettkampf erstellen, für Athlet*innen sichtbar",
+        "should_escape": true
       }
     ]
   },

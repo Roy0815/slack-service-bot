@@ -198,3 +198,57 @@ export function getAdminConfirmMessageCompetitionCreation(
 export async function saveCompetitionRegistration(competitionRegistrationData){
   sheet.saveInitialCompetitionRegistration(competitionRegistrationData);
 }
+
+/**
+ * Message for admin channel to confirm or deny a competition registration
+ * @param {types.competitionRegistrationData} competitionRegistrationData
+ * @returns {import("@slack/web-api").ChatPostMessageArguments}
+ */
+export function getAdminConfirmMessageCompetitionRegistration(competitionRegistrationData){
+  return {
+    channel: process.env.MELDUNGEN_ADMIN_CHANNEL,
+    text: `Eine neue Wettkampfmeldung wurde eingereicht von <@${competitionRegistrationData.slackID}>:`,
+    blocks: [
+      {
+        type: "section",
+        text: {
+          type: "mrkdwn",
+          text:
+            `*Neue Wettkampfmeldung von <@${competitionRegistrationData.slackID}>*\n` +
+            `*Wettkampf:* ${competitionRegistrationData.competition_id}\n` +
+            `*Name:* ${competitionRegistrationData.first_name} ${competitionRegistrationData.last_name}\n` +
+            `*Geburtsjahr:* ${competitionRegistrationData.birthyear}\n` +
+            `*Gewichtsklasse:* ${competitionRegistrationData.weight_class}\n` +
+            `*Handler benötigt:* ${competitionRegistrationData.handler_needed}\n` +
+            `*Zahlungsbeleg:* <${competitionRegistrationData.payment_record_file_permalink}|Hier klicken>\n\n` +
+            `Bitte bestätigt oder lehnt die Wettkampfmeldung ab.`
+        }
+      },
+      {
+        type: "actions",
+        elements: [
+          {
+            type: "button",
+            text: {
+              type: "plain_text",
+              text: "Bestätigen"
+            },
+            style: "primary",
+            value: JSON.stringify(competitionRegistrationData),
+            action_id: constants.competitionRegistrationAdminActions.confirm
+          },
+          {
+            type: "button",
+            text: {
+              type: "plain_text",
+              text: "Ablehnen"
+            },
+            style: "danger",
+            value: JSON.stringify(competitionRegistrationData),
+            action_id: constants.competitionRegistrationAdminActions.deny
+          }
+        ]
+      }
+    ]
+  };
+}

@@ -123,3 +123,37 @@ export async function saveInitialCompetitionRegistration(competitionRegistration
     });
 
 }
+
+/**
+ *
+ * @param {types.competitionRegistrationData} competitionRegistrationData
+ * @param {string} competitionRegistrationState
+ */
+export async function updateCompetitionRegistrationState(competitionRegistrationData, competitionRegistrationState){
+    // get name of the competition sheet
+    /** @type  {sheets_v4.Schema$Sheet[]} */
+    const allSheets = await general_sheets.getSheets(process.env.SPREADSHEET_ID_MELDUNGEN);
+
+    // find 'title' where 'sheetId' matches competitionRegistrationData.competition_id
+    const competitionSheet = allSheets.find(sheet => sheet.properties.sheetId.toString() === competitionRegistrationData.competition_id);
+
+    if (!competitionSheet) {
+        throw new Error(`Competition sheet with ID ${competitionRegistrationData.competition_id} not found.`);
+    }
+
+    const competitionSheetName = competitionSheet.properties.title;
+
+    // find row from last_name and first_name
+    const cells = await general_sheets.getCells(process.env.SPREADSHEET_ID_MELDUNGEN, competitionSheetName);
+
+    const row = cells.findIndex(row =>
+        row[constants.competitionSheetColumns.lastName] === competitionRegistrationData.last_name &&
+        row[constants.competitionSheetColumns.firstName] === competitionRegistrationData.first_name
+    );
+
+    // update the status in the sheet
+    await general_sheets.updateCell(process.env.SPREADSHEET_ID_MELDUNGEN, {
+        range: competitionSheetName + '!E' + (row + 1),
+        values: [[competitionRegistrationState]]
+    });
+}
