@@ -2,6 +2,7 @@ import * as controller from './controller.js';
 import * as types from './types.js';
 
 import * as awsRtAPI from '../general/aws-runtime-api.js';
+import * as constants from './constants.js';
 
 /** @type {import('../general/types.js').appComponent} */
 export const rechnungenApp = { setupApp, getHomeView: null };
@@ -39,13 +40,62 @@ function setupApp(app) {
         // upload to drive
         await controller.uploadFileToDriveFolder(file);
       } catch (error) {
-        // on error notify admins
+        // on error notify approvers
+        await app.client.chat.postMessage(
+          controller.getUploadFailureMessage(
+            file,
+            /** @type {string} */ (inputs.approverChannel)
+          )
+        );
+
+        // notify admin as well
+        // no admin maintained: no message
+        if (!process.env.APP_ADMIN_CHANNEL) return;
+
         await app.client.filesUploadV2({
-          channel_id: /** @type {string} */ (inputs.approverChannel),
+          channel_id: process.env.APP_ADMIN_CHANNEL,
           filename: 'error.js',
-          initial_comment: `An error occured when uploading document ${'`' + file.fileName + '`'} to Google Drive. Please upload it manually while the admin looks into the issue.`,
+          initial_comment: `An error occured when uploading document ${'`' + file.fileName + '`'} to Google Drive. Please look into the issue.`,
           title: 'Body',
           content: JSON.stringify(error, null, '\t')
+        });
+      }
+    }
+  );
+
+  //* ******************* Actions ********************//
+  app.action(
+    constants.uploadFailureMessage.retryActionId,
+    async ({ ack, body, client, action, respond }) => {
+      await ack();
+
+      // post 200 already
+      awsRtAPI.sendResponse();
+
+      // get file information from action
+      /** @type {types.fileInformation} */
+      const file = JSON.parse(
+        /** @type {import("@slack/bolt").ButtonAction} */ (action).value
+      );
+
+      // upload file to drive folder
+      try {
+        // download file from slack
+        await controller.getFileInfoFromSlack(client, file);
+
+        // upload to drive
+        await controller.uploadFileToDriveFolder(file);
+
+        // update message
+        await respond({
+          text: `Die Datei \`${file.fileName}\` wurde nachträglich erfolgreich von <@${body.user.id}> hochgeladen.`,
+          replace_original: true
+        });
+      } catch (error) {
+        client.chat.postEphemeral({
+          user: body.user.id,
+          channel: body.channel.id,
+          text: `Beim Hochladen der Datei \`${file.fileName}\` ist ein Fehler aufgetreten. Bitte versuche es erneut.`
         });
       }
     }
