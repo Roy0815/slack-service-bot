@@ -348,7 +348,7 @@ export function getUserMaintainEndMessage(hoursMaintFinalizer) {
       hoursMaintFinalizer.hours
     } Stunden am ${util.formatDate(dateObj)} für "${
       hoursMaintFinalizer.description
-    }" wurde ${hoursMaintFinalizer.approved ? 'genehmigt' : 'abgelehnt'}.`
+    }" wurde \`${hoursMaintFinalizer.approved ? 'genehmigt' : 'abgelehnt'}\`.`
   };
 }
 
