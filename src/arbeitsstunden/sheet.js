@@ -56,10 +56,17 @@ async function copySheetToNewYear(nameBase, year) {
   // recursive call to check if it exists, if not it will be created
   await checkYearSheetsExists(oldYear);
 
-  const copiedName = await sheet.copySheet(process.env.SPREADSHEET_ID_MASTERDATA, `${nameBase} ${oldYear}`);
+  const copiedName = await sheet.copySheet(
+    process.env.SPREADSHEET_ID_MASTERDATA,
+    `${nameBase} ${oldYear}`
+  );
   const newName = `${nameBase} ${currYear}`;
 
-  await sheet.renameSheet(process.env.SPREADSHEET_ID_MASTERDATA, copiedName, newName);
+  await sheet.renameSheet(
+    process.env.SPREADSHEET_ID_MASTERDATA,
+    copiedName,
+    newName
+  );
 
   if (nameBase === sheetNames.stundenSumme) {
     // update year field in sheet
@@ -86,12 +93,18 @@ async function copySheetToNewYear(nameBase, year) {
  */
 async function checkYearSheetsExists(year) {
   try {
-    await sheet.getSheetID(process.env.SPREADSHEET_ID_MASTERDATA, getSheetNameYear(sheetNames.stunden, year));
+    await sheet.getSheetID(
+      process.env.SPREADSHEET_ID_MASTERDATA,
+      getSheetNameYear(sheetNames.stunden, year)
+    );
   } catch (err) {
     await copySheetToNewYear(sheetNames.stunden, year);
   }
   try {
-    await sheet.getSheetID(process.env.SPREADSHEET_ID_MASTERDATA, getSheetNameYear(sheetNames.stundenSumme, year));
+    await sheet.getSheetID(
+      process.env.SPREADSHEET_ID_MASTERDATA,
+      getSheetNameYear(sheetNames.stundenSumme, year)
+    );
   } catch (err) {
     await copySheetToNewYear(sheetNames.stundenSumme, year);
   }
@@ -116,7 +129,8 @@ function getSheetNameYear(name, year) {
  * @returns {Promise<types.hoursObj[]>}
  */
 async function getDetails({ fullname, year }) {
-  const dataDetails = await sheet.getCells(process.env.SPREADSHEET_ID_MASTERDATA,
+  const dataDetails = await sheet.getCells(
+    process.env.SPREADSHEET_ID_MASTERDATA,
 
     getSheetNameYear(sheetNames.stunden, year)
   );
@@ -159,11 +173,24 @@ export async function getHoursFromSlackId({ id, year, details }) {
 
   await checkYearSheetsExists(year);
 
-  const dataSum = await sheet.getCells(process.env.SPREADSHEET_ID_MASTERDATA,
+  let dataSum = await sheet.getCells(
+    process.env.SPREADSHEET_ID_MASTERDATA,
     getSheetNameYear(sheetNames.stundenSumme, year)
   );
 
   if (!dataSum) return undefined;
+
+  // check if target hours have loaded yet
+  while (
+    dataSum[user.id][stundenSummeColumns.targetHours - 1] === 'Wird geladen...'
+  ) {
+    // if not, wait a second and try again
+    await new Promise((resolve) => setTimeout(resolve, 1000));
+    dataSum = await sheet.getCells(
+      process.env.SPREADSHEET_ID_MASTERDATA,
+      getSheetNameYear(sheetNames.stundenSumme, year)
+    );
+  }
 
   /** @type {types.workedHours} */
   const returnObj = {
@@ -200,7 +227,8 @@ export async function getAllUsers() {
  */
 export async function getAdminChannel() {
   await checkYearSheetsExists(new Date().getFullYear());
-  const sumData = await sheet.getCells(process.env.SPREADSHEET_ID_MASTERDATA,
+  const sumData = await sheet.getCells(
+    process.env.SPREADSHEET_ID_MASTERDATA,
     getSheetNameYear(sheetNames.stundenSumme)
   );
 
