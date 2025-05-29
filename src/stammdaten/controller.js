@@ -31,8 +31,6 @@ export async function getChangeMasterdataView(slackId) {
 
   // set placeholders
   Object.keys(constants.changeMasterdataViewBlocks).forEach((key, index) => {
-    if (key === 'vCardContent') return;
-
     /** @type {import('@slack/types').PlainTextInput} */ (
       /** @type {import('@slack/types').InputBlock} */ (view.blocks[index + 1])
         .element

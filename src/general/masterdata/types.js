@@ -14,6 +14,10 @@
  * @property {string} birthday
  * @property {string} email
  * @property {string} phone
+ * @property {string} street
+ * @property {string} houseNumber
+ * @property {string} zip
+ * @property {string} city
  */
 
 /**
