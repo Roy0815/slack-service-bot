@@ -57,10 +57,10 @@ export const competitionRegistrationView = {
           {
             text: {
               type: 'plain_text',
-              text: 'Keine Wettkämpfe gefunden',
+              text: constants.competitionDropdownPlaceholderOption.text,
               emoji: true
             },
-            value: 'waiting_for_competitions'
+            value: constants.competitionDropdownPlaceholderOption.value
           }
         ],
         action_id: constants.competitionRegistrationView.actionCompetitionSelect

@@ -264,3 +264,45 @@ export function getAdminConfirmMessageCompetitionRegistration(
     ]
   };
 }
+
+/**
+ * Extracts competition registration data from Slack view submission
+ * @param {object} selectedValues
+ * @param {masterdataTypes.user} user
+ * @returns {types.competitionRegistrationData}
+ */
+export function extractCompetitionRegistrationData(selectedValues, user) {
+  /** @type {types.competitionRegistrationData} */
+  const competitionRegistrationData = {
+    slackID: user.slackId,
+    first_name: user.firstname,
+    last_name: user.lastname,
+    birthyear: Number(user.birthday.slice(-4)),
+
+    competition_id:
+      selectedValues[
+        constants.competitionRegistrationView.blockCompetitionSelect
+      ][constants.competitionRegistrationView.actionCompetitionSelect]
+        .selected_option.value,
+
+    weight_class:
+      selectedValues[
+        constants.competitionRegistrationView.blockWeightClassSelect
+      ][constants.competitionRegistrationView.actionWeightClassSelect]
+        .selected_option.value,
+
+    handler_needed:
+      selectedValues[
+        constants.competitionRegistrationView.blockHandlerNeededSelect
+      ][constants.competitionRegistrationView.actionHandlerNeededSelect]
+        .selected_option.value,
+
+    payment_record_file_permalink:
+      selectedValues[
+        constants.competitionRegistrationView.blockPaymentRecordUpload
+      ][constants.competitionRegistrationView.actionPaymentRecordUpload]
+        .files[0].permalink
+  };
+
+  return competitionRegistrationData;
+}

@@ -4,7 +4,7 @@ import * as constants from './constants.js';
 import * as types from './types.js';
 import * as util from '../general/util.js';
 import * as asController from '../arbeitsstunden/controller.js';
-import * as meldungen_sheets from './sheet.js';
+import * as meldungenSheets from './sheet.js';
 import { masterdataService } from '../general/masterdata/service.js';
 import * as masterdataTypes from '../general/masterdata/types.js';
 
@@ -67,6 +67,7 @@ function setupApp(app) {
   });
 
   //* ****************** Views ******************//
+  // Runs when the /wettkampf-meldung form is submitted
   app.view(
     constants.competitionRegistrationView.viewName,
     async ({ body, ack, client }) => {
@@ -74,53 +75,32 @@ function setupApp(app) {
       // already send HTTP 200 that slack does not time out
       await awsRtAPI.sendResponse();
 
+      /** User inputs into modal */
       const selectedValues = body.view.state.values;
 
       /** @type {masterdataTypes.user} */
-      const user_data_from_sheet = await masterdataService.getUserFromId({
+      const userDataFromSheet = await masterdataService.getUserFromId({
         slackId: body.user.id
       });
 
       /** @type {types.competitionRegistrationData} */
-      const competitionRegistrationData = {
-        slackID: body.user.id,
-        first_name: user_data_from_sheet.firstname,
-        last_name: user_data_from_sheet.lastname,
-        birthyear: Number(user_data_from_sheet.birthday.slice(-4)),
-
-        competition_id:
-          selectedValues[
-            constants.competitionRegistrationView.blockCompetitionSelect
-          ][constants.competitionRegistrationView.actionCompetitionSelect]
-            .selected_option.value,
-
-        weight_class:
-          selectedValues[
-            constants.competitionRegistrationView.blockWeightClassSelect
-          ][constants.competitionRegistrationView.actionWeightClassSelect]
-            .selected_option.value,
-
-        handler_needed:
-          selectedValues[
-            constants.competitionRegistrationView.blockHandlerNeededSelect
-          ][constants.competitionRegistrationView.actionHandlerNeededSelect]
-            .selected_option.value,
-
-        payment_record_file_permalink:
-          selectedValues[
-            constants.competitionRegistrationView.blockPaymentRecordUpload
-          ][constants.competitionRegistrationView.actionPaymentRecordUpload]
-            .files[0].permalink
-      };
+      const competitionRegistrationData =
+        controller.extractCompetitionRegistrationData(
+          selectedValues,
+          userDataFromSheet
+        );
 
       if (
         competitionRegistrationData.competition_id ===
-        'waiting_for_competitions'
+        constants.competitionDropdownPlaceholderOption.value
       ) {
+        // Happens when the user selects the placeholder option.
+        // The placeholder option only appears when there are no competitions available
         await client.chat.postMessage({
           channel: body.user.id,
           text: 'Es gibt aktuell keine Wettkämpfe, für die du dich anmelden kannst, oder es liegt ein technischer Fehler vor. Bitte versuche es später noch einmal.'
         });
+        // Aborts the proccess
         return;
       }
 
@@ -142,6 +122,7 @@ function setupApp(app) {
     }
   );
 
+  // Runs when the /wettkampf-erstellen form is submitted
   app.view(
     constants.competitionCreationView.viewName,
     async ({ body, ack, client }) => {
@@ -176,8 +157,7 @@ function setupApp(app) {
         competition_id: '' // will be set later
       };
 
-      /** @todo */
-      await meldungen_sheets.createNewCompetition(competitionData);
+      await meldungenSheets.createNewCompetition(competitionData);
 
       // Notify admin channel about new competition and who created it
       await client.chat.postMessage(
@@ -206,7 +186,7 @@ function setupApp(app) {
         text: `Deine Wettkampfmeldung wurde von <@${body.user.id}> *bestätigt*.`
       });
 
-      // Optionally update the admin message
+      // Update the admin message
       const blocks = body.message.blocks.slice(0, -1); // Remove the last block (actions)
       blocks.push({
         type: 'context',
@@ -255,7 +235,7 @@ function setupApp(app) {
           `Bitte wende dich an per mail an kdk@schwerathletik-mannheim.de`
       });
 
-      // Optionally update the admin message
+      // Update the admin message
       const blocks = body.message.blocks.slice(0, -1); // Remove the last block (actions)
       blocks.push({
         type: 'context',

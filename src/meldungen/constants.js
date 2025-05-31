@@ -87,6 +87,14 @@ export const nameOfCompetitionSheet = 'Wettk\u00e4mpfe';
 
 /**
  * @readonly
+ */
+export const competitionDropdownPlaceholderOption = {
+  value: 'waiting_for_competitions',
+  text: 'Keine Wettkämpfe gefunden'
+};
+
+/**
+ * @readonly
  * @enum {string}
  */
 export const competitionMainSheetColumns = {
