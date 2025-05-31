@@ -1,4 +1,8 @@
-import { homeView, competitionRegistrationView, competitionCreationView } from './views.js';
+import {
+  homeView,
+  competitionRegistrationView,
+  competitionCreationView
+} from './views.js';
 import * as util from '../general/util.js';
 import * as constants from './constants.js';
 import * as types from './types.js';
@@ -24,21 +28,23 @@ export function getHomeView() {
 export async function getCompetitionRegistrationView(triggerId, user) {
   const view = util.deepCopy(competitionRegistrationView);
   // iterate over blocks to make changes e.g. add options to dropdowns
-  await Promise.all(view.blocks.map(async (block) => {
-    switch (block.block_id) {
-      case constants.competitionRegistrationView.blockCompetitionSelect:
-        await fillCompetitionDropdown(block);
-        break;
-      case constants.competitionRegistrationView.blockWeightClassSelect:
-        fillWeightClassDropdown(block);
-        break;
-      case constants.competitionRegistrationView.blockHandlerNeededSelect:
-        fillHandlerNeededDropdown(block);
-        break;
-      default:
-        break;
-    }
-  }));
+  await Promise.all(
+    view.blocks.map(async (block) => {
+      switch (block.block_id) {
+        case constants.competitionRegistrationView.blockCompetitionSelect:
+          await fillCompetitionDropdown(block);
+          break;
+        case constants.competitionRegistrationView.blockWeightClassSelect:
+          fillWeightClassDropdown(block);
+          break;
+        case constants.competitionRegistrationView.blockHandlerNeededSelect:
+          fillHandlerNeededDropdown(block);
+          break;
+        default:
+          break;
+      }
+    })
+  );
   return { trigger_id: triggerId, view };
 }
 
@@ -63,7 +69,7 @@ async function fillCompetitionDropdown(block) {
     value: competition.id
   }));
 
-  if( optionContents.length > 0) {
+  if (optionContents.length > 0) {
     await fillDropdownOptions(dropdown, optionContents);
   }
 }
@@ -141,10 +147,13 @@ function fillDropdownOptions(dropdown, optionContents) {
  * @param {types.competitionRegistrationData} competitionRegistrationData
  * @returns {import("@slack/web-api").ChatPostMessageArguments}
  */
-export function getUserConfirmMessageCompetitionCreation(competitionRegistrationData) {
+export function getUserConfirmMessageCompetitionCreation(
+  competitionRegistrationData
+) {
   return {
     channel: competitionRegistrationData.slackID,
-    text: `Deine Meldeanfrage wurde mit folgenden Daten erfasst:
+    text:
+      `Deine Meldeanfrage wurde mit folgenden Daten erfasst:
     \nWettkampf: ${competitionRegistrationData.competition_id}` +
       `\nGewichtsklasse: ${competitionRegistrationData.weight_class}` +
       `\nHandler benötigt: ${competitionRegistrationData.handler_needed}` +
@@ -182,7 +191,8 @@ export function getAdminConfirmMessageCompetitionCreation(
 ) {
   return {
     channel: process.env.MELDUNGEN_ADMIN_CHANNEL,
-    text: `Ein neuer Wettkampf wurde erstellt von <@${userId}>:` +
+    text:
+      `Ein neuer Wettkampf wurde erstellt von <@${userId}>:` +
       `\nID: ${competitionData.competition_id}` +
       `\nName: ${competitionData.competition_name}` +
       `\nDatum: ${competitionData.competition_date}` +
@@ -195,7 +205,7 @@ export function getAdminConfirmMessageCompetitionCreation(
  * with the initial state
  * @param {types.competitionRegistrationData} competitionRegistrationData
  */
-export async function saveCompetitionRegistration(competitionRegistrationData){
+export async function saveCompetitionRegistration(competitionRegistrationData) {
   sheet.saveInitialCompetitionRegistration(competitionRegistrationData);
 }
 
@@ -204,15 +214,17 @@ export async function saveCompetitionRegistration(competitionRegistrationData){
  * @param {types.competitionRegistrationData} competitionRegistrationData
  * @returns {import("@slack/web-api").ChatPostMessageArguments}
  */
-export function getAdminConfirmMessageCompetitionRegistration(competitionRegistrationData){
+export function getAdminConfirmMessageCompetitionRegistration(
+  competitionRegistrationData
+) {
   return {
     channel: process.env.MELDUNGEN_ADMIN_CHANNEL,
     text: `Eine neue Wettkampfmeldung wurde eingereicht von <@${competitionRegistrationData.slackID}>:`,
     blocks: [
       {
-        type: "section",
+        type: 'section',
         text: {
-          type: "mrkdwn",
+          type: 'mrkdwn',
           text:
             `*Neue Wettkampfmeldung von <@${competitionRegistrationData.slackID}>*\n` +
             `*Wettkampf:* ${competitionRegistrationData.competition_id}\n` +
@@ -225,25 +237,25 @@ export function getAdminConfirmMessageCompetitionRegistration(competitionRegistr
         }
       },
       {
-        type: "actions",
+        type: 'actions',
         elements: [
           {
-            type: "button",
+            type: 'button',
             text: {
-              type: "plain_text",
-              text: "Bestätigen"
+              type: 'plain_text',
+              text: 'Bestätigen'
             },
-            style: "primary",
+            style: 'primary',
             value: JSON.stringify(competitionRegistrationData),
             action_id: constants.competitionRegistrationAdminActions.confirm
           },
           {
-            type: "button",
+            type: 'button',
             text: {
-              type: "plain_text",
-              text: "Ablehnen"
+              type: 'plain_text',
+              text: 'Ablehnen'
             },
-            style: "danger",
+            style: 'danger',
             value: JSON.stringify(competitionRegistrationData),
             action_id: constants.competitionRegistrationAdminActions.deny
           }

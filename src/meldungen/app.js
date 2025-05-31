@@ -17,7 +17,6 @@ export const meldungenApp = { setupApp, getHomeView: controller.getHomeView };
  * @param {import("@slack/bolt").App} app
  */
 function setupApp(app) {
-
   //* ****************** Commands ******************//
   // Allow a user to register for a competition
   app.command('/wettkampf-meldung', async ({ ack, command, client }) => {
@@ -28,10 +27,10 @@ function setupApp(app) {
     /** @type {masterdataTypes.userContactCard} */
     const user = await masterdataService.getUserContactCardFromId({
       slackId: command.user_id
-    })
+    });
 
     // check if user is registered
-    if (!(user)) {
+    if (!user) {
       // send the register view to the user
       await client.views.open(
         await asController.getRegisterView(command.trigger_id)
@@ -54,7 +53,10 @@ function setupApp(app) {
     if (command.channel_id !== process.env.MELDUNGEN_ADMIN_CHANNEL) {
       await client.chat.postMessage({
         channel: command.user_id,
-        text: 'Dieser Befehl kann nur im <#' + process.env.MELDUNGEN_ADMIN_CHANNEL + '> Kanal verwendet werden.'
+        text:
+          'Dieser Befehl kann nur im <#' +
+          process.env.MELDUNGEN_ADMIN_CHANNEL +
+          '> Kanal verwendet werden.'
       });
       return;
     }
@@ -62,7 +64,6 @@ function setupApp(app) {
     await client.views.open(
       controller.getCompetitionCreationView(command.trigger_id)
     );
-
   });
 
   //* ****************** Views ******************//
@@ -76,11 +77,12 @@ function setupApp(app) {
       const selectedValues = body.view.state.values;
 
       /** @type {masterdataTypes.user} */
-      const user_data_from_sheet = await masterdataService.getUserFromId({slackId: body.user.id});
+      const user_data_from_sheet = await masterdataService.getUserFromId({
+        slackId: body.user.id
+      });
 
       /** @type {types.competitionRegistrationData} */
       const competitionRegistrationData = {
-
         slackID: body.user.id,
         first_name: user_data_from_sheet.firstname,
         last_name: user_data_from_sheet.lastname,
@@ -111,16 +113,18 @@ function setupApp(app) {
             .files[0].permalink
       };
 
-      if(competitionRegistrationData.competition_id === 'waiting_for_competitions'){
+      if (
+        competitionRegistrationData.competition_id ===
+        'waiting_for_competitions'
+      ) {
         await client.chat.postMessage({
           channel: body.user.id,
-          text: 'Es gibt aktuell keine Wettkämpfe, für die du dich anmelden kannst, oder es liegt ein technischer Fehler vor. Bitte versuche es später noch einmal.'});
+          text: 'Es gibt aktuell keine Wettkämpfe, für die du dich anmelden kannst, oder es liegt ein technischer Fehler vor. Bitte versuche es später noch einmal.'
+        });
         return;
       }
 
-      controller.saveCompetitionRegistration(
-        competitionRegistrationData
-      );
+      controller.saveCompetitionRegistration(competitionRegistrationData);
 
       // Send to admin channel for validation
       await client.chat.postMessage(
@@ -131,9 +135,10 @@ function setupApp(app) {
 
       // Send confirmation message to user
       await client.chat.postMessage(
-        await controller.getUserConfirmMessageCompetitionCreation(competitionRegistrationData)
+        await controller.getUserConfirmMessageCompetitionCreation(
+          competitionRegistrationData
+        )
       );
-
     }
   );
 
@@ -146,10 +151,11 @@ function setupApp(app) {
 
       const selectedValues = body.view.state.values;
 
-
       // convert selected date to our format
-      const dateInput = selectedValues[constants.competitionCreationView.blockCompetitionDate]
-      [constants.competitionCreationView.actionCompetitionDate].selected_date;
+      const dateInput =
+        selectedValues[constants.competitionCreationView.blockCompetitionDate][
+          constants.competitionCreationView.actionCompetitionDate
+        ].selected_date;
 
       const convertedCompetitionDate = util.formatDate(
         /** @type {Date} */
@@ -159,14 +165,15 @@ function setupApp(app) {
       /** @type {types.competitionData} */
       const competitionData = {
         competition_name:
-          selectedValues[constants.competitionCreationView.blockCompetitionName]
-            [constants.competitionCreationView.actionCompetitionName].value,
+          selectedValues[
+            constants.competitionCreationView.blockCompetitionName
+          ][constants.competitionCreationView.actionCompetitionName].value,
         competition_date: convertedCompetitionDate,
         competition_location:
           selectedValues[
             constants.competitionCreationView.blockCompetitionLocation
           ][constants.competitionCreationView.actionCompetitionLocation].value,
-        competition_id: '', // will be set later
+        competition_id: '' // will be set later
       };
 
       /** @todo */
@@ -179,98 +186,102 @@ function setupApp(app) {
           body.user.id
         )
       );
-
     }
   );
 
-
   //* ****************** Actions ******************//
-  app.action(constants.competitionRegistrationAdminActions.confirm, async ({ ack, body, client, action }) => {
-    await ack();
-    // already send HTTP 200 that slack does not time out
-    await awsRtAPI.sendResponse();
+  app.action(
+    constants.competitionRegistrationAdminActions.confirm,
+    async ({ ack, body, client, action }) => {
+      await ack();
+      // already send HTTP 200 that slack does not time out
+      await awsRtAPI.sendResponse();
 
-    // get the competition registration data from the action value
-    const data = JSON.parse(action.value);
+      // get the competition registration data from the action value
+      const data = JSON.parse(action.value);
 
+      // Notify user
+      await client.chat.postMessage({
+        channel: data.slackID,
+        text: `Deine Wettkampfmeldung wurde von <@${body.user.id}> *bestätigt*.`
+      });
 
-    // Notify user
-    await client.chat.postMessage({
-      channel: data.slackID,
-      text: `Deine Wettkampfmeldung wurde von <@${body.user.id}> *bestätigt*.`
-    });
+      // Optionally update the admin message
+      const blocks = body.message.blocks.slice(0, -1); // Remove the last block (actions)
+      blocks.push({
+        type: 'context',
+        elements: [
+          {
+            type: 'mrkdwn',
+            text: `:heavy_check_mark: Angenommen von <@${body.user.id}>`
+          }
+        ]
+      });
 
-    // Optionally update the admin message
-    const blocks = body.message.blocks.slice(0, -1); // Remove the last block (actions)
-    blocks.push({
-      type: "context",
-      elements: [
-        {
-          type: "mrkdwn",
-          text: `:heavy_check_mark: Angenommen von <@${body.user.id}>`
-        }
-      ]
-    });
+      await client.chat.update({
+        channel: body.channel.id,
+        ts: body.message.ts,
+        blocks,
+        text: `Die Wettkampfmeldung von <@${data.slackID}> wurde durch <@${body.user.id}> *angenommen*.`
+      });
 
-    await client.chat.update({
-      channel: body.channel.id,
-      ts: body.message.ts,
-      blocks,
-      text: `Die Wettkampfmeldung von <@${data.slackID}> wurde durch <@${body.user.id}> *angenommen*.`
-    });
+      // get the competition registration data from the action value
+      /** @type {types.competitionRegistrationData} */
+      const competitionRegistrationData = JSON.parse(action.value);
 
-    // get the competition registration data from the action value
-    /** @type {types.competitionRegistrationData} */
-    const competitionRegistrationData = JSON.parse(action.value);
+      // update the row in the competition sheet with the new state
+      await meldungen_sheets.updateCompetitionRegistrationState(
+        competitionRegistrationData,
+        constants.competitionRegistrationState.okay
+      );
+    }
+  );
 
-    // update the row in the competition sheet with the new state
-    await meldungen_sheets.updateCompetitionRegistrationState(
-      competitionRegistrationData,
-      constants.competitionRegistrationState.okay
-    );
-  });
+  app.action(
+    constants.competitionRegistrationAdminActions.deny,
+    async ({ ack, body, client, action }) => {
+      await ack();
+      // already send HTTP 200 that slack does not time out
+      await awsRtAPI.sendResponse();
 
-  app.action(constants.competitionRegistrationAdminActions.deny, async ({ ack, body, client, action }) => {
-    await ack();
-    // already send HTTP 200 that slack does not time out
-    await awsRtAPI.sendResponse();
+      // get the competition registration data from the action value
+      const data = JSON.parse(action.value);
 
-    // get the competition registration data from the action value
-    const data = JSON.parse(action.value);
+      // Notify user
+      await client.chat.postMessage({
+        channel: data.slackID,
+        text:
+          `Deine Wettkampfmeldung wurde von <@${body.user.id}> *abgelehnt*.` +
+          `Bitte wende dich an per mail an kdk@schwerathletik-mannheim.de`
+      });
 
-    // Notify user
-    await client.chat.postMessage({
-      channel: data.slackID,
-      text: `Deine Wettkampfmeldung wurde von <@${body.user.id}> *abgelehnt*.` +
-        `Bitte wende dich an per mail an kdk@schwerathletik-mannheim.de`
-    });
+      // Optionally update the admin message
+      const blocks = body.message.blocks.slice(0, -1); // Remove the last block (actions)
+      blocks.push({
+        type: 'context',
+        elements: [
+          {
+            type: 'mrkdwn',
+            text: `:x: Abgelehnt von <@${body.user.id}>`
+          }
+        ]
+      });
 
-    // Optionally update the admin message
-    const blocks = body.message.blocks.slice(0, -1); // Remove the last block (actions)
-    blocks.push({
-      type: "context",
-      elements: [
-        {
-          type: "mrkdwn",
-          text: `:x: Abgelehnt von <@${body.user.id}>`
-        }
-      ]
-    });
+      await client.chat.update({
+        channel: body.channel.id,
+        ts: body.message.ts,
+        blocks,
+        text: `Die Wettkampfmeldung von <@${data.slackID}> wurde durch <@${body.user.id}> *abgelehnt*.`
+      });
 
-    await client.chat.update({
-      channel: body.channel.id,
-      ts: body.message.ts,
-      blocks,
-      text: `Die Wettkampfmeldung von <@${data.slackID}> wurde durch <@${body.user.id}> *abgelehnt*.`
-    });
+      // get the competition registration data from the action value
+      const competitionRegistrationData = JSON.parse(action.value);
 
-    // get the competition registration data from the action value
-    const competitionRegistrationData = JSON.parse(action.value);
-
-     // update the row in the competition sheet with the new state
-    await meldungen_sheets.updateCompetitionRegistrationState(
-      competitionRegistrationData,
-      constants.competitionRegistrationState.problem
-    );
-  });
+      // update the row in the competition sheet with the new state
+      await meldungen_sheets.updateCompetitionRegistrationState(
+        competitionRegistrationData,
+        constants.competitionRegistrationState.problem
+      );
+    }
+  );
 }

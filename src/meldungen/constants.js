@@ -95,7 +95,7 @@ export const competitionMainSheetColumns = {
   competitionDate: '2',
   competitionLocation: '3',
   googleSheetsLink: '4'
-}
+};
 
 /**
  * @readonly
@@ -108,7 +108,7 @@ export const competitionSheetColumns = {
   weightClass: '3',
   status: '4',
   handlerNeeded: '5'
-}
+};
 
 /**
  * @readonly
@@ -119,4 +119,4 @@ export const competitionRegistrationState = {
   okay: 'In Ordnung',
   problem: 'Problem',
   registered: 'Gemeldet'
-}
+};

@@ -190,4 +190,4 @@ export const competitionCreationView = {
       }
     }
   ]
-}
+};

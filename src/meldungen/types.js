@@ -35,6 +35,4 @@
  * @property {string} payment_record_file_permalink
  */
 
-
-
 export {};
