@@ -137,7 +137,7 @@ function setupApp(app) {
     async ({ ack, client, body }) => {
       await ack();
 
-      client.views.open(
+      await client.views.open(
         controller.getAddAnswerView(
           /** @type {import('@slack/bolt').BlockButtonAction} */ (body)
         )
@@ -149,7 +149,7 @@ function setupApp(app) {
   app.view(constants.viewNames.creationModal, async ({ body, ack, client }) => {
     // validate user inputs
     try {
-      controller.validateInputs(body, client);
+      await controller.validateInputs(body, client);
     } catch (error) {
       if (error instanceof SlackViewSubmissionError) {
         await ack(error.getAckObject());

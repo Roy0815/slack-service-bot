@@ -42,7 +42,11 @@ function moveUserLineToObject(userLine) {
     birthday: userLine[allgDatenColumns.birthday - 1],
     email: userLine[allgDatenColumns.email - 1],
     phone: userLine[allgDatenColumns.phone - 1],
-    slackId: userLine[allgDatenColumns.slackId - 1]
+    slackId: userLine[allgDatenColumns.slackId - 1],
+    street: userLine[allgDatenColumns.street - 1],
+    houseNumber: userLine[allgDatenColumns.houseNumber - 1],
+    zip: userLine[allgDatenColumns.zip - 1],
+    city: userLine[allgDatenColumns.city - 1]
   };
 }
 
@@ -63,7 +67,11 @@ function moveUserLineToContactCard(userLine) {
     birthday: userLine[allgDatenColumns.birthday - 1],
     email: userLine[allgDatenColumns.email - 1],
     phone: userLine[allgDatenColumns.phone - 1],
-    slackId: userLine[allgDatenColumns.slackId - 1]
+    slackId: userLine[allgDatenColumns.slackId - 1],
+    street: userLine[allgDatenColumns.street - 1],
+    houseNumber: userLine[allgDatenColumns.houseNumber - 1],
+    zip: userLine[allgDatenColumns.zip - 1],
+    city: userLine[allgDatenColumns.city - 1]
   };
 }
 
@@ -76,7 +84,10 @@ function moveUserLineToContactCard(userLine) {
 async function getUserFromId({ id, slackId }) {
   if (!id && !slackId) return undefined;
 
-  const data = await sheet.getCells(process.env.SPREADSHEET_ID_MASTERDATA, allgDatenSheetName);
+  const data = await sheet.getCells(
+    process.env.SPREADSHEET_ID_MASTERDATA,
+    allgDatenSheetName
+  );
   if (!data) return undefined;
 
   // search by ID
@@ -104,7 +115,10 @@ async function getUserContactCardFromId({ id, slackId }) {
   if (!id && !slackId) return undefined;
 
   /** @type {string[][]} */
-  const data = await sheet.getCells(process.env.SPREADSHEET_ID_MASTERDATA, allgDatenSheetName);
+  const data = await sheet.getCells(
+    process.env.SPREADSHEET_ID_MASTERDATA,
+    allgDatenSheetName
+  );
   if (!data) return undefined;
 
   // get by line or slack ID
@@ -169,7 +183,10 @@ async function isUserRegistered(ids) {
  * @returns {Promise<types.user[]>}
  */
 async function getAllActiveUsers() {
-  const array = await sheet.getCells(process.env.SPREADSHEET_ID_MASTERDATA, allgDatenSheetName);
+  const array = await sheet.getCells(
+    process.env.SPREADSHEET_ID_MASTERDATA,
+    allgDatenSheetName
+  );
   if (!array) return [];
 
   array.shift();

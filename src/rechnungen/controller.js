@@ -4,7 +4,8 @@ import fetch from 'node-fetch';
 import stream from 'node:stream';
 
 import * as types from './types.js';
-// import { read } from 'node:fs';
+import * as util from '../general/util.js';
+import * as views from './views.js';
 
 //* ******************* Private functions ********************//
 /**
@@ -82,4 +83,36 @@ export async function uploadFileToDriveFolder(file) {
       body: readStream
     }
   });
+}
+
+/**
+ * Upload file to specified folder
+ * @param {types.fileInformation} file
+ * @param {string} approverChannel
+ * @returns {import("@slack/web-api").ChatPostMessageArguments}
+ */
+export function getUploadFailureMessage(file, approverChannel) {
+  const view = util.deepCopy(views.uploadFailureMessage);
+
+  // set channel for message
+  view.channel = approverChannel;
+
+  // set text in notification
+  view.text = `Beim Hochladen der Datei \`${file.fileName}\` ist ein Fehler aufgetreten. Bitte versuche es erneut.`;
+
+  // required for correct typing
+  if ('blocks' in view) {
+    // save file info in button
+    /** @type {import('@slack/types').Button } */ (
+      /** @type {import('@slack/types').SectionBlock } */ (view.blocks[0])
+        .accessory
+    ).value = JSON.stringify(file);
+
+    // set text in block
+    /** @type {import('@slack/types').SectionBlock } */ (
+      view.blocks[0]
+    ).text.text = view.text;
+  }
+
+  return view;
 }

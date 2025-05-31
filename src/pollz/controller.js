@@ -125,7 +125,6 @@ export function deleteAnswer({ id, hash, blocks }, { value }) {
 
 /**
  * Get initial poll message after sending poll
-
  * @param {import('@slack/bolt').SlackViewAction} viewAction
  * @returns {import('@slack/web-api').ChatPostMessageArguments}
  */
@@ -284,7 +283,6 @@ export function answerOptionsValid({ view }) {
 
 /**
  * vote, remove vote and remove all votes of user
-
  * @param {import("@slack/bolt").BlockAction} body
  * @param {import("@slack/bolt").ButtonAction} [action] undefined means delete all answers of user
  * @returns {import("@slack/bolt").RespondArguments}

@@ -256,7 +256,7 @@ function setupApp(app) {
   app.action(
     // eslint-disable-next-line prefer-regex-literals
     new RegExp(
-      `^(${constants.maintenanceApproval.approveButton})(${constants.maintenanceApproval.rejectButton})$`
+      `^(${constants.maintenanceApproval.approveButton})|(${constants.maintenanceApproval.rejectButton})$`
     ),
     async ({ ack, action, client, respond, body }) => {
       await ack();
@@ -407,6 +407,9 @@ function setupApp(app) {
   app.event('team_join', async ({ event, client }) => {
     // log in case of bot user analysis
     console.log(event);
+
+    // ignore bot users
+    if (event.user && event.user.is_bot) return;
 
     await client.chat.postMessage(
       await controller.getAutoRegisterMessage(event.user.id)

@@ -5,9 +5,12 @@
  * @returns {string} formatted time
  */
 export function formatTime(date) {
-  return `${date.getHours() < 10 ? '0' : ''}${date.getHours()}:${
-    date.getMinutes() < 10 ? '0' : ''
-  }${date.getMinutes()}`;
+  // only way to adjust time zone natively in JavaScript
+  const dateString = date.toLocaleString('de-DE', {
+    timeZone: 'Europe/Berlin'
+  });
+
+  return dateString.split(', ')[1].slice(0, 5); // HH:mm
 }
 
 /**
@@ -16,9 +19,17 @@ export function formatTime(date) {
  * @returns {string} formatted date
  */
 export function formatDate(date) {
-  return `${date.getDate() < 10 ? '0' : ''}${date.getDate()}.${
-    date.getMonth() + 1 < 10 ? '0' : ''
-  }${date.getMonth() + 1}.${date.getFullYear()}`;
+  // only way to adjust time zone natively in JavaScript
+  const dateArray = date
+    .toLocaleString('de-DE', {
+      timeZone: 'Europe/Berlin'
+    })
+    .split(', ')[0]
+    .split('.');
+
+  return `${dateArray[0].length === 1 ? '0' : ''}${dateArray[0]}.${
+    dateArray[1].length === 1 ? '0' : ''
+  }${dateArray[1]}.${dateArray[2]}`; // DD.MM.YYYY
 }
 
 /**

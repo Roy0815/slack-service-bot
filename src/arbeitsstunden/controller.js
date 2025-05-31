@@ -40,7 +40,7 @@ export function getHoursDisplayResponse(hoursObj, yearText) {
     ]
   };
 
-  // build message blocks
+  // build message blocks (50 blocks limit), text field limit is 3000 chars
   if (hoursObj.details.length > 0) {
     response.blocks.push(
       {
@@ -58,12 +58,44 @@ export function getHoursDisplayResponse(hoursObj, yearText) {
       }
     );
 
+    const detailsTextArray = [];
+
+    // save details in blocks of max 3000 chars
     hoursObj.details.forEach((element) => {
+      // max 50 blocks
+      if (response.blocks.length + detailsTextArray.length >= 50) return;
+      if (response.blocks.length + detailsTextArray.length === 49) {
+        detailsTextArray.push(
+          '...Es konnten nicht alle Einsätze angezeigt werden, du arbeitest einfach zu viel. Du bist eine Maschine! Danke für deinen Einsatz!'
+        );
+        return;
+      }
+
+      // 4 tab for single digit hours, 3 tab for double digit hours, 2 tab for decimals
+      const text = `*${element.date}*\t${element.hours}\t\t${element.hours >= 10 ? ' ' : `\t`}${element.hours % 1 !== 0 ? '' : `\t`}_${element.description}_`;
+
+      if (
+        detailsTextArray.length >= 1 &&
+        detailsTextArray[detailsTextArray.length - 1].length + text.length <=
+          3000
+      ) {
+        detailsTextArray[detailsTextArray.length - 1] += `\n${text}`;
+        return;
+      }
+
+      // add new block if length is exceeded
+      detailsTextArray.push(
+        `*${element.date}*\t${element.hours}\t\t\t\t_${element.description}_`
+      );
+    });
+
+    // add formatted texts into blocks
+    detailsTextArray.forEach((element) => {
       response.blocks.push({
         type: 'section',
         text: {
           type: 'mrkdwn',
-          text: `*${element.date}*\t${element.hours}\t\t\t\t_${element.description}_`
+          text: element
         }
       });
     });
@@ -348,7 +380,7 @@ export function getUserMaintainEndMessage(hoursMaintFinalizer) {
       hoursMaintFinalizer.hours
     } Stunden am ${util.formatDate(dateObj)} für "${
       hoursMaintFinalizer.description
-    }" wurde ${hoursMaintFinalizer.approved ? 'genehmigt' : 'abgelehnt'}.`
+    }" wurde \`${hoursMaintFinalizer.approved ? 'genehmigt' : 'abgelehnt'}\`.`
   };
 }
 
