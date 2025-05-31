@@ -10,21 +10,23 @@ Slack Bot für administrative Aufgaben innerhalb Schwerathletik Mannheim 2018 e.
 
 ## Setup
 
-Die aktuelle Version des Bots ist für die Ausführung als AWS Lambda Funktion ausgelegt. In der Vergangenheit gab es Versionen als Docker Image, welches auf einem privaten Server oder auf Docker Cloud Services (wie z.B. Google Cloud Run) laufen kann.
+Die aktuelle Version des Bots ist für die Ausführung als AWS Lambda Funktion ausgelegt. Zu Testzwecken wird AWS Lambda mit serverless-offline emuliert.
 
-Ich habe in diesem Dokument versucht das Setup des Bots von Infrastrukutur, Slack und Endanwender Seite zu erläutern.
+Dieses Dokument versucht das Setup des Bots von Infrastrukutur, Slack und Endanwender Seite zu erläutern.
 
-**Wo immer möglich habe ich Links zu Guides eingefügt. Trotzdem kann hier oder auch an anderen Stellen eine kurze Google Recherche notwendig sein.**
+**Wo immer möglich wurden Links zu Guides eingefügt, trotzdem kann hier oder auch an anderen Stellen eine kurze Google Recherche notwendig sein.**
 
 1. [Google APIs einrichten](#1-google-apis-einrichten)
-1. [Google und Slack Zugangsdaten holen](#2-google-und-slack-zugangsdaten-holen)
-1. [AWS Lambda aufsetzen](#3-aws-lambda-aufsetzen) **(die aktuelle Version des Bots ist für AWS Lambda ausgelegt, die Docker Version des Bots ist in [Release v2](https://github.com/Roy0815/slack-service-bot/releases/tag/v2.1.0) zu finden)**
-1. [Slack App Konfiguration](#4-slack-app-konfiguration)
+2. [Google und Slack Zugangsdaten holen](#2-google-und-slack-zugangsdaten-holen)
+3. [AWS Lambda aufsetzen](#3-aws-lambda-aufsetzen) **(die aktuelle Version des Bots ist für AWS Lambda ausgelegt, die Docker Version des Bots ist in [Release v2](https://github.com/Roy0815/slack-service-bot/releases/tag/v2.1.0) zu finden)**
+4. [Slack App Konfiguration](#4-slack-app-konfiguration)
 
 ### **1. Google APIs einrichten**
 
+**Zu Testzwecken wird keine Google Cloud Console und auch kein Dienstaccount benötigt. Ein normaler Google Account genügt, um der App Zugriff auf Drive/Sheets zu geben**
+
 Für die Integration mit Google Sheets und Google Drive werden die offiziellen Google APIs genutzt, die über eine sehr gute [Dokumentation](https://developers.google.com/) verfügt.
-In der [Google Cloud Console](console.cloud.google.com/welcome) können die persönlichen Projekte eingesehen werden. Das Projekt hängt in der Schwerathletik Mannheim Organisation und mehrere Nutzer von uns sind Inhaber.
+In der [Google Cloud Console](https://console.cloud.google.com/welcome) können die persönlichen Projekte eingesehen werden. Das Projekt hängt in der Schwerathletik Mannheim Organisation und mehrere Nutzer von uns sind Inhaber.
 
 Die benötigten APIs müssen im Projekt aktiviert werden:
 [Google Sheets API](https://console.cloud.google.com/apis/api/sheets.googleapis.com)
@@ -46,7 +48,9 @@ Wenn du allen Schritten im Punkt [1. Google APIs einrichten](#1-google-apis-einr
 
 ### **3. AWS Lambda aufsetzen**
 
-Bevor mit dem AWS Lambda Setup gestartet wird, muss eine lokale .env Datei angelegt werden. Eine Vorlage werde ich noch nachreichen. Hier werden alle Variablen definiert, die früher in der docker-compose.yml gepflegt wurden. Zusätzlich werden auch die Daten des Bot Benutzers für Google Sheets ab jetzt als Environment Variablen (Beispiel in [`example.env`](example.env)) gespeichert und nicht in der secrets.json Datei.
+Bevor mit dem AWS Lambda Setup gestartet wird, muss eine lokale .env Datei angelegt werden. Hier werden alle Variablen definiert, die die Umgebung benötigt. Zusätzlich werden auch die Daten des Bot Benutzers für Google Sheets als Environment Variablen gespeichert. (Beispiel in [`example.env`](example.env))
+
+**Zu Testzwecken wird AWS Lambda durch serverless-offline emuliert. Zu diesem Zweck kann das erste Kapitel des Guides [Set up AWS Lambda](https://tools.slack.dev/bolt-js/deployments/aws-lambda/#set-up-aws-lambda) übersprungen werden. Die Alternative wird im späteren Kapitel [Run the app locally](https://tools.slack.dev/bolt-js/deployments/aws-lambda/#run-the-app-locally) erklärt.**
 
 Dem [Guide](https://tools.slack.dev/bolt-js/deployments/aws-lambda/) bei Slack für AWS Lambda folgen.
 
@@ -76,7 +80,7 @@ serverless deploy
 
 ### **4. Slack App Konfiguration**
 
-_Hier gehe ich nur auf die technische und nicht die optische Konfiguration der App ein._
+_Hier wird nur auf die technische und nicht die optische Konfiguration der App eingegangen._
 
 Wenn du in deinem Slack Workspace angemeldet bist kannst du [hier](https://api.slack.com/apps) deine Slack Apps sehen. Hast du deine App ausgewählt kannst du die Details bearbeiten.
 
@@ -138,9 +142,9 @@ Die [`serverless.yml`](serverless.yml) ist außerdem so konfiguriert, dass eine 
 Arbeitsstunden stellt die Kommandos `/arbeitsstunden_anzeigen` und `/arbeitsstunden_erfassen` zur Verfügung. Außerdem konsumiert dieser Teil das Event `team_join` um die Verknüpfung zwischen Slack-ID und Mitglieder-Excel herzustellen.
 Alle Genehmigungen laufen über den Admin Channel, welcher im Sheet Sheet `Summe Stunden x` (siehe unten) im aktuellen Jahr hinterlegt ist.
 
-Für diesen Bereich müssen die Environment Variablen `SHEET_ID`, `GOOGLE_SERVICE_ACC_EMAIL` und `GOOGLE_SERVICE_ACC_PRIVATE_KEY` gefüllt werden (Beispiel [`example.env`](example.env)).
+Für diesen Bereich müssen die Environment Variablen `SPREADSHEET_ID_MASTERDATA`, `GOOGLE_SERVICE_ACC_EMAIL` und `GOOGLE_SERVICE_ACC_PRIVATE_KEY` gefüllt werden (Beispiel [`example.env`](example.env)).
 
-Die `SHEET_ID` findet man in der URL der Tabelle um die es geht. Sie steht zwischen `docs.google.com/spreadsheets/d/` und dem nächsten `/`.
+Die `SPREADSHEET_ID_MASTERDATA` findet man in der URL der Tabelle um die es geht. Sie steht zwischen `docs.google.com/spreadsheets/d/` und dem nächsten `/`.
 
 Bei die beiden Variablen `GOOGLE_SERVICE_ACC_EMAIL` und `GOOGLE_SERVICE_ACC_PRIVATE_KEY` findet man in der Datei aus dem Schritt [Google Zugangsdaten holen](#2-google-und-slack-zugangsdaten-holen).
 
@@ -210,14 +214,14 @@ Da Docker das Testen in der Produktivumgebung etwas verlangsamt und man im Zweif
 
 #### 2.2 Testen mit lokalem Server
 
-Die zweite, etwas geschicktere Möglichkeit ist es, das fertige Docker Image direkt als Container auf seiner lokalen Maschine zu starten.
+Die zweite, etwas geschicktere Möglichkeit ist es, das Projekt auf der lokalen Maschine zu starten.
 Mit AWS Lambda und dem "serverless offline" Paket läuft das relativ identisch. Die Funktion kann einfach per Befehl gestartet werden:
 
 ```
 serverless offline --noPrependStageInUrl
 ```
 
-Dieser Server / diese Funktion muss dann öffentlich im Internet verfügbar gemacht werden. Ich habe das mit [ngrok](https://ngrok.com) erreicht. Hier habe ich die .exe heruntergeladen, per Befehl meinen API Key aus dem ngrok Account gesetzt und dann mit einem Befehl den localhost mit Docker Container Port öffentlich verfügbar gemacht unter einer ngrok Webadresse. Diese kann man dann bei Slack hinterlegen und den lokalen Docker Container/ die Lambda Funktion ansteuern.
+Dieser Server / diese Funktion muss dann öffentlich im Internet verfügbar gemacht werden. Ich habe das mit [ngrok](https://ngrok.com) erreicht. Erstelle einen gratis Account und [Folge den Setupanweisungen für dein Betriebssystem und denen für NodeJS](https://dashboard.ngrok.com/get-started/setup/)
 
 ```bash
 .\ngrok.exe http http://localhost:8080

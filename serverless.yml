@@ -13,7 +13,7 @@ provider:
     SLACK_BOT_TOKEN: ${env:SLACK_BOT_TOKEN}
     APP_ADMIN: ${env:APP_ADMIN}
     PORT: ${env:PORT}
-    SHEET_ID: ${env:SHEET_ID}
+    SPREADSHEET_ID_MASTERDATA: ${env:SPREADSHEET_ID_MASTERDATA}
     GOOGLE_SERVICE_ACC_EMAIL: ${env:GOOGLE_SERVICE_ACC_EMAIL}
     GOOGLE_SERVICE_ACC_PRIVATE_KEY: ${env:GOOGLE_SERVICE_ACC_PRIVATE_KEY}
     STAETTE_CHANNEL: ${env:STAETTE_CHANNEL}
@@ -31,7 +31,7 @@ package:
 
 functions:
   slack-service-bot:
-    handler: app.handler
+    handler: ./src/app.handler
     events:
       - http:
           path: slack/events
