@@ -210,7 +210,7 @@ function setupApp(app) {
       const competitionRegistrationData = JSON.parse(action.value);
 
       // update the row in the competition sheet with the new state
-      await meldungen_sheets.updateCompetitionRegistrationState(
+      await meldungenSheets.updateCompetitionRegistrationState(
         competitionRegistrationData,
         constants.competitionRegistrationState.okay
       );
@@ -258,7 +258,7 @@ function setupApp(app) {
       const competitionRegistrationData = JSON.parse(action.value);
 
       // update the row in the competition sheet with the new state
-      await meldungen_sheets.updateCompetitionRegistrationState(
+      await meldungenSheets.updateCompetitionRegistrationState(
         competitionRegistrationData,
         constants.competitionRegistrationState.problem
       );

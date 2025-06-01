@@ -35,7 +35,7 @@ export async function getCompetitionRegistrationView(triggerId, user) {
           await fillCompetitionDropdown(block);
           break;
         case constants.competitionRegistrationView.blockWeightClassSelect:
-          fillWeightClassDropdown(block);
+          fillWeightClassDropdown(block, user);
           break;
         case constants.competitionRegistrationView.blockHandlerNeededSelect:
           fillHandlerNeededDropdown(block);
@@ -77,12 +77,23 @@ async function fillCompetitionDropdown(block) {
 /**
  * Fills the weight class dropdown with the weight classes for the athletes sex
  * @param {import('@slack/types').AnyBlock} block
+ * @param {masterdataTypes.user} user
  */
-async function fillWeightClassDropdown(block) {
+async function fillWeightClassDropdown(block, user) {
   /** @todo get weight class array depending on sex */
+  const weightClasses = [];
+  switch (user.sex) {
+    case masterdataTypes.userSex.female:
+      weightClasses.push(...Object.values(constants.weightClassesFemale));
+      break;
+    case masterdataTypes.userSex.male:
+      weightClasses.push(...Object.values(constants.weightClassesMale));
+      break;
+    default:
+      weightClasses.push(...Object.values(constants.weightClassesFemale));
+      weightClasses.push(...Object.values(constants.weightClassesMale));
+  }
 
-  const weightClasses = Object.values(constants.weightClassesFemale);
-  weightClasses.push(...Object.values(constants.weightClassesMale));
   const inputBlock =
     /** @type {import('@slack/types').InputBlock} */
     (block);
@@ -196,7 +207,8 @@ export function getAdminConfirmMessageCompetitionCreation(
       `\nID: ${competitionData.competition_id}` +
       `\nName: ${competitionData.competition_name}` +
       `\nDatum: ${competitionData.competition_date}` +
-      `\nOrt: ${competitionData.competition_location}`
+      `\nOrt: ${competitionData.competition_location}` +
+      `\nhttps://docs.google.com/spreadsheets/d/${process.env.SPREADSHEET_ID_MELDUNGEN}/edit#gid=${competitionData.competition_id}`
   };
 }
 

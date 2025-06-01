@@ -1,14 +1,7 @@
 # Verbesserungen User-Sicht
-## Command /wettkampf-erstellen
-- Nachricht verbessern
-  - Link zu google sheet einfügen
-- Modal:
-  - Alle Eingeben verplfichtend machen
-
 
 ## Command /wettkampf-meldung
 - Modal:
-  - Geschlecht herausfinden und gewichtsklassen daran anpassen
   - Feld für "bemerkungen" -> Landet in Nachrichten an User und Admins, aber nicht im Sheet
 - Nachricht an user nach anmeldung
   - Zu wettkampf-ID auch die anderen Daten des Wettkampfs angeben
@@ -21,6 +14,8 @@
 - Verhindern, dass ein User sich doppelt für einen Wettkampf meldet
 
 # Briefing für testing:
+Vor test: Stammdaten zum Laufen bekommen, damit man sich registrieren kann
+
 Bisher habe ich versucht unseren exisiterenden Workflow der Meldungen per Mail zu automatisieren ohne inhaltlich viel daran zu ändern.
 1. Fallen dir irgendwelche Fehler and der Umsetzung auf?
    1. Ist irgendein text falsch oder verwirrend
