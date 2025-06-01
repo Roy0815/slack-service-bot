@@ -8,10 +8,24 @@ import { sheets_v4 } from 'googleapis/build/src/apis/sheets/index.js';
 /**
  * Creates a new competition in the spreadsheet
  * @param {types.competitionData} competitionData
+ * @returns {Promise<boolean>} return false if the competition already exists
  */
 export async function createNewCompetition(competitionData) {
+  // check if the competition already exists
+  const competitions = await getLiveCompetitions();
+  const existingCompetition = competitions.find(
+    (competition) =>
+      competition.name === competitionData.name &&
+      competition.date === competitionData.date &&
+      competition.location === competitionData.location
+  );
+  if (existingCompetition) {
+    return false; // competition already exists
+  }
+
   const newSheetName = await createNewCompetitionSheet(competitionData);
   appendCompetitionDataToMainSheet(competitionData, newSheetName);
+  return true;
 }
 
 /**

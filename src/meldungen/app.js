@@ -170,7 +170,21 @@ function setupApp(app) {
         ID: '' // will be set later
       };
 
-      await meldungenSheets.createNewCompetition(competitionData);
+      if (
+        (await meldungenSheets.createNewCompetition(competitionData)) === false
+      ) {
+        await client.chat.postMessage({
+          channel: body.user.id,
+          text:
+            `Wettkampf erstellen fehlgeschlagen!\n\n` +
+            `Ein Wettkampf mit diesen Daten:\n` +
+            `\t*Name:* ${competitionData.name}\n` +
+            `\t*Datum:* ${competitionData.date}\n` +
+            `\t*Ort:* ${competitionData.location}\n` +
+            `existiert bereits!`
+        });
+        return;
+      }
 
       // Notify admin channel about new competition and who created it
       await client.chat.postMessage(
