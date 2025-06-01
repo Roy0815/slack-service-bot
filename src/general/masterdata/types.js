@@ -12,6 +12,7 @@
  * @property {string} leaveDate
  * @property {string} slackId
  * @property {string} birthday
+ * @property {userSex} sex
  * @property {string} email
  * @property {string} phone
  * @property {string} street
@@ -19,6 +20,15 @@
  * @property {string} zip
  * @property {string} city
  */
+
+/**
+ * @readonly
+ * @enum {string}
+ */
+export const userSex = {
+  male: 'm',
+  female: 'w'
+};
 
 /**
  * @typedef {object} userMaintenanceDetails
