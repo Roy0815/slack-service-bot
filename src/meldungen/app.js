@@ -85,13 +85,13 @@ function setupApp(app) {
 
       /** @type {types.competitionRegistrationData} */
       const competitionRegistrationData =
-        controller.extractCompetitionRegistrationData(
+        await controller.extractCompetitionRegistrationData(
           selectedValues,
           userDataFromSheet
         );
 
       if (
-        competitionRegistrationData.competition_id ===
+        competitionRegistrationData.competition.ID ===
         constants.competitionDropdownPlaceholderOption.value
       ) {
         // Happens when the user selects the placeholder option.
@@ -145,16 +145,15 @@ function setupApp(app) {
 
       /** @type {types.competitionData} */
       const competitionData = {
-        competition_name:
-          selectedValues[
-            constants.competitionCreationView.blockCompetitionName
-          ][constants.competitionCreationView.actionCompetitionName].value,
-        competition_date: convertedCompetitionDate,
-        competition_location:
+        name: selectedValues[
+          constants.competitionCreationView.blockCompetitionName
+        ][constants.competitionCreationView.actionCompetitionName].value,
+        date: convertedCompetitionDate,
+        location:
           selectedValues[
             constants.competitionCreationView.blockCompetitionLocation
           ][constants.competitionCreationView.actionCompetitionLocation].value,
-        competition_id: '' // will be set later
+        ID: '' // will be set later
       };
 
       await meldungenSheets.createNewCompetition(competitionData);

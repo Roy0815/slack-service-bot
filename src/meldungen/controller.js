@@ -60,13 +60,14 @@ async function fillCompetitionDropdown(block) {
     /** @type {import('@slack/types').StaticSelect} */
     (inputBlock.element);
 
+  /** @type {types.competitionData[]} */
   const competitions = await sheet.getLiveCompetitions();
 
   // Map 'competitions' to the format expected by fillDropdownOptions()
   /** @type {types.dropdownOptionPlainText[]} */
   const optionContents = competitions.map((competition) => ({
     text: competition.name,
-    value: competition.id
+    value: competition.ID
   }));
 
   if (optionContents.length > 0) {
@@ -164,17 +165,22 @@ export function getUserConfirmMessageCompetitionCreation(
   return {
     channel: competitionRegistrationData.slackID,
     text:
-      `Deine Meldeanfrage wurde mit folgenden Daten erfasst:
-    \nWettkampf: ${competitionRegistrationData.competition_id}` +
-      `\nGewichtsklasse: ${competitionRegistrationData.weight_class}` +
-      `\nHandler benötigt: ${competitionRegistrationData.handler_needed}` +
-      `\nZahlungsbeleg: <${competitionRegistrationData.payment_record_file_permalink}|Hier klicken>` +
+      `Deine Meldeanfrage wurde mit folgenden Daten erfasst:` +
+      `\n*Wettkampf*:` +
+      `\n\t*ID*: ${competitionRegistrationData.competition.ID}` +
+      `\n\t*Name*: ${competitionRegistrationData.competition.name}` +
+      `\n\t*Datum*: ${competitionRegistrationData.competition.date}` +
+      `\n\t*Ort*: ${competitionRegistrationData.competition.location}` +
+      `\n*Gewichtsklasse*: ${competitionRegistrationData.weight_class}` +
+      `\n*Handler benötigt*: ${competitionRegistrationData.handler_needed}` +
+      `\n*Zahlungsbeleg*: <${competitionRegistrationData.payment_record_file_permalink}|Hier klicken>` +
+      `\n*Bemerkungen*:\n${competitionRegistrationData.user_remarks}` +
       `\n\n` +
       `\nDie Anfrage wird an die Admins weitergeleitet und geprüft. ` +
       `\nBitte überprüfe den Status deiner Meldung unter ` +
-      `https://docs.google.com/spreadsheets/d/${process.env.SPREADSHEET_ID_MELDUNGEN}` +
-      `\nDirekter link zum sheet: https://docs.google.com/spreadsheets/d/${process.env.SPREADSHEET_ID_MELDUNGEN}/edit#gid=${competitionRegistrationData.competition_id}` +
-      `\nFalls der Bot deine Meldung nicht umgehend im Spreadsheet einträgt, oder etwas schief gelaufen ist, melde dich unbedingt per mail an ` +
+      `<https://docs.google.com/spreadsheets/d/${process.env.SPREADSHEET_ID_MELDUNGEN}|Wettkämpfe> ` +
+      `bzw. direker link: <https://docs.google.com/spreadsheets/d/${process.env.SPREADSHEET_ID_MELDUNGEN}/edit#gid=${competitionRegistrationData.competition.ID}|${competitionRegistrationData.competition.name}>` +
+      `\n\nFalls der Bot deine Meldung nicht umgehend im Spreadsheet einträgt, oder etwas schief gelaufen ist, melde dich unbedingt per mail an ` +
       `kdk@schwerathletik-mannheim.de`
   };
 }
@@ -204,11 +210,11 @@ export function getAdminConfirmMessageCompetitionCreation(
     channel: process.env.MELDUNGEN_ADMIN_CHANNEL,
     text:
       `Ein neuer Wettkampf wurde erstellt von <@${userId}>:` +
-      `\nID: ${competitionData.competition_id}` +
-      `\nName: ${competitionData.competition_name}` +
-      `\nDatum: ${competitionData.competition_date}` +
-      `\nOrt: ${competitionData.competition_location}` +
-      `\nhttps://docs.google.com/spreadsheets/d/${process.env.SPREADSHEET_ID_MELDUNGEN}/edit#gid=${competitionData.competition_id}`
+      `\nID: ${competitionData.ID}` +
+      `\nName: ${competitionData.name}` +
+      `\nDatum: ${competitionData.date}` +
+      `\nOrt: ${competitionData.location}` +
+      `\nhttps://docs.google.com/spreadsheets/d/${process.env.SPREADSHEET_ID_MELDUNGEN}/edit#gid=${competitionData.ID}`
   };
 }
 
@@ -239,12 +245,18 @@ export function getAdminConfirmMessageCompetitionRegistration(
           type: 'mrkdwn',
           text:
             `*Neue Wettkampfmeldung von <@${competitionRegistrationData.slackID}>*\n` +
-            `*Wettkampf:* ${competitionRegistrationData.competition_id}\n` +
+            `*Wettkampf:*\n` +
+            `\t*ID*: ${competitionRegistrationData.competition.ID}\n` +
+            `\t*Name*: ${competitionRegistrationData.competition.name}\n` +
+            `\t*Datum*: ${competitionRegistrationData.competition.date}\n` +
+            `\t*Ort*: ${competitionRegistrationData.competition.location}\n` +
             `*Name:* ${competitionRegistrationData.first_name} ${competitionRegistrationData.last_name}\n` +
             `*Geburtsjahr:* ${competitionRegistrationData.birthyear}\n` +
             `*Gewichtsklasse:* ${competitionRegistrationData.weight_class}\n` +
             `*Handler benötigt:* ${competitionRegistrationData.handler_needed}\n` +
-            `*Zahlungsbeleg:* <${competitionRegistrationData.payment_record_file_permalink}|Hier klicken>\n\n` +
+            `*Zahlungsbeleg:* <${competitionRegistrationData.payment_record_file_permalink}|Hier klicken>\n` +
+            `*Bemerkungen:*\n${competitionRegistrationData.user_remarks}\n\n` +
+            `direker link zum Wettkampf sheet: <https://docs.google.com/spreadsheets/d/${process.env.SPREADSHEET_ID_MELDUNGEN}/edit#gid=${competitionRegistrationData.competition.ID}|${competitionRegistrationData.competition.name}>\n\n` +
             `Bitte bestätigt oder lehnt die Wettkampfmeldung ab.`
         }
       },
@@ -281,9 +293,28 @@ export function getAdminConfirmMessageCompetitionRegistration(
  * Extracts competition registration data from Slack view submission
  * @param {object} selectedValues
  * @param {masterdataTypes.user} user
- * @returns {types.competitionRegistrationData}
+ * @returns {Promise<types.competitionRegistrationData>}
  */
-export function extractCompetitionRegistrationData(selectedValues, user) {
+export async function extractCompetitionRegistrationData(selectedValues, user) {
+  /** @type {string} */
+  const competitionID =
+    selectedValues[
+      constants.competitionRegistrationView.blockCompetitionSelect
+    ][constants.competitionRegistrationView.actionCompetitionSelect]
+      .selected_option.value;
+
+  /** @type {types.competitionData} */
+  const competitionData = await sheet.getCompetitionDataFromID(competitionID);
+
+  // userRemarks is an Optional field -> May be null
+  let userRemarks =
+    selectedValues[constants.competitionRegistrationView.blockRemarksInput][
+      constants.competitionRegistrationView.actionRemarksInput
+    ].value;
+  if (!userRemarks) {
+    userRemarks = '';
+  }
+
   /** @type {types.competitionRegistrationData} */
   const competitionRegistrationData = {
     slackID: user.slackId,
@@ -291,11 +322,7 @@ export function extractCompetitionRegistrationData(selectedValues, user) {
     last_name: user.lastname,
     birthyear: Number(user.birthday.slice(-4)),
 
-    competition_id:
-      selectedValues[
-        constants.competitionRegistrationView.blockCompetitionSelect
-      ][constants.competitionRegistrationView.actionCompetitionSelect]
-        .selected_option.value,
+    competition: competitionData,
 
     weight_class:
       selectedValues[
@@ -313,7 +340,9 @@ export function extractCompetitionRegistrationData(selectedValues, user) {
       selectedValues[
         constants.competitionRegistrationView.blockPaymentRecordUpload
       ][constants.competitionRegistrationView.actionPaymentRecordUpload]
-        .files[0].permalink
+        .files[0].permalink,
+
+    user_remarks: userRemarks
   };
 
   return competitionRegistrationData;

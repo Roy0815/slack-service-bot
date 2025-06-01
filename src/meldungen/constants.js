@@ -13,7 +13,9 @@ export const competitionRegistrationView = {
   blockHandlerNeededSelect: 'handler_needed_select_block',
   actionHandlerNeededSelect: 'handler_needed_select',
   blockPaymentRecordUpload: 'payment_record_upload_block',
-  actionPaymentRecordUpload: 'payment_record_upload'
+  actionPaymentRecordUpload: 'payment_record_upload',
+  blockRemarksInput: 'remarks_input_block',
+  actionRemarksInput: 'remarks_input'
 };
 
 /**

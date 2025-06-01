@@ -1,15 +1,8 @@
 # Verbesserungen User-Sicht
 
 ## Command /wettkampf-meldung
-- Modal:
-  - Feld für "bemerkungen" -> Landet in Nachrichten an User und Admins, aber nicht im Sheet
-- Nachricht an user nach anmeldung
-  - Zu wettkampf-ID auch die anderen Daten des Wettkampfs angeben
-- Nachricht an user bei ablehnung (auch bei "angenommen" überprüfen)
-  - Space nach "abgelehnt" einfügen
 
 # Verbesserungen Code
-- Refactoring um Model-View-Controller einzuhalten
 - Verhindern, dass ein Wettkampf doppelt erstellt wird
 - Verhindern, dass ein User sich doppelt für einen Wettkampf meldet
 

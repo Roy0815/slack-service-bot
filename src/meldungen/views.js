@@ -125,6 +125,21 @@ export const competitionRegistrationView = {
         type: 'plain_text',
         text: 'Zahlungsnachweis'
       }
+    },
+    {
+      type: 'input',
+      block_id: constants.competitionRegistrationView.blockRemarksInput,
+      optional: true,
+      element: {
+        type: 'plain_text_input',
+        action_id: constants.competitionRegistrationView.actionRemarksInput,
+        multiline: true
+      },
+      label: {
+        type: 'plain_text',
+        text: 'Bemerkungen',
+        emoji: true
+      }
     }
   ]
 };

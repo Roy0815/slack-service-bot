@@ -1,6 +1,6 @@
 import * as types from './types.js';
 import * as util from '../general/util.js';
-import * as general_sheets from '../general/sheet.js';
+import * as generalSheets from '../general/sheet.js';
 import * as constants from './constants.js';
 import { sheets } from 'googleapis/build/src/apis/sheets/index.js';
 import { sheets_v4 } from 'googleapis/build/src/apis/sheets/index.js';
@@ -21,22 +21,22 @@ export async function createNewCompetition(competitionData) {
  */
 async function createNewCompetitionSheet(competitionData) {
   const newSheetName = getSheetNameFromCompetitionData(competitionData);
-  const copyName = await general_sheets.copySheet(
+  const copyName = await generalSheets.copySheet(
     process.env.SPREADSHEET_ID_MELDUNGEN,
     'Vorlage Wettkampf'
   );
-  await general_sheets.renameSheet(
+  await generalSheets.renameSheet(
     process.env.SPREADSHEET_ID_MELDUNGEN,
     copyName,
     newSheetName
   );
 
-  const newSheetID = await general_sheets.getSheetID(
+  const newSheetID = await generalSheets.getSheetID(
     process.env.SPREADSHEET_ID_MELDUNGEN,
     newSheetName
   );
 
-  competitionData.competition_id = newSheetID.toString();
+  competitionData.ID = newSheetID.toString();
 
   // return a tuple of the new sheet name and the link to the new sheet
   return newSheetName;
@@ -48,14 +48,14 @@ async function createNewCompetitionSheet(competitionData) {
  * @param {string} sheetName
  */
 async function appendCompetitionDataToMainSheet(competitionData, sheetName) {
-  const googleSheetsLink = `=HYPERLINK("https://docs.google.com/spreadsheets/d/${process.env.SPREADSHEET_ID_MELDUNGEN}/edit#gid=${competitionData.competition_id}"; "${sheetName}")`;
-  general_sheets.appendRow(process.env.SPREADSHEET_ID_MELDUNGEN, {
+  const googleSheetsLink = `=HYPERLINK("https://docs.google.com/spreadsheets/d/${process.env.SPREADSHEET_ID_MELDUNGEN}/edit#gid=${competitionData.ID}"; "${sheetName}")`;
+  generalSheets.appendRow(process.env.SPREADSHEET_ID_MELDUNGEN, {
     range: constants.nameOfCompetitionSheet + '!A:E',
     values: [
-      [competitionData.competition_id],
-      [competitionData.competition_name],
-      [competitionData.competition_date],
-      [competitionData.competition_location],
+      [competitionData.ID],
+      [competitionData.name],
+      [competitionData.date],
+      [competitionData.location],
       [googleSheetsLink]
     ]
   });
@@ -67,29 +67,34 @@ async function appendCompetitionDataToMainSheet(competitionData, sheetName) {
  * @returns {string}
  */
 function getSheetNameFromCompetitionData(competitionData) {
-  return `${competitionData.competition_name} (${competitionData.competition_date}) ${competitionData.competition_location}`;
+  return `${competitionData.name} (${competitionData.date}) ${competitionData.location}`;
 }
 
 /**
  * Retrieves competition information from Google Sheet
- * @returns {Promise<{id: string, name: string}[]>} Array of Competitions
+ * @returns {Promise<types.competitionData[]>} Array of Competitions
  */
 export async function getLiveCompetitions() {
   /** @type {any[][]} */
-  const cells = await general_sheets.getCells(
+  const cells = await generalSheets.getCells(
     process.env.SPREADSHEET_ID_MELDUNGEN,
     constants.nameOfCompetitionSheet
   );
 
   // get IDs and names of competitions
+  /** @type {types.competitionData[]} */
   const competitions = [];
+
   for (let i = 1; i < cells.length; i++) {
-    const id = cells[i][constants.competitionMainSheetColumns.competitionID];
-    const name =
-      cells[i][constants.competitionMainSheetColumns.competitionName];
-    if (id && name) {
-      competitions.push({ id, name });
-    }
+    const row = cells[i];
+    const competitionData = {
+      ID: row[constants.competitionMainSheetColumns.competitionID],
+      name: row[constants.competitionMainSheetColumns.competitionName],
+      date: row[constants.competitionMainSheetColumns.competitionDate],
+      location: row[constants.competitionMainSheetColumns.competitionLocation]
+    };
+
+    competitions.push(competitionData);
   }
 
   return competitions;
@@ -105,26 +110,26 @@ export async function saveInitialCompetitionRegistration(
 ) {
   // get name of the competition sheet
   /** @type  {sheets_v4.Schema$Sheet[]} */
-  const allSheets = await general_sheets.getSheets(
+  const allSheets = await generalSheets.getSheets(
     process.env.SPREADSHEET_ID_MELDUNGEN
   );
 
-  // find 'title' where 'sheetId' matches competitionRegistrationData.competition_id
+  // find 'title' where 'sheetId' matches competitionRegistrationData.competition.ID
   const competitionSheet = allSheets.find(
     (sheet) =>
       sheet.properties.sheetId.toString() ===
-      competitionRegistrationData.competition_id
+      competitionRegistrationData.competition.ID
   );
 
   if (!competitionSheet) {
     throw new Error(
-      `Competition sheet with ID ${competitionRegistrationData.competition_id} not found.`
+      `Competition sheet with ID ${competitionRegistrationData.competition.ID} not found.`
     );
   }
 
   const competitionSheetName = competitionSheet.properties.title;
 
-  await general_sheets.appendRow(process.env.SPREADSHEET_ID_MELDUNGEN, {
+  await generalSheets.appendRow(process.env.SPREADSHEET_ID_MELDUNGEN, {
     range: competitionSheetName + '!A:F',
     values: [
       [competitionRegistrationData.last_name],
@@ -148,27 +153,27 @@ export async function updateCompetitionRegistrationState(
 ) {
   // get name of the competition sheet
   /** @type  {sheets_v4.Schema$Sheet[]} */
-  const allSheets = await general_sheets.getSheets(
+  const allSheets = await generalSheets.getSheets(
     process.env.SPREADSHEET_ID_MELDUNGEN
   );
 
-  // find 'title' where 'sheetId' matches competitionRegistrationData.competition_id
+  // find 'title' where 'sheetId' matches competitionRegistrationData.competition.ID
   const competitionSheet = allSheets.find(
     (sheet) =>
       sheet.properties.sheetId.toString() ===
-      competitionRegistrationData.competition_id
+      competitionRegistrationData.competition.ID
   );
 
   if (!competitionSheet) {
     throw new Error(
-      `Competition sheet with ID ${competitionRegistrationData.competition_id} not found.`
+      `Competition sheet with ID ${competitionRegistrationData.competition.ID} not found.`
     );
   }
 
   const competitionSheetName = competitionSheet.properties.title;
 
   // find row from last_name and first_name
-  const cells = await general_sheets.getCells(
+  const cells = await generalSheets.getCells(
     process.env.SPREADSHEET_ID_MELDUNGEN,
     competitionSheetName
   );
@@ -182,8 +187,19 @@ export async function updateCompetitionRegistrationState(
   );
 
   // update the status in the sheet
-  await general_sheets.updateCell(process.env.SPREADSHEET_ID_MELDUNGEN, {
+  await generalSheets.updateCell(process.env.SPREADSHEET_ID_MELDUNGEN, {
     range: competitionSheetName + '!E' + (row + 1),
     values: [[competitionRegistrationState]]
   });
+}
+
+/**
+ * Retrieves competition data from the main competition sheet
+ * @param {string} competitionID
+ * @returns {Promise<types.competitionData>}
+ */
+export async function getCompetitionDataFromID(competitionID) {
+  /** @type {types.competitionData[]} */
+  const competitions = await getLiveCompetitions();
+  return competitions.find((competition) => competition.ID === competitionID);
 }
