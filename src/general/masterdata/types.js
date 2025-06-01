@@ -12,6 +12,7 @@
  * @property {string} leaveDate
  * @property {string} slackId
  * @property {string} birthday
+ * @property {string} sex
  * @property {string} email
  * @property {string} phone
  * @property {string} street
