@@ -222,10 +222,12 @@ async function getAllActiveUsers() {
 
 /**
  * save slack id to google sheet
- * @param {number} id
+ * @param {number} id Row number in the sheet (0-based index)
  * @param {string} slackId
  */
 async function saveSlackId(id, slackId) {
+  // google sheet functions count rows starting from 1
+  id++;
   await sheet.updateCell(process.env.SPREADSHEET_ID_MASTERDATA, {
     range: `'${allgDatenSheetName}'!${util.convertNumberToColumn(
       allgDatenColumns.slackId
