@@ -222,9 +222,10 @@ export function getAdminConfirmMessageCompetitionCreation(
  * Saves a competition registration to the correct sheet for the competition
  * with the initial state
  * @param {types.competitionRegistrationData} competitionRegistrationData
+ * @returns {Promise<boolean>} return false if the registration already exists
  */
 export async function saveCompetitionRegistration(competitionRegistrationData) {
-  sheet.saveInitialCompetitionRegistration(competitionRegistrationData);
+  return sheet.saveInitialCompetitionRegistration(competitionRegistrationData);
 }
 
 /**

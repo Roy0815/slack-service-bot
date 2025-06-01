@@ -104,7 +104,21 @@ function setupApp(app) {
         return;
       }
 
-      controller.saveCompetitionRegistration(competitionRegistrationData);
+      if (
+        (await controller.saveCompetitionRegistration(
+          competitionRegistrationData
+        )) === false
+      ) {
+        await client.chat.postMessage({
+          channel: body.user.id,
+          text:
+            `Du hast dich bereits für diesen Wettkampf angemeldet. ` +
+            `<https://docs.google.com/spreadsheets/d/${process.env.SPREADSHEET_ID_MELDUNGEN}/edit#gid=${competitionRegistrationData.competition.ID}|${competitionRegistrationData.competition.name}>\n\n` +
+            `Bitte kontaktiere uns, wenn du deine Anmeldung ändern möchtest.\n` +
+            `kdk@schwerathletik-mannheim.de`
+        });
+        return;
+      }
 
       // Send to admin channel for validation
       await client.chat.postMessage(
@@ -231,7 +245,7 @@ function setupApp(app) {
         channel: data.slackID,
         text:
           `Deine Wettkampfmeldung wurde von <@${body.user.id}> *abgelehnt*.` +
-          `Bitte wende dich an per mail an kdk@schwerathletik-mannheim.de`
+          ` Bitte wende dich an per mail an kdk@schwerathletik-mannheim.de`
       });
 
       // Update the admin message

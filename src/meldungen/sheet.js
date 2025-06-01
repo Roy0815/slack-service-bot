@@ -104,6 +104,7 @@ export async function getLiveCompetitions() {
  * Saves a competition registration to the correct sheet for the competition
  * with the initial state
  * @param {types.competitionRegistrationData} competitionRegistrationData
+ * @returns {Promise<boolean>} return false if the registration already exists
  */
 export async function saveInitialCompetitionRegistration(
   competitionRegistrationData
@@ -127,6 +128,22 @@ export async function saveInitialCompetitionRegistration(
     );
   }
 
+  // check if the registration already exists
+  const cells = await generalSheets.getCells(
+    process.env.SPREADSHEET_ID_MELDUNGEN,
+    competitionSheet.properties.title
+  );
+  const existingRow = cells.findIndex(
+    (row) =>
+      row[constants.competitionSheetColumns.lastName] ===
+        competitionRegistrationData.last_name &&
+      row[constants.competitionSheetColumns.firstName] ===
+        competitionRegistrationData.first_name
+  );
+  if (existingRow !== -1) {
+    return false;
+  }
+
   const competitionSheetName = competitionSheet.properties.title;
 
   await generalSheets.appendRow(process.env.SPREADSHEET_ID_MELDUNGEN, {
@@ -140,6 +157,7 @@ export async function saveInitialCompetitionRegistration(
       [competitionRegistrationData.handler_needed]
     ]
   });
+  return true;
 }
 
 /**
