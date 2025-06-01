@@ -160,7 +160,7 @@ function setupApp(app) {
   app.action(
     // eslint-disable-next-line prefer-regex-literals
     new RegExp(
-      `^(${constants.registerApproval.approveButton})(${constants.registerApproval.rejectButton})$`
+      `^(${constants.registerApproval.approveButton})|(${constants.registerApproval.rejectButton})$`
     ),
     async ({ ack, action, client, respond, body }) => {
       await ack();
