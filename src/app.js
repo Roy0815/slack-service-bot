@@ -98,5 +98,12 @@ export async function handler(event, context, callback) {
   const handler = await awsLambdaReceiver.start();
   // buffer AWS Request ID to interact with the runtime API
   globalData.awsRequestId = context.awsRequestId;
+
+  // In serverless-offline, avoid using callback (causes modal issues)
+  // and ack() won't work properly
+  if(process.env.IS_OFFLINE === 'true'){
+    return handler(event, context);
+  }
+
   return handler(event, context, callback);
 }
