@@ -1,15 +1,12 @@
 import * as constants from './constants.js';
 
-/**
- * @type {import("@slack/types").KnownBlock[]}
- * @todo Fill with information regarding this app's functions
- */
+/** @type {import("@slack/types").KnownBlock[]} */
 export const homeView = [
   {
     type: 'header',
     text: {
       type: 'plain_text',
-      text: 'Meldungen-Bot',
+      text: 'Meldungen für Wettkämpfe',
       emoji: true
     }
   },
@@ -17,8 +14,23 @@ export const homeView = [
     type: 'section',
     text: {
       type: 'mrkdwn',
-      text: 'Home View'
+      text: '*`/meldung` Kommando:*\nMit diesem Kommando meldest du dich für einen Wettkampf.\n\nEs wird ein Dialog gestartet, in dem du einen Wettkampf auswählst und notwendige Daten angibts. Beim Speichern werden die Daten zur Bestätigung an einen Admin geschickt und du wirst benachrichtigt, sobald deine Meldung akzeptiert wurde, oder falls ein Problem besteht.'
     }
+  },
+  {
+    type: 'actions',
+    block_id: constants.homeView.blockMeldungInput,
+    elements: [
+      {
+        type: 'button',
+        text: {
+          type: 'plain_text',
+          text: '/meldung',
+          emoji: true
+        },
+        action_id: constants.homeView.actionMeldungInput
+      }
+    ]
   }
 ];
 

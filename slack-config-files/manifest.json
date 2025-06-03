@@ -55,7 +55,7 @@
         "should_escape": true
       },
       {
-        "command": "/wettkampf-meldung",
+        "command": "/meldung",
         "url": "PUT REQUEST URL HERE",
         "description": "Als Athlet*in für einen Wettkampf anmelden",
         "should_escape": true

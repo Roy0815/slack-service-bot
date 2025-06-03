@@ -210,11 +210,11 @@ export function getAdminConfirmMessageCompetitionCreation(
     channel: process.env.MELDUNGEN_ADMIN_CHANNEL,
     text:
       `Ein neuer Wettkampf wurde erstellt von <@${userId}>:` +
-      `\nID: ${competitionData.ID}` +
-      `\nName: ${competitionData.name}` +
-      `\nDatum: ${competitionData.date}` +
-      `\nOrt: ${competitionData.location}` +
-      `\nhttps://docs.google.com/spreadsheets/d/${process.env.SPREADSHEET_ID_MELDUNGEN}/edit#gid=${competitionData.ID}`
+      `\n*ID*: ${competitionData.ID}` +
+      `\n*Name*: ${competitionData.name}` +
+      `\n*Datum*: ${competitionData.date}` +
+      `\n*Ort*: ${competitionData.location}` +
+      `\n<https://docs.google.com/spreadsheets/d/${process.env.SPREADSHEET_ID_MELDUNGEN}/edit#gid=${competitionData.ID}|Direkter Link>`
   };
 }
 

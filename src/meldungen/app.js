@@ -19,7 +19,7 @@ export const meldungenApp = { setupApp, getHomeView: controller.getHomeView };
 function setupApp(app) {
   //* ****************** Commands ******************//
   // Allow a user to register for a competition
-  app.command('/wettkampf-meldung', async ({ ack, command, client }) => {
+  app.command('/meldung', async ({ ack, command, client }) => {
     await ack();
     // already send HTTP 200 so slack does not time out
     await awsRtAPI.sendResponse();
@@ -29,18 +29,8 @@ function setupApp(app) {
       slackId: command.user_id
     });
 
-    // check if user is registered
-    if (!user) {
-      // send the register view to the user
-      await client.views.open(
-        await asController.getRegisterView(command.trigger_id)
-      );
-      return;
-    }
-
-    await client.views.open(
-      await controller.getCompetitionRegistrationView(command.trigger_id, user)
-    );
+    /** @todo do i need to await? */
+    await meldungCommand(client, command.trigger_id, user);
   });
 
   // Create a new competition
@@ -67,7 +57,7 @@ function setupApp(app) {
   });
 
   //* ****************** Views ******************//
-  // Runs when the /wettkampf-meldung form is submitted
+  // Runs when the /meldung form is submitted
   app.view(
     constants.competitionRegistrationView.viewName,
     async ({ body, ack, client }) => {
@@ -77,6 +67,26 @@ function setupApp(app) {
 
       /** User inputs into modal */
       const selectedValues = body.view.state.values;
+
+      /** @type {string} */
+      const competitionID =
+        selectedValues[
+          constants.competitionRegistrationView.blockCompetitionSelect
+        ][constants.competitionRegistrationView.actionCompetitionSelect]
+          .selected_option.value;
+
+      if (
+        competitionID === constants.competitionDropdownPlaceholderOption.value
+      ) {
+        // Happens when the user selects the placeholder option.
+        // The placeholder option only appears when there are no competitions available
+        await client.chat.postMessage({
+          channel: body.user.id,
+          text: 'Es gibt aktuell keine Wettkämpfe, für die du dich anmelden kannst, oder es liegt ein technischer Fehler vor. Bitte versuche es später noch einmal.'
+        });
+        // Aborts the proccess
+        return;
+      }
 
       /** @type {masterdataTypes.user} */
       const userDataFromSheet = await masterdataService.getUserFromId({
@@ -89,20 +99,6 @@ function setupApp(app) {
           selectedValues,
           userDataFromSheet
         );
-
-      if (
-        competitionRegistrationData.competition.ID ===
-        constants.competitionDropdownPlaceholderOption.value
-      ) {
-        // Happens when the user selects the placeholder option.
-        // The placeholder option only appears when there are no competitions available
-        await client.chat.postMessage({
-          channel: body.user.id,
-          text: 'Es gibt aktuell keine Wettkämpfe, für die du dich anmelden kannst, oder es liegt ein technischer Fehler vor. Bitte versuche es später noch einmal.'
-        });
-        // Aborts the proccess
-        return;
-      }
 
       if (
         (await controller.saveCompetitionRegistration(
@@ -140,63 +136,91 @@ function setupApp(app) {
   app.view(
     constants.competitionCreationView.viewName,
     async ({ body, ack, client }) => {
-      await ack();
-      // already send HTTP 200 that slack does not time out
-      await awsRtAPI.sendResponse();
+      try {
+        await ack();
+        // already send HTTP 200 that slack does not time out
+        await awsRtAPI.sendResponse();
 
-      const selectedValues = body.view.state.values;
+        const selectedValues = body.view.state.values;
 
-      // convert selected date to our format
-      const dateInput =
-        selectedValues[constants.competitionCreationView.blockCompetitionDate][
-          constants.competitionCreationView.actionCompetitionDate
-        ].selected_date;
-
-      const convertedCompetitionDate = util.formatDate(
-        /** @type {Date} */
-        new Date(dateInput)
-      );
-
-      /** @type {types.competitionData} */
-      const competitionData = {
-        name: selectedValues[
-          constants.competitionCreationView.blockCompetitionName
-        ][constants.competitionCreationView.actionCompetitionName].value,
-        date: convertedCompetitionDate,
-        location:
+        // convert selected date to our format
+        const dateInput =
           selectedValues[
-            constants.competitionCreationView.blockCompetitionLocation
-          ][constants.competitionCreationView.actionCompetitionLocation].value,
-        ID: '' // will be set later
-      };
+            constants.competitionCreationView.blockCompetitionDate
+          ][constants.competitionCreationView.actionCompetitionDate]
+            .selected_date;
 
-      if (
-        (await meldungenSheets.createNewCompetition(competitionData)) === false
-      ) {
-        await client.chat.postMessage({
-          channel: body.user.id,
-          text:
-            `Wettkampf erstellen fehlgeschlagen!\n\n` +
-            `Ein Wettkampf mit diesen Daten:\n` +
-            `\t*Name:* ${competitionData.name}\n` +
-            `\t*Datum:* ${competitionData.date}\n` +
-            `\t*Ort:* ${competitionData.location}\n` +
-            `existiert bereits!`
-        });
-        return;
+        const convertedCompetitionDate = util.formatDate(
+          /** @type {Date} */
+          new Date(dateInput)
+        );
+
+        /** @type {types.competitionData} */
+        const competitionData = {
+          name: selectedValues[
+            constants.competitionCreationView.blockCompetitionName
+          ][constants.competitionCreationView.actionCompetitionName].value,
+          date: convertedCompetitionDate,
+          location:
+            selectedValues[
+              constants.competitionCreationView.blockCompetitionLocation
+            ][constants.competitionCreationView.actionCompetitionLocation]
+              .value,
+          ID: '' // will be set later
+        };
+
+        if (
+          (await meldungenSheets.createNewCompetition(competitionData)) ===
+          false
+        ) {
+          await client.chat.postMessage({
+            channel: body.user.id,
+            text:
+              `Wettkampf erstellen fehlgeschlagen!\n\n` +
+              `Ein Wettkampf mit diesen Daten:\n` +
+              `\t*Name:* ${competitionData.name}\n` +
+              `\t*Datum:* ${competitionData.date}\n` +
+              `\t*Ort:* ${competitionData.location}\n` +
+              `existiert bereits!`
+          });
+          return;
+        }
+
+        // Notify admin channel about new competition and who created it
+        await client.chat.postMessage(
+          await controller.getAdminConfirmMessageCompetitionCreation(
+            competitionData,
+            body.user.id
+          )
+        );
+      } catch (err) {
+        console.error('Unexpected error before or after ack:', err);
       }
-
-      // Notify admin channel about new competition and who created it
-      await client.chat.postMessage(
-        await controller.getAdminConfirmMessageCompetitionCreation(
-          competitionData,
-          body.user.id
-        )
-      );
     }
   );
 
   //* ****************** Actions ******************//
+  app.action(
+    constants.homeView.actionMeldungInput,
+    async ({ ack, body, client, action }) => {
+      await ack();
+      // already send HTTP 200 that slack does not time out
+      await awsRtAPI.sendResponse();
+
+      /** @type {masterdataTypes.userContactCard} */
+      const user = await masterdataService.getUserContactCardFromId({
+        slackId: body.user.id
+      });
+
+      const blockAction = /** @type {import("@slack/bolt").BlockAction} */ (
+        body
+      );
+
+      /** @todo do i need to await? */
+      await meldungCommand(client, blockAction.trigger_id, user);
+    }
+  );
+
   app.action(
     constants.competitionRegistrationAdminActions.confirm,
     async ({ ack, body, client, action }) => {
@@ -290,5 +314,25 @@ function setupApp(app) {
         constants.competitionRegistrationState.problem
       );
     }
+  );
+}
+
+/**
+ *
+ * @param {import("@slack/bolt").webApi.WebClient} client
+ * @param {string} triggerId
+ * @param {masterdataTypes.userContactCard} user
+ * @returns {Promise<void>}
+ */
+async function meldungCommand(client, triggerId, user) {
+  // check if user is registered
+  if (!user) {
+    // send the register view to the user
+    await client.views.open(await asController.getRegisterView(triggerId));
+    return;
+  }
+
+  await client.views.open(
+    await controller.getCompetitionRegistrationView(triggerId, user)
   );
 }

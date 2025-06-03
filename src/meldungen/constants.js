@@ -4,6 +4,15 @@ import * as types from './types.js';
  * @readonly
  * @enum {string}
  */
+export const homeView = {
+  blockMeldungInput: 'meldung_input_block',
+  actionMeldungInput: 'meldung_input'
+};
+
+/**
+ * @readonly
+ * @enum {string}
+ */
 export const competitionRegistrationView = {
   viewName: 'competitionregistrationview',
   blockCompetitionSelect: 'competition_select_block',
