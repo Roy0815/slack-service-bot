@@ -7,7 +7,6 @@ import * as util from '../general/util.js';
 import * as constants from './constants.js';
 import * as types from './types.js';
 import * as sheet from './sheet.js';
-import { masterdataService } from '../general/masterdata/service.js';
 import * as masterdataTypes from '../general/masterdata/types.js';
 
 /**
@@ -179,8 +178,8 @@ export function getUserConfirmMessageCompetitionCreation(
       `\nDie Anfrage wird an die Admins weitergeleitet und geprüft. ` +
       `\nBitte überprüfe den Status deiner Meldung unter ` +
       `<https://docs.google.com/spreadsheets/d/${process.env.SPREADSHEET_ID_MELDUNGEN}|Wettkämpfe> ` +
-      `bzw. direker link: <https://docs.google.com/spreadsheets/d/${process.env.SPREADSHEET_ID_MELDUNGEN}/edit#gid=${competitionRegistrationData.competition.ID}|${competitionRegistrationData.competition.name}>` +
-      `\n\nFalls der Bot deine Meldung nicht umgehend im Spreadsheet einträgt, oder etwas schief gelaufen ist, melde dich unbedingt per mail an ` +
+      `bzw. direkter Link: <https://docs.google.com/spreadsheets/d/${process.env.SPREADSHEET_ID_MELDUNGEN}/edit#gid=${competitionRegistrationData.competition.ID}|${competitionRegistrationData.competition.name}>` +
+      `\n\nFalls der Bot deine Meldung nicht umgehend im Spreadsheet einträgt, oder etwas schief gelaufen ist, melde dich unbedingt per Mail an ` +
       `kdk@schwerathletik-mannheim.de`
   };
 }
@@ -257,11 +256,18 @@ export function getAdminConfirmMessageCompetitionRegistration(
             `*Handler benötigt:* ${competitionRegistrationData.handler_needed}\n` +
             `*Zahlungsbeleg:* <${competitionRegistrationData.payment_record_file_permalink}|Hier klicken>\n` +
             `*Bemerkungen:*\n${competitionRegistrationData.user_remarks}\n\n` +
-            `direker link zum Wettkampf sheet: <https://docs.google.com/spreadsheets/d/${process.env.SPREADSHEET_ID_MELDUNGEN}/edit#gid=${competitionRegistrationData.competition.ID}|${competitionRegistrationData.competition.name}>\n\n` +
-            `Bitte bestätigt oder lehnt die Wettkampfmeldung ab.`
+            `direker link zum Wettkampf sheet: <https://docs.google.com/spreadsheets/d/${process.env.SPREADSHEET_ID_MELDUNGEN}/edit#gid=${competitionRegistrationData.competition.ID}|${competitionRegistrationData.competition.name}>\n\n`
         }
       },
       {
+        type: 'section',
+        text: {
+          type: 'mrkdwn',
+          text: `Bitte bestätigt oder lehnt die Wettkampfmeldung ab.`
+        }
+      },
+      {
+        // This block gets deleted after one of the buttons is pressed
         type: 'actions',
         elements: [
           {

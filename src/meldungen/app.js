@@ -222,96 +222,79 @@ function setupApp(app) {
   );
 
   app.action(
-    constants.competitionRegistrationAdminActions.confirm,
+    new RegExp(
+      `^(${constants.competitionRegistrationAdminActions.confirm})|(${constants.competitionRegistrationAdminActions.deny})$`
+    ),
     async ({ ack, body, client, action }) => {
       await ack();
       // already send HTTP 200 that slack does not time out
       await awsRtAPI.sendResponse();
 
       // get the competition registration data from the action value
-      const data = JSON.parse(action.value);
-
-      // Notify user
-      await client.chat.postMessage({
-        channel: data.slackID,
-        text: `Deine Wettkampfmeldung wurde von <@${body.user.id}> *bestätigt*.`
-      });
-
-      // Update the admin message
-      const blocks = body.message.blocks.slice(0, -1); // Remove the last block (actions)
-      blocks.push({
-        type: 'context',
-        elements: [
-          {
-            type: 'mrkdwn',
-            text: `:heavy_check_mark: Angenommen von <@${body.user.id}>`
-          }
-        ]
-      });
-
-      await client.chat.update({
-        channel: body.channel.id,
-        ts: body.message.ts,
-        blocks,
-        text: `Die Wettkampfmeldung von <@${data.slackID}> wurde durch <@${body.user.id}> *angenommen*.`
-      });
-
-      // get the competition registration data from the action value
-      /** @type {types.competitionRegistrationData} */
-      const competitionRegistrationData = JSON.parse(action.value);
-
-      // update the row in the competition sheet with the new state
-      await meldungenSheets.updateCompetitionRegistrationState(
-        competitionRegistrationData,
-        constants.competitionRegistrationState.okay
+      const btnAction = /** @type {import("@slack/bolt").ButtonAction} */ (
+        action
       );
-    }
-  );
 
-  app.action(
-    constants.competitionRegistrationAdminActions.deny,
-    async ({ ack, body, client, action }) => {
-      await ack();
-      // already send HTTP 200 that slack does not time out
-      await awsRtAPI.sendResponse();
+      const blockAction = /** @type {import("@slack/bolt").BlockAction} */ (
+        body
+      );
 
-      // get the competition registration data from the action value
-      const data = JSON.parse(action.value);
+      /** @type {constants.competitionRegistrationAdminActions} */
+      const actionID = btnAction.action_id;
+
+      /** @type {types.competitionRegistrationData} */
+      const competitionRegistrationData = JSON.parse(btnAction.value);
+
+      /** @type {string} Text that depends on the which button was pressed */
+      let actionSpecificText;
+
+      switch (actionID) {
+        case constants.competitionRegistrationAdminActions.confirm:
+          actionSpecificText = `*angenommen*:heavy_check_mark:`;
+          break;
+        case constants.competitionRegistrationAdminActions.deny:
+          actionSpecificText = `*Abgelehnt*:x:. Bitte wende dich an per mail an kdk@schwerathletik-mannheim.de`;
+          break;
+      }
 
       // Notify user
       await client.chat.postMessage({
-        channel: data.slackID,
-        text:
-          `Deine Wettkampfmeldung wurde von <@${body.user.id}> *abgelehnt*.` +
-          ` Bitte wende dich an per mail an kdk@schwerathletik-mannheim.de`
+        channel: competitionRegistrationData.slackID,
+        text: `Deine Wettkampfmeldung wurde von <@${blockAction.user.id}> ${actionSpecificText}.`
       });
 
+      switch (actionID) {
+        case constants.competitionRegistrationAdminActions.confirm:
+          actionSpecificText = `:heavy_check_mark: *angenommen*`;
+          break;
+        case constants.competitionRegistrationAdminActions.deny:
+          actionSpecificText = `:x: *Abgelehnt*`;
+          break;
+      }
+
       // Update the admin message
-      const blocks = body.message.blocks.slice(0, -1); // Remove the last block (actions)
+      const blocks = blockAction.message.blocks.slice(0, -2); // Remove the last block (actions)
       blocks.push({
         type: 'context',
         elements: [
           {
             type: 'mrkdwn',
-            text: `:x: Abgelehnt von <@${body.user.id}>`
+            text: `${actionSpecificText} von <@${blockAction.user.id}>`
           }
         ]
       });
 
       await client.chat.update({
-        channel: body.channel.id,
-        ts: body.message.ts,
+        channel: blockAction.channel.id,
+        ts: blockAction.message.ts,
         blocks,
-        text: `Die Wettkampfmeldung von <@${data.slackID}> wurde durch <@${body.user.id}> *abgelehnt*.`
+        text: `Die Wettkampfmeldung von <@${competitionRegistrationData.slackID}> wurde durch <@${blockAction.user.id}> ${actionSpecificText}.`
       });
-
-      // get the competition registration data from the action value
-      const competitionRegistrationData = JSON.parse(action.value);
 
       // update the row in the competition sheet with the new state
       await meldungenSheets.updateCompetitionRegistrationState(
         competitionRegistrationData,
-        constants.competitionRegistrationState.problem
+        actionID
       );
     }
   );
