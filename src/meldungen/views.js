@@ -1,15 +1,12 @@
 import * as constants from './constants.js';
 
-/**
- * @type {import("@slack/types").KnownBlock[]}
- * @todo Fill with information regarding this app's functions
- */
+/** @type {import("@slack/types").KnownBlock[]} */
 export const homeView = [
   {
     type: 'header',
     text: {
       type: 'plain_text',
-      text: 'Meldungen-Bot',
+      text: 'Meldungen für Wettkämpfe',
       emoji: true
     }
   },
@@ -17,8 +14,23 @@ export const homeView = [
     type: 'section',
     text: {
       type: 'mrkdwn',
-      text: 'Home View'
+      text: '*`/meldung` Kommando:*\nMit diesem Kommando meldest du dich für einen Wettkampf.\n\nEs wird ein Dialog gestartet, in dem du einen Wettkampf auswählst und notwendige Daten angibts. Beim Speichern werden die Daten zur Bestätigung an einen Admin geschickt und du wirst benachrichtigt, sobald deine Meldung akzeptiert wurde, oder falls ein Problem besteht.'
     }
+  },
+  {
+    type: 'actions',
+    block_id: constants.homeView.blockMeldungInput,
+    elements: [
+      {
+        type: 'button',
+        text: {
+          type: 'plain_text',
+          text: '/meldung',
+          emoji: true
+        },
+        action_id: constants.homeView.actionMeldungInput
+      }
+    ]
   }
 ];
 
@@ -44,7 +56,7 @@ export const competitionRegistrationView = {
   blocks: [
     {
       type: 'input',
-      block_id: constants.competitionRegistrationView.blockCompetition,
+      block_id: constants.competitionRegistrationView.blockCompetitionSelect,
       element: {
         type: 'static_select',
         placeholder: {
@@ -52,17 +64,9 @@ export const competitionRegistrationView = {
           text: 'Wähle einen Wettkampf',
           emoji: true
         },
-        // Will be overwritten dynamically
-        options: [
-          {
-            text: {
-              type: 'plain_text',
-              text: 'Testwettkampf',
-              emoji: true
-            },
-            value: 'value-0'
-          }
-        ]
+
+        options: [],
+        action_id: constants.competitionRegistrationView.actionCompetitionSelect
       },
       label: {
         type: 'plain_text',
@@ -72,7 +76,7 @@ export const competitionRegistrationView = {
     },
     {
       type: 'input',
-      block_id: constants.competitionRegistrationView.blockWeightClass,
+      block_id: constants.competitionRegistrationView.blockWeightClassSelect,
       element: {
         type: 'static_select',
         placeholder: {
@@ -81,16 +85,8 @@ export const competitionRegistrationView = {
           emoji: true
         },
         // Will be overwritten dynamically
-        options: [
-          {
-            text: {
-              type: 'plain_text',
-              text: '-105kg',
-              emoji: true
-            },
-            value: 'value-0'
-          }
-        ]
+        options: [],
+        action_id: constants.competitionRegistrationView.actionWeightClassSelect
       },
       label: {
         type: 'plain_text',
@@ -100,7 +96,7 @@ export const competitionRegistrationView = {
     },
     {
       type: 'input',
-      block_id: constants.competitionRegistrationView.blockHandlerNeeded,
+      block_id: constants.competitionRegistrationView.blockHandlerNeededSelect,
       element: {
         type: 'static_select',
         placeholder: {
@@ -108,28 +104,106 @@ export const competitionRegistrationView = {
           text: 'Ja/Nein',
           emoji: true
         },
-        options: [
-          {
-            text: {
-              type: 'plain_text',
-              text: 'ja',
-              emoji: true
-            },
-            value: 'true'
-          },
-          {
-            text: {
-              type: 'plain_text',
-              text: 'nein',
-              emoji: true
-            },
-            value: 'false'
-          }
-        ]
+        options: [],
+        action_id:
+          constants.competitionRegistrationView.actionHandlerNeededSelect
       },
       label: {
         type: 'plain_text',
         text: 'Betreuung Benötigt',
+        emoji: true
+      }
+    },
+    {
+      type: 'input',
+      block_id: constants.competitionRegistrationView.blockPaymentRecordUpload,
+      element: {
+        type: 'file_input',
+        action_id:
+          constants.competitionRegistrationView.actionPaymentRecordUpload,
+        filetypes: ['jpg', 'png', 'pdf'],
+        max_files: 1
+      },
+      label: {
+        type: 'plain_text',
+        text: 'Zahlungsnachweis'
+      }
+    },
+    {
+      type: 'input',
+      block_id: constants.competitionRegistrationView.blockRemarksInput,
+      optional: true,
+      element: {
+        type: 'plain_text_input',
+        action_id: constants.competitionRegistrationView.actionRemarksInput,
+        multiline: true
+      },
+      label: {
+        type: 'plain_text',
+        text: 'Bemerkungen',
+        emoji: true
+      }
+    }
+  ]
+};
+
+/** @type {import('@slack/types').View} */
+export const competitionCreationView = {
+  type: 'modal',
+  callback_id: constants.competitionCreationView.viewName,
+  title: {
+    type: 'plain_text',
+    text: 'Wettkampf erstellen',
+    emoji: true
+  },
+  submit: {
+    type: 'plain_text',
+    text: 'Erstellen',
+    emoji: true
+  },
+  close: {
+    type: 'plain_text',
+    text: 'Abbrechen',
+    emoji: true
+  },
+  blocks: [
+    // Blocks for competition creation will be added here
+    {
+      type: 'input',
+      block_id: 'competition_name_block',
+      element: {
+        type: 'plain_text_input',
+        action_id: 'competition_name_input'
+      },
+      label: {
+        type: 'plain_text',
+        text: 'Wettkampfname',
+        emoji: true
+      }
+    },
+    {
+      type: 'input',
+      block_id: 'competition_date_block',
+      element: {
+        type: 'datepicker',
+        action_id: 'competition_date_input'
+      },
+      label: {
+        type: 'plain_text',
+        text: 'Datum des Wettkampfs',
+        emoji: true
+      }
+    },
+    {
+      type: 'input',
+      block_id: 'competition_location_block',
+      element: {
+        type: 'plain_text_input',
+        action_id: 'competition_location_input'
+      },
+      label: {
+        type: 'plain_text',
+        text: 'Ort des Wettkampfs',
         emoji: true
       }
     }
