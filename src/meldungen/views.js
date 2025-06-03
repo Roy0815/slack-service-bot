@@ -65,16 +65,7 @@ export const competitionRegistrationView = {
           emoji: true
         },
 
-        options: [
-          {
-            text: {
-              type: 'plain_text',
-              text: constants.competitionDropdownPlaceholderOption.text,
-              emoji: true
-            },
-            value: constants.competitionDropdownPlaceholderOption.value
-          }
-        ],
+        options: [],
         action_id: constants.competitionRegistrationView.actionCompetitionSelect
       },
       label: {

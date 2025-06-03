@@ -23,6 +23,7 @@ export function getHomeView() {
  * @param {string} triggerId
  * @param {masterdataTypes.userContactCard} user
  * @returns {Promise<import("@slack/web-api").ViewsOpenArguments>}
+ * @throws {NoCompetitionsFoundError} if no competitions are found
  */
 export async function getCompetitionRegistrationView(triggerId, user) {
   const view = util.deepCopy(competitionRegistrationView);
@@ -50,6 +51,7 @@ export async function getCompetitionRegistrationView(triggerId, user) {
 /**
  * Fills the competition dropdown with competitions
  * @param {import('@slack/types').AnyBlock} block
+ * @throws {NoCompetitionsFoundError} if no competitions are found
  */
 async function fillCompetitionDropdown(block) {
   const inputBlock =
@@ -69,9 +71,11 @@ async function fillCompetitionDropdown(block) {
     value: competition.ID
   }));
 
-  if (optionContents.length > 0) {
-    await fillDropdownOptions(dropdown, optionContents);
+  if (optionContents.length <= 0) {
+    throw new NoCompetitionsFoundError();
   }
+
+  await fillDropdownOptions(dropdown, optionContents);
 }
 
 /**
@@ -353,4 +357,10 @@ export async function extractCompetitionRegistrationData(selectedValues, user) {
   };
 
   return competitionRegistrationData;
+}
+
+export class NoCompetitionsFoundError extends Error {
+  constructor(message = '') {
+    super(message);
+  }
 }

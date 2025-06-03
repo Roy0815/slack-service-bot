@@ -7,7 +7,6 @@ import * as asController from '../arbeitsstunden/controller.js';
 import * as meldungenSheets from './sheet.js';
 import { masterdataService } from '../general/masterdata/service.js';
 import * as masterdataTypes from '../general/masterdata/types.js';
-
 import * as awsRtAPI from '../general/aws-runtime-api.js';
 
 /** @type {import('../general/types.js').appComponent} */
@@ -30,7 +29,7 @@ function setupApp(app) {
     });
 
     /** @todo do i need to await? */
-    await meldungCommand(client, command.trigger_id, user);
+    await meldungCommand(client, command.trigger_id, command.channel_id, user);
   });
 
   // Create a new competition
@@ -67,26 +66,6 @@ function setupApp(app) {
 
       /** User inputs into modal */
       const selectedValues = body.view.state.values;
-
-      /** @type {string} */
-      const competitionID =
-        selectedValues[
-          constants.competitionRegistrationView.blockCompetitionSelect
-        ][constants.competitionRegistrationView.actionCompetitionSelect]
-          .selected_option.value;
-
-      if (
-        competitionID === constants.competitionDropdownPlaceholderOption.value
-      ) {
-        // Happens when the user selects the placeholder option.
-        // The placeholder option only appears when there are no competitions available
-        await client.chat.postMessage({
-          channel: body.user.id,
-          text: 'Es gibt aktuell keine Wettkämpfe, für die du dich anmelden kannst, oder es liegt ein technischer Fehler vor. Bitte versuche es später noch einmal.'
-        });
-        // Aborts the proccess
-        return;
-      }
 
       /** @type {masterdataTypes.user} */
       const userDataFromSheet = await masterdataService.getUserFromId({
@@ -217,7 +196,7 @@ function setupApp(app) {
       );
 
       /** @todo do i need to await? */
-      await meldungCommand(client, blockAction.trigger_id, user);
+      await meldungCommand(client, blockAction.trigger_id, body.user.id, user);
     }
   );
 
@@ -316,10 +295,11 @@ function setupApp(app) {
  *
  * @param {import("@slack/bolt").webApi.WebClient} client
  * @param {string} triggerId
+ * @param {string} channelID
  * @param {masterdataTypes.userContactCard} user
  * @returns {Promise<void>}
  */
-async function meldungCommand(client, triggerId, user) {
+async function meldungCommand(client, triggerId, channelID, user) {
   // check if user is registered
   if (!user) {
     // send the register view to the user
@@ -327,7 +307,16 @@ async function meldungCommand(client, triggerId, user) {
     return;
   }
 
-  await client.views.open(
-    await controller.getCompetitionRegistrationView(triggerId, user)
-  );
+  try {
+    await client.views.open(
+      await controller.getCompetitionRegistrationView(triggerId, user)
+    );
+  } catch (NoCompetitionsFoundError) {
+    // Happens when the user selects the placeholder option.
+    // The placeholder option only appears when there are no competitions available
+    await client.chat.postMessage({
+      channel: channelID,
+      text: 'Es gibt aktuell keine Wettkämpfe, für die du dich anmelden kannst, oder es liegt ein technischer Fehler vor. Bitte versuche es später noch einmal.'
+    });
+  }
 }
