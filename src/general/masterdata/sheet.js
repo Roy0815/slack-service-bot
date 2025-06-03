@@ -223,12 +223,10 @@ async function getAllActiveUsers() {
  * @param {string} slackId
  */
 async function saveSlackId(id, slackId) {
-  // google sheet functions count rows starting from 1
-  id++;
   await sheet.updateCell(process.env.SPREADSHEET_ID_MASTERDATA, {
     range: `'${allgDatenSheetName}'!${util.convertNumberToColumn(
       allgDatenColumns.slackId
-    )}${id}`,
+    )}${id + 1}`, // google sheet functions count rows starting from 1
     values: [[slackId]]
   });
 }
