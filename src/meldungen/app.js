@@ -291,10 +291,22 @@ function setupApp(app) {
         text: `Die Wettkampfmeldung von <@${competitionRegistrationData.slackID}> wurde durch <@${blockAction.user.id}> ${actionSpecificText}.`
       });
 
+      let competitionRegistrationState;
+      switch (actionID) {
+        case constants.competitionRegistrationAdminActions.confirm:
+          competitionRegistrationState =
+            constants.competitionRegistrationState.okay;
+          break;
+        case constants.competitionRegistrationAdminActions.deny:
+          competitionRegistrationState =
+            constants.competitionRegistrationState.problem;
+          break;
+      }
+
       // update the row in the competition sheet with the new state
       await meldungenSheets.updateCompetitionRegistrationState(
         competitionRegistrationData,
-        actionID
+        competitionRegistrationState
       );
     }
   );
