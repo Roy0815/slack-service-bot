@@ -18,6 +18,7 @@ const allgDatenColumns = {
   lastname: 3,
   leaveDate: 5,
   birthday: 7,
+  sex: 9,
   email: 10,
   street: 11,
   houseNumber: 12,
@@ -40,6 +41,7 @@ function moveUserLineToObject(userLine) {
     lastname: userLine[allgDatenColumns.lastname - 1],
     leaveDate: userLine[allgDatenColumns.leaveDate - 1],
     birthday: userLine[allgDatenColumns.birthday - 1],
+    sex: userLine[allgDatenColumns.sex - 1],
     email: userLine[allgDatenColumns.email - 1],
     phone: userLine[allgDatenColumns.phone - 1],
     slackId: userLine[allgDatenColumns.slackId - 1],
@@ -62,6 +64,7 @@ function moveUserLineToContactCard(userLine) {
     lastname: userLine[allgDatenColumns.lastname - 1],
     leaveDate: userLine[allgDatenColumns.leaveDate - 1],
     birthday: userLine[allgDatenColumns.birthday - 1],
+    sex: userLine[allgDatenColumns.sex - 1],
     email: userLine[allgDatenColumns.email - 1],
     phone: userLine[allgDatenColumns.phone - 1],
     slackId: userLine[allgDatenColumns.slackId - 1],
@@ -216,14 +219,14 @@ async function getAllActiveUsers() {
 
 /**
  * save slack id to google sheet
- * @param {number} id
+ * @param {number} id Row number in the sheet (0-based index)
  * @param {string} slackId
  */
 async function saveSlackId(id, slackId) {
   await sheet.updateCell(process.env.SPREADSHEET_ID_MASTERDATA, {
     range: `'${allgDatenSheetName}'!${util.convertNumberToColumn(
       allgDatenColumns.slackId
-    )}${id}`,
+    )}${id + 1}`, // google sheet functions count rows starting from 1
     values: [[slackId]]
   });
 }
