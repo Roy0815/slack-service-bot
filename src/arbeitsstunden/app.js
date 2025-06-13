@@ -405,8 +405,8 @@ function setupApp(app) {
 
   //* ******************* Events Submissions ********************//
   app.event('team_join', async ({ event, client }) => {
-    // log in case of bot user analysis
-    console.log(event);
+    // acknowledge event
+    awsRtAPI.sendResponse();
 
     // ignore bot users
     if (event.user && event.user.is_bot) return;
