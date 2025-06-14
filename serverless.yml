@@ -41,7 +41,7 @@ functions:
           path: slack/events
           method: post
   slack-service-bot-staette-cleanup:
-    handler: ./helper/staette/cleanup.run
+    handler: ./src/staette/cleanup.run
     events:
       - schedule: cron(0 0 * * ? *)
 
