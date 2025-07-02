@@ -43,7 +43,15 @@ functions:
   slack-service-bot-staette-cleanup:
     handler: ./src/staette/cleanup.run
     events:
-      - schedule: cron(0 0 * * ? *)
+      - schedule: cron(0 0 * * ? *) ## Runs every day at midnight UTC
+  slack-service-bot-masterdata-notification:
+    handler: ./src/general/masterdata/notifications.run
+    events:
+      - schedule:
+          method: scheduler
+          rate:
+            - cron(0 9 * * ? *) ## Runs every day at 9:00 Berlin time
+          timezone: Europe/Berlin
 
 plugins:
   - serverless-offline
