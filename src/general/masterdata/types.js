@@ -9,6 +9,7 @@
  * @property {number} id
  * @property {string} firstname
  * @property {string} lastname
+ * @property {string} joinedDate
  * @property {string} leaveDate
  * @property {string} slackId
  * @property {string} birthday
