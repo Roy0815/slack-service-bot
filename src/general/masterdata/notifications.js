@@ -60,8 +60,8 @@ export async function run(event, context) {
       user.joinedDate &&
       user.joinedDate.substring(0, 6) ===
         util.formatDate(new Date()).substring(0, 6) &&
-      (parseInt(util.formatDate(new Date()).substring(6, 8)) -
-        parseInt(user.joinedDate.substring(6, 8))) %
+      (parseInt(util.formatDate(new Date()).substring(6, 10)) -
+        parseInt(user.joinedDate.substring(6, 10))) %
         5 ===
         0
   );
@@ -82,8 +82,8 @@ export async function run(event, context) {
               .map(
                 (user) =>
                   `${
-                    parseInt(util.formatDate(new Date()).substring(6, 8)) -
-                    parseInt(user.joinedDate.substring(6, 8))
+                    parseInt(util.formatDate(new Date()).substring(6, 10)) -
+                    parseInt(user.joinedDate.substring(6, 10))
                   } Jahre:\t<@${user.slackId}> - ${user.firstname} ${user.lastname}`
               )
               .join('\n')}`
@@ -94,10 +94,7 @@ export async function run(event, context) {
 
   // get users with leave date today
   const leavingUsers = users.filter(
-    (user) =>
-      user.leaveDate &&
-      user.leaveDate.substring(0, 6) ===
-        util.formatDate(new Date()).substring(0, 6)
+    (user) => user.leaveDate && user.leaveDate === util.formatDate(new Date())
   );
 
   // message leaving users

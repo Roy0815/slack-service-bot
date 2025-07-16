@@ -212,7 +212,10 @@ async function getAllActiveUsers() {
       continue;
     }
 
-    if (util.convertStringToDate(userObject.leaveDate) > today) {
+    if (
+      util.convertStringToDate(userObject.leaveDate) > today ||
+      userObject.leaveDate === util.formatDate(today)
+    ) {
       activeUsers.push(userObject);
     }
   }
