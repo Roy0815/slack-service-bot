@@ -1,11 +1,11 @@
 import * as controller from './controller.js';
 import * as types from './types.js';
 
-import * as awsRtAPI from '../general/aws-runtime-api.js';
+import * as awsRtAPI from '../../general/aws-runtime-api.js';
 import * as constants from './constants.js';
 
-/** @type {import('../general/types.js').appComponent} */
-export const rechnungenApp = { setupApp, getHomeView: null };
+/** @type {import('../../general/types.js').appComponent} */
+export const googledriveWorkflowsApp = { setupApp, getHomeView: null };
 
 /**
  * @param {import("@slack/bolt").App} app

@@ -4,7 +4,7 @@ import fetch from 'node-fetch';
 import stream from 'node:stream';
 
 import * as types from './types.js';
-import * as util from '../general/util.js';
+import * as util from '../../general/util.js';
 import * as views from './views.js';
 
 //* ******************* Private functions ********************//
