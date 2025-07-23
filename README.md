@@ -179,7 +179,7 @@ Wie im Kapitel [1. Google APIs einrichten](#1-google-apis-einrichten) beschriebe
 
 Der Workflow kann zu Slack mit Hilfe der Datei [Rechnung einreichen.json](/slack-config-files/workflows/Rechnung%20einreichen.json) hinzugefügt werden. Da zum Zeitpunkt der Implementierung Custom steps noch nicht über eine solche Konfig-Datei exportiert werden können, muss noch folgende manuelle Aktion erfolgen.
 
-in Schritt 6 den custom Step einfügen wie hier zu sehen (Bei File ID Dropdown "File ID" auswählen und die ID des Google Drive Ordners auswählen, in den die Datein gelegt werden sollen):
+in Schritt 8 den custom Step einfügen wie hier zu sehen (Bei File ID Dropdown "File ID" auswählen und die ID des Google Drive Ordners auswählen, in den die Datein gelegt werden sollen):
 
 ![Konfiguration Workflow Schritt](/images/[RECHNUNGEN]%20Custom%20workflow%20step.png)
 

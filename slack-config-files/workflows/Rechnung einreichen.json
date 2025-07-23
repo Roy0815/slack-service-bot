@@ -8,14 +8,14 @@
         "type": "slack#/types/interactivity",
         "name": "Ft085RERHX5M__interactivity",
         "description": "Interactivity context",
-        "title": "Interactivity context",
+        "title": "Interaktivitätskontext",
         "is_hidden": true
       },
       "Ft085RERHX5M__user_id": {
         "type": "slack#/types/user_id",
         "name": "Ft085RERHX5M__user_id",
         "description": "Person who used this workflow",
-        "title": "Person who used this workflow"
+        "title": "Person, die diesen Workflow verwendet hat"
       },
       "Ft085RERHX5M__channel_id": {
         "type": "slack#/types/channel_id",
@@ -52,10 +52,132 @@
                   "description": "für was war die Ausgabe?"
                 },
                 {
+                  "enum": [
+                    [
+                      {
+                        "type": "rich_text",
+                        "elements": [
+                          {
+                            "type": "rich_text_section",
+                            "elements": [
+                              {
+                                "text": "Rechnung ist noch offen",
+                                "type": "text"
+                              }
+                            ]
+                          }
+                        ]
+                      }
+                    ],
+                    [
+                      {
+                        "type": "rich_text",
+                        "elements": [
+                          {
+                            "type": "rich_text_section",
+                            "elements": [
+                              {
+                                "text": "Rechnung wurde privat bezahlt",
+                                "type": "text"
+                              }
+                            ]
+                          }
+                        ]
+                      }
+                    ],
+                    [
+                      {
+                        "type": "rich_text",
+                        "elements": [
+                          {
+                            "type": "rich_text_section",
+                            "elements": [
+                              {
+                                "text": "Rechnung wurde vom Verein bezahlt",
+                                "type": "text"
+                              }
+                            ]
+                          }
+                        ]
+                      }
+                    ]
+                  ],
+                  "name": "8ba31f32-d8a1-4729-9abf-b54c764d9a4b",
+                  "type": "slack#/types/limited_rich_text",
+                  "title": "Rechnung noch offen?",
+                  "choices": [
+                    {
+                      "id": "7c4ebdee-b509-478c-bc64-a0c73bfb6283",
+                      "title": "Rechnung ist noch offen",
+                      "value": [
+                        {
+                          "type": "rich_text",
+                          "elements": [
+                            {
+                              "type": "rich_text_section",
+                              "elements": [
+                                {
+                                  "text": "Rechnung ist noch offen",
+                                  "type": "text"
+                                }
+                              ]
+                            }
+                          ]
+                        }
+                      ],
+                      "description": "Rechnung ist noch offen"
+                    },
+                    {
+                      "id": "da1742c6-813a-4c8f-ae06-4bbf0f6f3174",
+                      "title": "Rechnung wurde privat bezahlt",
+                      "value": [
+                        {
+                          "type": "rich_text",
+                          "elements": [
+                            {
+                              "type": "rich_text_section",
+                              "elements": [
+                                {
+                                  "text": "Rechnung wurde privat bezahlt",
+                                  "type": "text"
+                                }
+                              ]
+                            }
+                          ]
+                        }
+                      ],
+                      "description": "Rechnung wurde privat bezahlt"
+                    },
+                    {
+                      "id": "9a85d8c2-bc2e-4bd2-a550-5afe9590fd7c",
+                      "title": "Rechnung wurde vom Verein bezahlt",
+                      "value": [
+                        {
+                          "type": "rich_text",
+                          "elements": [
+                            {
+                              "type": "rich_text_section",
+                              "elements": [
+                                {
+                                  "text": "Rechnung wurde vom Verein bezahlt",
+                                  "type": "text"
+                                }
+                              ]
+                            }
+                          ]
+                        }
+                      ],
+                      "description": "Rechnung wurde vom Verein bezahlt"
+                    }
+                  ],
+                  "default": "",
+                  "description": ""
+                },
+                {
                   "name": "b0abe6bf-d070-447b-a63e-c6bc9b40b89d",
                   "type": "string",
-                  "title": "dein Paypal Konto (Bankverbindung haben wir)",
-                  "description": ""
+                  "title": "Paypal Konto (Falls du Geld ausgelegt hast)",
+                  "description": "(Bankverbindung haben wir)"
                 },
                 {
                   "name": "6dcbc10a-eab9-4e45-aa4b-33ec46548d7f",
@@ -72,7 +194,7 @@
               "required": [
                 "2568827b-28eb-4040-8840-2b6c0bfb072a",
                 "6b47642e-e193-4f36-a722-ae1d7aebc3fe",
-                "b0abe6bf-d070-447b-a63e-c6bc9b40b89d",
+                "8ba31f32-d8a1-4729-9abf-b54c764d9a4b",
                 "6dcbc10a-eab9-4e45-aa4b-33ec46548d7f"
               ]
             }
@@ -181,6 +303,13 @@
                         "type": "workflowtoken",
                         "property": "",
                         "data_type": "string"
+                      },
+                      { "text": "\n", "type": "text" },
+                      {
+                        "id": "{{steps.964e0b42-8804-467b-8ea3-1ee6198cd539.fields.8ba31f32-d8a1-4729-9abf-b54c764d9a4b}}",
+                        "type": "workflowtoken",
+                        "property": "",
+                        "data_type": "slack#/types/limited_rich_text"
                       },
                       { "text": "\n", "type": "text" },
                       {
@@ -389,8 +518,8 @@
         }
       },
       {
-        "id": "87d8ef35-db61-442f-9bc7-32d0faa08e62",
-        "function_id": "Fn0102",
+        "id": "4d92cec5-5401-4654-ae16-3f030d6736e8",
+        "function_id": "Fn010P",
         "inputs": {
           "message": {
             "hidden": false,
@@ -400,39 +529,6 @@
                 "type": "rich_text",
                 "elements": [
                   {
-                    "type": "rich_text_section",
-                    "elements": [
-                      { "text": "Ausgabe von ", "type": "text" },
-                      {
-                        "id": "{{inputs.Ft085RERHX5M__user_id}}",
-                        "type": "workflowtoken",
-                        "property": "",
-                        "data_type": "slack#/types/user_id"
-                      },
-                      { "text": ":\n", "type": "text" },
-                      {
-                        "id": "{{steps.964e0b42-8804-467b-8ea3-1ee6198cd539.fields.6b47642e-e193-4f36-a722-ae1d7aebc3fe}}",
-                        "type": "workflowtoken",
-                        "property": "",
-                        "data_type": "string"
-                      },
-                      { "text": " - ", "type": "text" },
-                      {
-                        "id": "{{steps.964e0b42-8804-467b-8ea3-1ee6198cd539.fields.2568827b-28eb-4040-8840-2b6c0bfb072a}}",
-                        "type": "workflowtoken",
-                        "property": "",
-                        "data_type": "slack#/types/date"
-                      },
-                      { "text": "\n\n", "type": "text" },
-                      {
-                        "text": "Bezahlung per",
-                        "type": "text",
-                        "style": { "bold": true }
-                      },
-                      { "text": "\n", "type": "text" }
-                    ]
-                  },
-                  {
                     "id": "{{steps.8c0f2894-de96-4ba4-882e-c9ab0ec9e35b.fields.8bc9f3c0-6917-4140-a0d8-83dc9aad0567}}",
                     "type": "workflowtoken",
                     "property": "",
@@ -441,13 +537,6 @@
                   {
                     "type": "rich_text_section",
                     "elements": [
-                      { "text": "\n\nPaypal Konto\n", "type": "text" },
-                      {
-                        "id": "{{steps.964e0b42-8804-467b-8ea3-1ee6198cd539.fields.b0abe6bf-d070-447b-a63e-c6bc9b40b89d}}",
-                        "type": "workflowtoken",
-                        "property": "",
-                        "data_type": "string"
-                      },
                       {
                         "text": "\n\nRechnung liegt hier (bitte noch sortieren):\n",
                         "type": "text"
@@ -463,10 +552,37 @@
               }
             ]
           },
-          "channel_id": {
+          "message_context": {
             "hidden": false,
             "locked": false,
-            "value": "C0789FQF0QJ"
+            "value": "{{steps.0ef80f0c-6982-46dc-a2d1-c8c19eb203ca.message_context}}"
+          },
+          "reply_broadcast": {
+            "hidden": false,
+            "locked": false,
+            "value": "false"
+          }
+        }
+      },
+      {
+        "id": "d26cf83d-6e3a-4f6b-9bfa-55ee65ffdfac",
+        "function_id": "Fn0133",
+        "inputs": {
+          "columns": {
+            "hidden": false,
+            "locked": false,
+            "value": {
+              "name": "Rechnung: {{steps.964e0b42-8804-467b-8ea3-1ee6198cd539.fields.6b47642e-e193-4f36-a722-ae1d7aebc3fe}}",
+              "Col08LRUJMGRL": "{{steps.0ef80f0c-6982-46dc-a2d1-c8c19eb203ca.message_link}}",
+              "Col08M2A52QHY": "OptWQ6EQWNO",
+              "Col08M9UVR0HX": "OptFXY9DFYV",
+              "Col096NG6M0CF": "OptWIIZZQ1X"
+            }
+          },
+          "list_id": {
+            "hidden": false,
+            "locked": false,
+            "value": "F08LJQDNR9D"
           }
         }
       }
