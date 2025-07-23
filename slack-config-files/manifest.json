@@ -94,6 +94,27 @@
     "function_runtime": "remote"
   },
   "functions": {
+    "setLeaveDate": {
+      "title": "Setzt das Austrittsdatum eines Mitglieds",
+      "description": "",
+      "input_parameters": {
+        "leaveUser": {
+          "type": "slack#/types/user_id",
+          "title": "Leaving User",
+          "description": "",
+          "is_required": true,
+          "name": "leaveUser"
+        },
+        "leaveDate": {
+          "type": "slack#/types/date",
+          "title": "Leave Date of User",
+          "description": "",
+          "is_required": true,
+          "name": "leaveDate"
+        }
+      },
+      "output_parameters": {}
+    },
     "uploadFileToGoogleDrive": {
       "title": "Datei zu Google Drive hochladen",
       "description": "Die Datei muss in einem Channel mit dem Bot verfügbar sein, bevor diese Funktion gerufen werden kann. Input ist die File ID, die in einem Workflow Input Form gesammelt wurde, sowie die Ordner ID.",

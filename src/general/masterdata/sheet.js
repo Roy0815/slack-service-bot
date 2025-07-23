@@ -238,6 +238,30 @@ async function saveSlackId(id, slackId) {
 }
 
 /**
+ * save leave date to google sheet
+ * @param {types.ids} ids
+ * @param {string} leaveDate
+ */
+async function saveLeaveDate(ids, leaveDate) {
+  // check any id is set
+  if (!ids.id && !ids.slackId) return;
+
+  // get id from slack id
+  if (!ids.id) {
+    const user = await getUserFromId({ slackId: ids.slackId });
+    if (!user) return;
+    ids.id = user.id;
+  }
+
+  await sheet.updateCell(process.env.SPREADSHEET_ID_MASTERDATA, {
+    range: `'${allgDatenSheetName}'!${util.convertNumberToColumn(
+      allgDatenColumns.leaveDate
+    )}${ids.id + 1}`, // google sheet functions count rows starting from 1
+    values: [[leaveDate]]
+  });
+}
+
+/**
  * object with all masterdata functions
  * @type {types.userService}
  */
@@ -247,5 +271,6 @@ export const googleSheetMasterdataService = {
   saveMasterdataChanges,
   isUserRegistered,
   getAllActiveUsers,
-  saveSlackId
+  saveSlackId,
+  saveLeaveDate
 };

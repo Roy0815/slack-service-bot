@@ -99,6 +99,13 @@ export const userSex = {
  */
 
 /**
+ * save leave date of user to database
+ * @callback saveLeaveDate
+ * @param {ids} ids
+ * @param {string} leaveDate
+ */
+
+/**
  * Interface to be implemented by the active userservice
  * @typedef {object} userService
  * @property {getUserFromId} getUserFromId
@@ -107,6 +114,7 @@ export const userSex = {
  * @property {isUserRegistered} isUserRegistered
  * @property {getAllActiveUsers} getAllActiveUsers
  * @property {saveSlackId} saveSlackId
+ * @property {saveLeaveDate} saveLeaveDate
  */
 
 export {};
