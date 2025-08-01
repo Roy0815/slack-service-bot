@@ -188,7 +188,7 @@ in Schritt 8 den custom Step einfügen wie hier zu sehen (Bei File ID Dropdown "
 1. [Generelle Projektstruktur](#1-generelle-projektstruktur)
 2. [Slack App Entwicklung](#2-slack-app-entwicklung)
    1. [Testen mit Glitch (Live Webserver)](#21-testen-mit-glitch)
-   1. [Testen mit lokalem Docker Container](#22-testen-mit-lokalem-server)
+   1. [Testen mit lokalem Server](#22-testen-mit-lokalem-server)
 3. [Contribution Guidelines](#3-contribution-guidelines)
 
 ### **1. Generelle Projektstruktur**
@@ -222,9 +222,10 @@ serverless offline --noPrependStageInUrl
 ```
 
 Dieser Server / diese Funktion muss dann öffentlich im Internet verfügbar gemacht werden. Ich habe das mit [ngrok](https://ngrok.com) erreicht. Erstelle einen gratis Account und [Folge den Setupanweisungen für dein Betriebssystem und denen für NodeJS](https://dashboard.ngrok.com/get-started/setup/)
+Alternativ hat auch diese Anleitung für WSL (Windows-Subsystem für Linux), sehr gut geklappt: [Github](https://gist.github.com/SalahHamza/799cac56b8c2cd20e6bfeb8886f18455)
 
 ```bash
-.\ngrok.exe http http://localhost:8080
+ngrok http http://localhost:8080
 ```
 
 ### **3. Contribution Guidelines**
