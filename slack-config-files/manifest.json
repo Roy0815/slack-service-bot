@@ -123,7 +123,8 @@
           "type": "slack#/types/rich_text",
           "title": "File ID in Slack",
           "description": "File ID aus Workflow Input Form",
-          "is_required": true,
+          "is_required": false,
+          "hint": "File ID ODER File URL sind benötigt",
           "name": "fileID"
         },
         "driveFolderID": {
@@ -137,7 +138,7 @@
           "type": "slack#/types/date",
           "title": "Datum der Datei",
           "description": "",
-          "is_required": true,
+          "is_required": false,
           "name": "fileDate"
         },
         "fileName": {
@@ -149,10 +150,16 @@
         },
         "approverChannel": {
           "type": "slack#/types/channel_id",
-          "title": "Channel für Fehler",
-          "description": "Channel, in dem mögliche Fehler mitgeteilt werden",
+          "title": "Genehmiger Channel",
+          "description": "Channel, in dem die Ausgaben genehmigt werden",
           "is_required": true,
           "name": "approverChannel"
+        },
+        "fileURL": {
+          "type": "string",
+          "title": "Datei URL",
+          "description": "Muss öffentlich ohne Authorisierung verfügbar sein. URL oder File ID sind benötigt",
+          "name": "fileURL"
         }
       },
       "output_parameters": {}
