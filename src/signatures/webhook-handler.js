@@ -1,8 +1,12 @@
-import * as controller from './controller.js';
+import * as controller from './webhook-controller.js';
+import * as awsRtAPI from '../general/aws-runtime-api.js';
 
 // Handle webhook events from docuseal
 /** @type {import('aws-lambda').LambdaFunctionURLHandler } */
-export async function handler(event) {
+export async function handler(event, context) {
+  // Set global AWS request ID for further processing
+  awsRtAPI.globalData.awsRequestId = context.awsRequestId;
+
   // Verify the webhook signature
   if (
     !event.headers ||
@@ -21,7 +25,11 @@ export async function handler(event) {
 
     switch (payload.event_type) {
       case 'form.completed':
-        controller.handleFormCompleted(event);
+        // already send 200 response to Docuseal
+        await awsRtAPI.sendResponse();
+
+        // Handle form completed event
+        await controller.handleFormCompleted(event);
         break;
 
       default:
