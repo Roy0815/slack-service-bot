@@ -392,7 +392,9 @@
                         "elements": [
                           {
                             "type": "rich_text_section",
-                            "elements": [{ "text": "Paypal", "type": "text" }]
+                            "elements": [
+                              { "text": "Verein zahlt direkt", "type": "text" }
+                            ]
                           }
                         ]
                       }
@@ -404,7 +406,26 @@
                           {
                             "type": "rich_text_section",
                             "elements": [
-                              { "text": "Banküberweisung", "type": "text" }
+                              {
+                                "text": "Verein überweist Mitglied",
+                                "type": "text"
+                              }
+                            ]
+                          }
+                        ]
+                      }
+                    ],
+                    [
+                      {
+                        "type": "rich_text",
+                        "elements": [
+                          {
+                            "type": "rich_text_section",
+                            "elements": [
+                              {
+                                "text": "Verein schickt Mitglied per Paypal",
+                                "type": "text"
+                              }
                             ]
                           }
                         ]
@@ -412,26 +433,12 @@
                     ]
                   ],
                   "name": "8bc9f3c0-6917-4140-a0d8-83dc9aad0567",
-                  "type": "slack#/types/rich_text",
+                  "type": "slack#/types/limited_rich_text",
                   "title": "Wie wird bezahlt?",
                   "choices": [
                     {
-                      "title": "Paypal",
-                      "value": [
-                        {
-                          "type": "rich_text",
-                          "elements": [
-                            {
-                              "type": "rich_text_section",
-                              "elements": [{ "text": "Paypal", "type": "text" }]
-                            }
-                          ]
-                        }
-                      ],
-                      "description": "Paypal"
-                    },
-                    {
-                      "title": "Banküberweisung",
+                      "id": "60dcaf08-279c-4a5b-ba28-8895e2ae2be7",
+                      "title": "Verein zahlt direkt",
                       "value": [
                         {
                           "type": "rich_text",
@@ -439,13 +446,58 @@
                             {
                               "type": "rich_text_section",
                               "elements": [
-                                { "text": "Banküberweisung", "type": "text" }
+                                {
+                                  "text": "Verein zahlt direkt",
+                                  "type": "text"
+                                }
                               ]
                             }
                           ]
                         }
                       ],
-                      "description": "Banküberweisung"
+                      "description": "Verein zahlt direkt"
+                    },
+                    {
+                      "id": "589301bf-995e-4e6d-a7d5-8df90f12ee5d",
+                      "title": "Verein überweist Mitglied",
+                      "value": [
+                        {
+                          "type": "rich_text",
+                          "elements": [
+                            {
+                              "type": "rich_text_section",
+                              "elements": [
+                                {
+                                  "text": "Verein überweist Mitglied",
+                                  "type": "text"
+                                }
+                              ]
+                            }
+                          ]
+                        }
+                      ],
+                      "description": "Verein überweist Mitglied"
+                    },
+                    {
+                      "id": "2331af17-56ab-4c0e-b2e4-163b0b18a542",
+                      "title": "Verein schickt Mitglied per Paypal",
+                      "value": [
+                        {
+                          "type": "rich_text",
+                          "elements": [
+                            {
+                              "type": "rich_text_section",
+                              "elements": [
+                                {
+                                  "text": "Verein schickt Mitglied per Paypal",
+                                  "type": "text"
+                                }
+                              ]
+                            }
+                          ]
+                        }
+                      ],
+                      "description": "Verein schickt Mitglied per Paypal"
                     }
                   ],
                   "default": "",
@@ -484,25 +536,14 @@
                         "data_type": "string"
                       },
                       {
-                        "text": " wurde genehmigt.\nSie wird dir zeitnah per\n",
+                        "text": " wurde genehmigt.\nBezahlung:\n",
                         "type": "text"
-                      }
-                    ]
-                  },
-                  {
-                    "id": "{{steps.8c0f2894-de96-4ba4-882e-c9ab0ec9e35b.fields.8bc9f3c0-6917-4140-a0d8-83dc9aad0567}}",
-                    "type": "workflowtoken",
-                    "property": "",
-                    "data_type": "slack#/types/rich_text"
-                  },
-                  {
-                    "type": "rich_text_section",
-                    "elements": [
-                      { "text": "\ngutgeschrieben ", "type": "text" },
+                      },
                       {
-                        "name": "slightly_smiling_face",
-                        "type": "emoji",
-                        "unicode": "1f642"
+                        "id": "{{steps.8c0f2894-de96-4ba4-882e-c9ab0ec9e35b.fields.8bc9f3c0-6917-4140-a0d8-83dc9aad0567}}",
+                        "type": "workflowtoken",
+                        "property": "",
+                        "data_type": "slack#/types/limited_rich_text"
                       }
                     ]
                   }
@@ -529,14 +570,14 @@
                 "type": "rich_text",
                 "elements": [
                   {
-                    "id": "{{steps.8c0f2894-de96-4ba4-882e-c9ab0ec9e35b.fields.8bc9f3c0-6917-4140-a0d8-83dc9aad0567}}",
-                    "type": "workflowtoken",
-                    "property": "",
-                    "data_type": "slack#/types/rich_text"
-                  },
-                  {
                     "type": "rich_text_section",
                     "elements": [
+                      {
+                        "id": "{{steps.8c0f2894-de96-4ba4-882e-c9ab0ec9e35b.fields.8bc9f3c0-6917-4140-a0d8-83dc9aad0567}}",
+                        "type": "workflowtoken",
+                        "property": "",
+                        "data_type": "slack#/types/limited_rich_text"
+                      },
                       {
                         "text": "\n\nRechnung liegt hier (bitte noch sortieren):\n",
                         "type": "text"

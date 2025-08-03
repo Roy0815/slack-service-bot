@@ -30,12 +30,20 @@ async function auth() {
 
 //* ******************* Public functions ********************//
 /**
- * get download URL from Slack file and download it
+ * get download URL from Slack or public
  * @param {import("@slack/bolt").webApi.WebClient} client
  * @param {types.fileInformation} file
  * @returns {Promise<any>}
  */
-export async function getFileInfoFromSlack(client, file) {
+export async function getFileInfo(client, file) {
+  // for public files, no need to fetch from slack
+  if (file.publicFileURL) {
+    file.mimetype =
+      types.mimeTypes[file.fileName.split('.').pop()] ||
+      'application/octet-stream';
+    return;
+  }
+
   // get file URL from slack
   const fileInfo = await client.files.info({
     file: file.fileID
@@ -62,13 +70,13 @@ export async function uploadFileToDriveFolder(file) {
   // create streamable instance for upload
   const readStream = new stream.PassThrough();
 
-  // download slack file and pipe into stream
+  // download file from slack or public and pipe into stream
   (
-    await fetch(file.fileURL, {
+    await fetch(file.publicFileURL || file.fileURL, {
       method: 'get',
-      headers: {
-        Authorization: `Bearer ${process.env.SLACK_BOT_TOKEN}`
-      }
+      headers: file.publicFileURL
+        ? {}
+        : { Authorization: `Bearer ${process.env.SLACK_BOT_TOKEN}` }
     })
   ).body.pipe(readStream);
 

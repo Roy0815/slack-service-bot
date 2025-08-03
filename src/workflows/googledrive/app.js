@@ -21,21 +21,20 @@ function setupApp(app) {
       try {
         // get step parameters
         file = {
-          fileName: /** @type {string} */ (
-            `${/** @type {string} */ (inputs.fileDate).replace(/-*/g, '')} ${inputs.fileName}`
-          ),
+          fileName: `${inputs.fileDate ? /** @type {string} */ (inputs.fileDate).replace(/-*/g, '') + ' ' : ''}${inputs.fileName}`,
           driveFolderID: /** @type {string} */ (inputs.driveFolderID),
-          fileID: inputs.fileID[0].elements[0].elements[0].text
+          fileID: inputs.fileID?.[0].elements[0].elements[0].text,
+          publicFileURL: /** @type {string} */ (inputs?.fileURL)
         };
 
         // set workflow step to complete
         await complete();
 
         // post 200 already to not wait for drive upload
-        awsRtAPI.sendResponse();
+        await awsRtAPI.sendResponse();
 
-        // download file from slack
-        await controller.getFileInfoFromSlack(client, file);
+        // get file info
+        await controller.getFileInfo(client, file);
 
         // upload to drive
         await controller.uploadFileToDriveFolder(file);
@@ -70,7 +69,7 @@ function setupApp(app) {
       await ack();
 
       // post 200 already
-      awsRtAPI.sendResponse();
+      await awsRtAPI.sendResponse();
 
       // get file information from action
       /** @type {types.fileInformation} */
@@ -80,8 +79,8 @@ function setupApp(app) {
 
       // upload file to drive folder
       try {
-        // download file from slack
-        await controller.getFileInfoFromSlack(client, file);
+        // get file info
+        await controller.getFileInfo(client, file);
 
         // upload to drive
         await controller.uploadFileToDriveFolder(file);
