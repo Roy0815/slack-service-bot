@@ -19,6 +19,11 @@ provider:
     # Staette config
     STAETTE_CHANNEL: ${env:STAETTE_CHANNEL}
     CRONJOB_LOG_TO_ADMIN: ${env:CRONJOB_LOG_TO_ADMIN}
+    # Signatures config
+    SIGNATURE_SIGNING_SECRET: ${env:SIGNATURE_SIGNING_SECRET}
+    SIGNATURE_HEADER_NAME: ${env:SIGNATURE_HEADER_NAME}
+    APPLICATION_FORM_TEMPLATE_ID: ${env:APPLICATION_FORM_TEMPLATE_ID}
+    SIGNATURE_WORKFLOW_SLACK_WEBHOOK: ${env:SIGNATURE_WORKFLOW_SLACK_WEBHOOK}
     # Arbeitsstunden config
     SPREADSHEET_ID_MASTERDATA: ${env:SPREADSHEET_ID_MASTERDATA}
     GOOGLE_SERVICE_ACC_EMAIL: ${env:GOOGLE_SERVICE_ACC_EMAIL}
@@ -52,6 +57,12 @@ functions:
           rate:
             - cron(0 9 * * ? *) ## Runs every day at 9:00 Berlin time
           timezone: Europe/Berlin
+  slack-service-bot-signature-webhook:
+    handler: ./src/signatures/webhook-handler.handler
+    events:
+      - http:
+          path: docuseal/webhook
+          method: post
 
 plugins:
   - serverless-offline

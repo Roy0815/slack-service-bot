@@ -126,6 +126,7 @@ Die zentrale App verarbeitet das Event `app_home_opened`.
 3. [Arbeitsstunden](#3-arbeitsstunden)
 4. [Stammdaten](#4-stammdaten)
 5. [Rechnungen](#5-rechnungen)
+6. [Mitgliederaufnahme](#6-mitgliederaufnahme)
 
 ### **1. Pollz**
 
@@ -182,6 +183,23 @@ Der Workflow kann zu Slack mit Hilfe der Datei [Rechnung einreichen.json](/slack
 in Schritt 8 den custom Step einfügen wie hier zu sehen (Bei File ID Dropdown "File ID" auswählen und die ID des Google Drive Ordners auswählen, in den die Datein gelegt werden sollen):
 
 ![Konfiguration Workflow Schritt](/images/[RECHNUNGEN]%20Custom%20workflow%20step.png)
+
+### **6. Mitgliederaufnahme**
+
+Die Mitgliederaufnahme ist über den Workflow Builder eingerichtet. Der Bot implementiert mehrere Custom Workflow Steps, welche die Interaktion mit Google Drive ermöglichen.
+
+Wie im Kapitel [1. Google APIs einrichten](#1-google-apis-einrichten) beschrieben, muss der Service Account dem Google Drive Ordner als Bearbeiter hinzugefügt werden.
+
+Der Workflow muss manuell hinzugefügt werden, da zum Zeitpunkt der Implementierung Custom steps und Trigger noch nicht über eine Konfig-Datei exportiert werden können.
+Die URL des Custom Triggers muss in der .env Datei hinterlegt werden.
+
+Screenshots der Konfiguration:
+
+![Konfiguration Workflow](/images/[APPLICATION]%20Workflow%20configuration.png)
+
+![Konfiguration Workflow Schritt Mitgliedsinfos speichern](/images/[APPLICATION]%20Workflow%20step%20-%20save%20member%20information%20to%20drive.png)
+
+![Konfiguration Workflow Schritt Mitgliedsantrag ablegen](/images/[APPLICATION]%20Workflow%20step%20-%20save%20member%20information%20to%20drive.png)
 
 ## Upgrades & Contribution
 
