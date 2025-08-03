@@ -10,6 +10,12 @@ export const allgDatenSheetName = 'Allg Daten';
 
 /**
  * @readonly
+ * @type {string}
+ */
+export const bankDatenSheetName = 'SEPA Daten';
+
+/**
+ * @readonly
  * @enum {number}
  */
 const allgDatenColumns = {
@@ -18,6 +24,7 @@ const allgDatenColumns = {
   lastname: 3,
   joinedDate: 4,
   leaveDate: 5,
+  membershipType: 6,
   birthday: 7,
   sex: 9,
   email: 10,
@@ -27,6 +34,17 @@ const allgDatenColumns = {
   city: 14,
   phone: 15,
   slackId: 16
+};
+
+/**
+ * @readonly
+ * @enum {number}
+ */
+const bankDatenColumns = {
+  IBAN: 4,
+  BIC: 5,
+  signingDate: 9,
+  accountOwner: 10
 };
 
 //* ******************* Private functions ********************//
@@ -192,6 +210,7 @@ async function getAllActiveUsers() {
   );
   if (!array) return [];
 
+  // remove header line
   array.shift();
 
   /** @type {types.user[]} */
@@ -262,6 +281,62 @@ async function saveLeaveDate(ids, leaveDate) {
 }
 
 /**
+ * save new member to sheet
+ * @param {types.userJoiningDetails} userJoiningDetails
+ */
+async function saveNewMember(userJoiningDetails) {
+  // cleanup data
+  // clear account owner if it is the same as the name
+  userJoiningDetails.accountOwner =
+    userJoiningDetails.accountOwner !==
+    `${userJoiningDetails.firstname} ${userJoiningDetails.lastname}`
+      ? userJoiningDetails.accountOwner
+      : '';
+
+  // escape + and spaces in phone numbers
+  userJoiningDetails.phone = userJoiningDetails.phone
+    .replace(/\s+/g, '')
+    .replace(/^(\+)/, "'$1");
+
+  // get last row
+  const ids = await sheet.getCells(
+    process.env.SPREADSHEET_ID_MASTERDATA,
+    `${allgDatenSheetName}!${util.convertNumberToColumn(allgDatenColumns.id)}:${util.convertNumberToColumn(allgDatenColumns.id)}`
+  );
+
+  const newIdx =
+    ids.filter((line) => line.length > 0 && line[0] !== '').length + 1;
+
+  // update each field individually to not overwrite other data
+  /** @type {Promise<void>[]} */
+  const promises = [];
+
+  Object.keys(userJoiningDetails).forEach((key) => {
+    // not in general or bank infos
+    if (!allgDatenColumns[key] && !bankDatenColumns[key]) return;
+
+    // get correct sheet and column
+    const sheetName = allgDatenColumns[key]
+      ? allgDatenSheetName
+      : bankDatenSheetName;
+
+    const column = util.convertNumberToColumn(
+      allgDatenColumns[key] || bankDatenColumns[key]
+    );
+
+    promises.push(
+      sheet.updateCell(process.env.SPREADSHEET_ID_MASTERDATA, {
+        range: `'${sheetName}'!${column}${newIdx}`,
+        values: [[userJoiningDetails[key]]]
+      })
+    );
+  });
+
+  // Wait for all updates to finish in parallel
+  await Promise.all(promises);
+}
+
+/**
  * object with all masterdata functions
  * @type {types.userService}
  */
@@ -272,5 +347,6 @@ export const googleSheetMasterdataService = {
   isUserRegistered,
   getAllActiveUsers,
   saveSlackId,
-  saveLeaveDate
+  saveLeaveDate,
+  saveNewMember
 };

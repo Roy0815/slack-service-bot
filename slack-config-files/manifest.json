@@ -65,6 +65,7 @@
         "chat:write",
         "chat:write.public",
         "commands",
+        "files:read",
         "files:write",
         "groups:history",
         "groups:read",
@@ -73,7 +74,7 @@
         "im:write",
         "mpim:read",
         "users:read",
-        "files:read"
+        "team:read"
       ]
     }
   },
@@ -94,6 +95,125 @@
     "function_runtime": "remote"
   },
   "functions": {
+    "saveNewMember": {
+      "title": "Save new Member Information",
+      "description": "",
+      "input_parameters": {
+        "joinedDate": {
+          "type": "string",
+          "title": "Beitrittsdatum",
+          "description": "",
+          "is_required": true,
+          "name": "joinedDate"
+        },
+        "firstname": {
+          "type": "string",
+          "title": "Vorname",
+          "description": "",
+          "is_required": true,
+          "name": "firstname"
+        },
+        "lastname": {
+          "type": "string",
+          "title": "Nachname",
+          "description": "",
+          "is_required": true,
+          "name": "lastname"
+        },
+        "email": {
+          "type": "string",
+          "title": "E-Mail",
+          "description": "",
+          "is_required": true,
+          "name": "email"
+        },
+        "phone": {
+          "type": "string",
+          "title": "Telefonnummer",
+          "description": "",
+          "is_required": true,
+          "name": "phone"
+        },
+        "birthday": {
+          "type": "string",
+          "title": "Geburtstag",
+          "description": "",
+          "is_required": true,
+          "name": "birthday"
+        },
+        "street": {
+          "type": "string",
+          "title": "Straße",
+          "description": "",
+          "is_required": true,
+          "name": "street"
+        },
+        "houseNumber": {
+          "type": "string",
+          "title": "Hausnummer",
+          "description": "",
+          "is_required": true,
+          "name": "houseNumber"
+        },
+        "zip": {
+          "type": "string",
+          "title": "Postleitzahl",
+          "description": "",
+          "is_required": true,
+          "name": "zip"
+        },
+        "city": {
+          "type": "string",
+          "title": "Wohnort",
+          "description": "",
+          "is_required": true,
+          "name": "city"
+        },
+        "sex": {
+          "type": "string",
+          "title": "Geschlecht",
+          "description": "",
+          "is_required": true,
+          "name": "sex"
+        },
+        "membershipType": {
+          "type": "string",
+          "title": "Art der Mitgliedschaft",
+          "description": "",
+          "is_required": true,
+          "name": "membershipType"
+        },
+        "IBAN": {
+          "type": "string",
+          "title": "IBAN",
+          "description": "",
+          "is_required": true,
+          "name": "IBAN"
+        },
+        "BIC": {
+          "type": "string",
+          "title": "BIC",
+          "description": "",
+          "is_required": true,
+          "name": "BIC"
+        },
+        "accountOwner": {
+          "type": "string",
+          "title": "Kontoinhaber",
+          "description": "",
+          "is_required": true,
+          "name": "accountOwner"
+        },
+        "signingDate": {
+          "type": "string",
+          "title": "Datum der Unterschrift",
+          "description": "",
+          "is_required": true,
+          "name": "signingDate"
+        }
+      },
+      "output_parameters": {}
+    },
     "setLeaveDate": {
       "title": "Setzt das Austrittsdatum eines Mitglieds",
       "description": "",
