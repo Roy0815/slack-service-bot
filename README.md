@@ -188,18 +188,19 @@ in Schritt 8 den custom Step einfügen wie hier zu sehen (Bei File ID Dropdown "
 
 Die Mitgliederaufnahme ist über den Workflow Builder eingerichtet. Der Bot implementiert mehrere Custom Workflow Steps, welche die Interaktion mit Google Drive ermöglichen.
 
-Wie im Kapitel [1. Google APIs einrichten](#1-google-apis-einrichten) beschrieben, muss der Service Account dem Google Drive Ordner als Bearbeiter hinzugefügt werden.
+Ausgelöst wird der Prozess durch einen unterschriebenen Aufnahmeantrag über [DocuSeal](https://docuseal.com/).
+Unter Einstellungen - API - Webhooks kann die URL für den Webhook im Signatures Ordner mitgegeben werden. Außerdem sollte ein Webhook Secret gesetzt und bei Aufruf des Webhooks verifiziert werden.
+Der Webhook muss für unsere Zwecke für `form.completed` aktiv sein.
 
-Der Workflow muss manuell hinzugefügt werden, da zum Zeitpunkt der Implementierung Custom steps und Trigger noch nicht über eine Konfig-Datei exportiert werden können.
+Weitere Vorraussetzung ist, dass wie im Kapitel [1. Google APIs einrichten](#1-google-apis-einrichten) beschrieben, der Service Account dem Google Drive Ordner als Bearbeiter hinzugefügt wurde.
+
+Der Slack Workflow muss manuell hinzugefügt werden, da zum Zeitpunkt der Implementierung Custom steps und Trigger noch nicht über eine Konfig-Datei exportiert werden können.
+Der Workflow startet mit einem Custom Trigger "Von einem Webhook". Die Datenvariablen sind im Objekt "userJoiningDetails" in den [Masterdata-Types](/src/general/masterdata/types.js) definiert. Alle Variablen sind Typ String.
 Die URL des Custom Triggers muss in der .env Datei hinterlegt werden.
 
 Screenshots der Konfiguration:
 
-![Konfiguration Workflow](/images/[APPLICATION]%20Workflow%20configuration.png)
-
-![Konfiguration Workflow Schritt Mitgliedsinfos speichern](/images/[APPLICATION]%20Workflow%20step%20-%20save%20member%20information%20to%20drive.png)
-
-![Konfiguration Workflow Schritt Mitgliedsantrag ablegen](/images/[APPLICATION]%20Workflow%20step%20-%20save%20member%20information%20to%20drive.png)
+<img src="/images/%5BAPPLICATION%5D%20Workflow%20configuration.png" style="width: 300px;" alt="Konfiguration Workflow"> <img src="/images/%5BAPPLICATION%5D%20Workflow%20step%20-%20save%20member%20information%20to%20drive.png" style="width: 300px;" alt="Konfiguration Workflow Schritt Mitgliedsinfos speichern"> <img src="/images/%5BAPPLICATION%5D%20Workflow%20step%20-%20save%20member%20form%20to%20drive.png" style="width: 300px;" alt="Konfiguration Workflow Schritt Mitgliedsantrag ablegen">
 
 ## Upgrades & Contribution
 
