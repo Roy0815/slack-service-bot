@@ -10,10 +10,7 @@ export const masterdataWorkflowsApp = { setupApp, getHomeView: null };
 function setupApp(app) {
   //* ******************* Workflow Steps ********************//
   app.function('setLeaveDate', async ({ client, inputs, fail, complete }) => {
-    // set workflow step to complete
-    await complete();
-
-    // post 200 already to not wait for drive upload
+    // post 200 to acknowledge receipt of workflow step
     await awsRtAPI.sendResponse();
 
     const leaveDateFormatted = /** @type {string} */ (inputs.leaveDate)
@@ -21,20 +18,24 @@ function setupApp(app) {
       .reverse()
       .join('.');
 
-    await masterdataService.saveLeaveDate(
-      { slackId: /** @type {string} */ (inputs.leaveUser) },
-      leaveDateFormatted
-    );
+    try {
+      await masterdataService.saveLeaveDate(
+        { slackId: /** @type {string} */ (inputs.leaveUser) },
+        leaveDateFormatted
+      );
+
+      // set workflow step to complete
+      await complete();
+    } catch (error) {
+      await fail({
+        error: `An error occurred while saving the leave date: ${error.message}`
+      });
+    }
   });
 
-  app.function('saveNewMember', async ({ inputs, complete }) => {
-    // set workflow step to complete
-    await complete();
-
-    // post 200 already to not wait for drive upload
+  app.function('saveNewMember', async ({ inputs, fail, complete }) => {
+    // post 200 to acknowledge receipt of workflow step
     await awsRtAPI.sendResponse();
-
-    console.log('Saving new member information:', inputs);
 
     /** @type {import('../../general/masterdata/types.js').userJoiningDetails} */
     const newMemberInfo = {};
@@ -44,7 +45,16 @@ function setupApp(app) {
       newMemberInfo[key] = inputs[key];
     });
 
-    // save to sheet
-    await masterdataService.saveNewMember(newMemberInfo);
+    try {
+      // save to sheet
+      await masterdataService.saveNewMember(newMemberInfo);
+
+      // set workflow step to complete
+      await complete();
+    } catch (error) {
+      await fail({
+        error: `An error occurred while saving the new member information: ${error.message}`
+      });
+    }
   });
 }
