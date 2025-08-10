@@ -58,7 +58,7 @@ functions:
             - cron(0 9 * * ? *) ## Runs every day at 9:00 Berlin time
           timezone: Europe/Berlin
   slack-service-bot-signature-webhook:
-    handler: ./src/signatures/webhook-handler.handler
+    handler: ./src/signatures/webhooks.handler
     events:
       - http:
           path: docuseal/webhook
