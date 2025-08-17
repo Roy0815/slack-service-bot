@@ -292,6 +292,10 @@ export function getUserRegisterEndMessage({ slackId, name, approved }) {
 export function getMaintainHoursView(triggerId) {
   const view = util.deepCopy(maintainHoursView);
 
+  /** @type {import('@slack/types').Datepicker} */ (
+    /** @type {import('@slack/types').InputBlock} */ (view.blocks[1]).element
+  ).initial_date = new Date().toISOString().split('T')[0]; // current date in YYYY-MM-DD format
+
   return { trigger_id: triggerId, view };
 }
 

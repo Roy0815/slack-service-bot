@@ -84,6 +84,7 @@ export const maintainHoursView = {
           text: 'Datum auswählen',
           emoji: true
         },
+        initial_date: '', // filled in method
         action_id: constants.maintainHoursView.actionDate
       },
       label: {

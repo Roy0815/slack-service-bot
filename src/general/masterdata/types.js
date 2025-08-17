@@ -9,6 +9,7 @@
  * @property {number} id
  * @property {string} firstname
  * @property {string} lastname
+ * @property {string} joinedDate
  * @property {string} leaveDate
  * @property {string} slackId
  * @property {string} birthday
@@ -55,6 +56,57 @@ export const userSex = {
  * @typedef {user & vCardContent} userContactCard
  */
 
+/**
+ * @typedef {object} userJoiningDetails
+ * @property {string} [joinedDate]
+ * @property {string} [firstname]
+ * @property {string} [lastname]
+ * @property {string} [email]
+ * @property {string} [phone]
+ * @property {string} [birthday]
+ * @property {string} [street]
+ * @property {string} [houseNumber]
+ * @property {string} [zip]
+ * @property {string} [city]
+ * @property {userSex} [sex]
+ * @property {('aktiv'|'ermäßigt'|'passiv')} [membershipType]
+ * @property {string} [IBAN]
+ * @property {string} [BIC]
+ * @property {string} [accountOwner]
+ * @property {string} [signingDate]
+ * @property {string} [docusealFileURL]
+ */
+
+/**
+ * @readonly
+ * @type {string[]}
+ */
+export const userJoiningFields = [
+  'joinedDate',
+  'firstname',
+  'lastname',
+  'email',
+  'phone',
+  'birthday',
+  'street',
+  'houseNumber',
+  'zip',
+  'city',
+  'sex',
+  'membershipType',
+  'IBAN',
+  'BIC',
+  'accountOwner',
+  'signingDate'
+];
+
+/**
+ * @typedef {object} userJoiningReturn
+ * @property {string} mandateReference
+ * @property {string} recurringAmount
+ * @property {string} initialAmount
+ */
+
 /** Interface */
 
 /**
@@ -98,6 +150,20 @@ export const userSex = {
  */
 
 /**
+ * save leave date of user to database
+ * @callback saveLeaveDate
+ * @param {ids} ids
+ * @param {string} leaveDate
+ */
+
+/**
+ * save new member to sheet
+ * @callback saveNewMember
+ * @param {userJoiningDetails} userJoiningDetails
+ * @returns {Promise<userJoiningReturn>}
+ */
+
+/**
  * Interface to be implemented by the active userservice
  * @typedef {object} userService
  * @property {getUserFromId} getUserFromId
@@ -106,6 +172,8 @@ export const userSex = {
  * @property {isUserRegistered} isUserRegistered
  * @property {getAllActiveUsers} getAllActiveUsers
  * @property {saveSlackId} saveSlackId
+ * @property {saveLeaveDate} saveLeaveDate
+ * @property {saveNewMember} saveNewMember
  */
 
 export {};

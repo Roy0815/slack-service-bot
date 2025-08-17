@@ -126,6 +126,7 @@ Die zentrale App verarbeitet das Event `app_home_opened`.
 3. [Arbeitsstunden](#3-arbeitsstunden)
 4. [Stammdaten](#4-stammdaten)
 5. [Rechnungen](#5-rechnungen)
+6. [Mitgliederaufnahme](#6-mitgliederaufnahme)
 
 ### **1. Pollz**
 
@@ -179,16 +180,74 @@ Wie im Kapitel [1. Google APIs einrichten](#1-google-apis-einrichten) beschriebe
 
 Der Workflow kann zu Slack mit Hilfe der Datei [Rechnung einreichen.json](/slack-config-files/workflows/Rechnung%20einreichen.json) hinzugefügt werden. Da zum Zeitpunkt der Implementierung Custom steps noch nicht über eine solche Konfig-Datei exportiert werden können, muss noch folgende manuelle Aktion erfolgen.
 
-in Schritt 6 den custom Step einfügen wie hier zu sehen (Bei File ID Dropdown "File ID" auswählen und die ID des Google Drive Ordners auswählen, in den die Datein gelegt werden sollen):
+in Schritt 8 den custom Step einfügen wie hier zu sehen (Bei File ID Dropdown "File ID" auswählen und die ID des Google Drive Ordners auswählen, in den die Datein gelegt werden sollen):
 
 ![Konfiguration Workflow Schritt](/images/[RECHNUNGEN]%20Custom%20workflow%20step.png)
+
+### **6. Mitgliederaufnahme**
+
+Die Mitgliederaufnahme ist über den Workflow Builder eingerichtet. Der Bot implementiert mehrere Custom Workflow Steps, welche die Interaktion mit Google Drive ermöglichen.
+
+Ausgelöst wird der Prozess durch einen unterschriebenen Aufnahmeantrag über [DocuSeal](https://docuseal.com/).
+Unter Einstellungen - API - Webhooks kann die URL für den Webhook in der Datei [`/signatures/webhooks.js`](/src/signatures/webhooks.js) mitgegeben werden. Außerdem sollte ein Webhook Secret gesetzt und bei Aufruf des Webhooks verifiziert werden. Das Secret und der dazugehörige Header sind in den Environment Variablen gespeichert.
+Der Webhook muss für unsere Zwecke für `form.completed` aktiv sein.
+
+Weitere Vorraussetzung ist, dass wie im Kapitel [1. Google APIs einrichten](#1-google-apis-einrichten) beschrieben, der Service Account dem Google Drive Ordner als Bearbeiter hinzugefügt wurde.
+
+Der Slack Workflow muss manuell hinzugefügt werden, da zum Zeitpunkt der Implementierung Custom steps und Trigger noch nicht über eine Konfig-Datei exportiert werden können.
+Der Workflow startet mit einem Custom Trigger "Von einem Webhook". Die Datenvariablen sind im Objekt "userJoiningDetails" in den [Masterdata-Types](/src/general/masterdata/types.js) definiert. Alle Variablen sind Typ String.
+Die URL des Custom Triggers muss in der .env Datei hinterlegt werden.
+
+Flowchart des Workflows:
+
+```mermaid
+sequenceDiagram
+  participant DocuSeal as DocuSeal
+  participant SAM Service Bot as SAM Service Bot
+  participant Slack Workflow as Slack Workflow
+  participant Slack User as Slack User
+  participant Slack Admin ToDo List
+  participant Gmail as Gmail
+  DocuSeal ->>+ SAM Service Bot: Webhook form.completed
+  Note over SAM Service Bot: /src/signatures/webhooks.js
+  SAM Service Bot ->> DocuSeal: HTTP 200
+  SAM Service Bot ->>- Slack Workflow: Custom Workflow Trigger<br>with attributes of form
+  activate Slack Workflow
+  Slack Workflow ->>+ Slack User: send notification
+  deactivate Slack Workflow
+  Slack User ->>- Slack Workflow: approve and<br/>maintain sex
+  activate Slack Workflow
+  Slack Workflow ->> Gmail: send E-Mail with join information to member
+  Slack Workflow ->>+ SAM Service Bot: save new member<br/>Information to sheet
+  deactivate Slack Workflow
+  SAM Service Bot ->> Slack Workflow: send user contact card
+  SAM Service Bot ->>- Slack Workflow: return bank details +<br>link to contact card
+  activate Slack Workflow
+  Slack Workflow ->> Slack Admin ToDo List: "add user to Slack and WhatsApp" ToDo
+  Slack Workflow ->>+ SAM Service Bot: save signed form to drive
+  deactivate Slack Workflow
+  SAM Service Bot ->>- Slack Workflow: successful save
+  activate Slack Workflow
+  Slack Workflow ->> Slack Admin ToDo List: "create SEPA mandate" ToDo
+  Slack Workflow ->>+ Slack User: send notification
+  deactivate Slack Workflow
+  Slack User ->>- Slack Workflow: complete ToDo and<br>set first direct debit date
+  activate Slack Workflow
+  Slack Workflow ->> Slack Admin ToDo List: complete "create SEPA mandate"
+  Slack Workflow ->> Gmail: send E-Mail with SEPA information to member
+  deactivate Slack Workflow
+```
+
+Screenshots der Konfiguration:
+
+<img src="/images/%5BAPPLICATION%5D%20Workflow%20configuration.png" style="width: 250px;" alt="Konfiguration Workflow"> <img src="/images/%5BAPPLICATION%5D%20Workflow%20step%20-%20save%20member%20information%20to%20drive.png" style="width: 250px;" alt="Konfiguration Workflow Schritt Mitgliedsinfos speichern"> <img src="/images/%5BAPPLICATION%5D%20Workflow%20step%20-%20save%20member%20form%20to%20drive.png" style="width: 250px;" alt="Konfiguration Workflow Schritt Mitgliedsantrag ablegen">
 
 ## Upgrades & Contribution
 
 1. [Generelle Projektstruktur](#1-generelle-projektstruktur)
 2. [Slack App Entwicklung](#2-slack-app-entwicklung)
    1. [Testen mit Glitch (Live Webserver)](#21-testen-mit-glitch)
-   1. [Testen mit lokalem Docker Container](#22-testen-mit-lokalem-server)
+   1. [Testen mit lokalem Server](#22-testen-mit-lokalem-server)
 3. [Contribution Guidelines](#3-contribution-guidelines)
 
 ### **1. Generelle Projektstruktur**
@@ -222,9 +281,10 @@ serverless offline --noPrependStageInUrl
 ```
 
 Dieser Server / diese Funktion muss dann öffentlich im Internet verfügbar gemacht werden. Ich habe das mit [ngrok](https://ngrok.com) erreicht. Erstelle einen gratis Account und [Folge den Setupanweisungen für dein Betriebssystem und denen für NodeJS](https://dashboard.ngrok.com/get-started/setup/)
+Alternativ hat auch diese Anleitung für WSL (Windows-Subsystem für Linux), sehr gut geklappt: [Github](https://gist.github.com/SalahHamza/799cac56b8c2cd20e6bfeb8886f18455)
 
 ```bash
-.\ngrok.exe http http://localhost:8080
+ngrok http http://localhost:8080
 ```
 
 ### **3. Contribution Guidelines**

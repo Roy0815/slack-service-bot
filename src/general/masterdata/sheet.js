@@ -10,13 +10,21 @@ export const allgDatenSheetName = 'Allg Daten';
 
 /**
  * @readonly
+ * @type {string}
+ */
+export const bankDatenSheetName = 'SEPA Daten';
+
+/**
+ * @readonly
  * @enum {number}
  */
 const allgDatenColumns = {
   id: 1,
   firstname: 2,
   lastname: 3,
+  joinedDate: 4,
   leaveDate: 5,
+  membershipType: 6,
   birthday: 7,
   sex: 9,
   email: 10,
@@ -26,6 +34,20 @@ const allgDatenColumns = {
   city: 14,
   phone: 15,
   slackId: 16
+};
+
+/**
+ * @readonly
+ * @enum {number}
+ */
+const bankDatenColumns = {
+  IBAN: 4,
+  BIC: 5,
+  recurringAmount: 6,
+  mandateReference: 8,
+  signingDate: 9,
+  accountOwner: 10,
+  initialAmount: 11
 };
 
 //* ******************* Private functions ********************//
@@ -39,6 +61,7 @@ function moveUserLineToObject(userLine) {
     id: Number(userLine[allgDatenColumns.id - 1]),
     firstname: userLine[allgDatenColumns.firstname - 1],
     lastname: userLine[allgDatenColumns.lastname - 1],
+    joinedDate: userLine[allgDatenColumns.joinedDate - 1],
     leaveDate: userLine[allgDatenColumns.leaveDate - 1],
     birthday: userLine[allgDatenColumns.birthday - 1],
     sex: userLine[allgDatenColumns.sex - 1],
@@ -62,6 +85,7 @@ function moveUserLineToContactCard(userLine) {
     id: Number(userLine[allgDatenColumns.id - 1]),
     firstname: userLine[allgDatenColumns.firstname - 1],
     lastname: userLine[allgDatenColumns.lastname - 1],
+    joinedDate: userLine[allgDatenColumns.joinedDate - 1],
     leaveDate: userLine[allgDatenColumns.leaveDate - 1],
     birthday: userLine[allgDatenColumns.birthday - 1],
     sex: userLine[allgDatenColumns.sex - 1],
@@ -189,6 +213,7 @@ async function getAllActiveUsers() {
   );
   if (!array) return [];
 
+  // remove header line
   array.shift();
 
   /** @type {types.user[]} */
@@ -209,7 +234,10 @@ async function getAllActiveUsers() {
       continue;
     }
 
-    if (util.convertStringToDate(userObject.leaveDate) > today) {
+    if (
+      util.convertStringToDate(userObject.leaveDate) > today ||
+      userObject.leaveDate === util.formatDate(today)
+    ) {
       activeUsers.push(userObject);
     }
   }
@@ -219,16 +247,111 @@ async function getAllActiveUsers() {
 
 /**
  * save slack id to google sheet
- * @param {number} id
+ * @param {number} id Row number in the sheet (0-based index)
  * @param {string} slackId
  */
 async function saveSlackId(id, slackId) {
   await sheet.updateCell(process.env.SPREADSHEET_ID_MASTERDATA, {
     range: `'${allgDatenSheetName}'!${util.convertNumberToColumn(
       allgDatenColumns.slackId
-    )}${id}`,
+    )}${id + 1}`, // google sheet functions count rows starting from 1
     values: [[slackId]]
   });
+}
+
+/**
+ * save leave date to google sheet
+ * @param {types.ids} ids
+ * @param {string} leaveDate
+ */
+async function saveLeaveDate(ids, leaveDate) {
+  // check any id is set
+  if (!ids.id && !ids.slackId) return;
+
+  // get id from slack id
+  if (!ids.id) {
+    const user = await getUserFromId({ slackId: ids.slackId });
+    if (!user) return;
+    ids.id = user.id;
+  }
+
+  await sheet.updateCell(process.env.SPREADSHEET_ID_MASTERDATA, {
+    range: `'${allgDatenSheetName}'!${util.convertNumberToColumn(
+      allgDatenColumns.leaveDate
+    )}${ids.id + 1}`, // google sheet functions count rows starting from 1
+    values: [[leaveDate]]
+  });
+}
+
+/**
+ * save new member to sheet
+ * @param {types.userJoiningDetails} userJoiningDetails
+ * @returns {Promise<types.userJoiningReturn>} mandateReference
+ */
+async function saveNewMember(userJoiningDetails) {
+  // cleanup data
+  // clear account owner if it is the same as the name
+  userJoiningDetails.accountOwner =
+    userJoiningDetails.accountOwner !==
+    `${userJoiningDetails.firstname} ${userJoiningDetails.lastname}`
+      ? userJoiningDetails.accountOwner
+      : '';
+
+  // escape + and spaces in phone numbers
+  userJoiningDetails.phone = userJoiningDetails.phone
+    .replace(/\s+/g, '')
+    .replace(/^(\+)/, "'$1");
+
+  // get last row
+  const ids = await sheet.getCells(
+    process.env.SPREADSHEET_ID_MASTERDATA,
+    `${allgDatenSheetName}!${util.convertNumberToColumn(allgDatenColumns.id)}:${util.convertNumberToColumn(allgDatenColumns.id)}`
+  );
+
+  const newIdx =
+    ids.filter((line) => line.length > 0 && line[0] !== '').length + 1;
+
+  // update each field individually to not overwrite other data
+  /** @type {Promise<void>[]} */
+  const promises = [];
+
+  Object.keys(userJoiningDetails).forEach((key) => {
+    // not in general or bank infos
+    if (!allgDatenColumns[key] && !bankDatenColumns[key]) return;
+
+    // get correct sheet and column
+    const sheetName = allgDatenColumns[key]
+      ? allgDatenSheetName
+      : bankDatenSheetName;
+
+    const column = util.convertNumberToColumn(
+      allgDatenColumns[key] || bankDatenColumns[key]
+    );
+
+    promises.push(
+      sheet.updateCell(process.env.SPREADSHEET_ID_MASTERDATA, {
+        range: `'${sheetName}'!${column}${newIdx}`,
+        values: [[userJoiningDetails[key]]]
+      })
+    );
+  });
+
+  // Wait for all updates to finish in parallel
+  await Promise.all(promises);
+
+  // get return fields
+  const fields = (
+    await sheet.getCells(
+      process.env.SPREADSHEET_ID_MASTERDATA,
+      `${bankDatenSheetName}!A${newIdx}:${util.convertNumberToColumn(bankDatenColumns.initialAmount)}${newIdx}`
+    )
+  )[0];
+
+  return {
+    mandateReference: fields[bankDatenColumns.mandateReference - 1],
+    recurringAmount: fields[bankDatenColumns.recurringAmount - 1],
+    initialAmount: fields[bankDatenColumns.initialAmount - 1]
+  };
 }
 
 /**
@@ -241,5 +364,7 @@ export const googleSheetMasterdataService = {
   saveMasterdataChanges,
   isUserRegistered,
   getAllActiveUsers,
-  saveSlackId
+  saveSlackId,
+  saveLeaveDate,
+  saveNewMember
 };
