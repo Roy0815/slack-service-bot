@@ -100,6 +100,13 @@ export const userJoiningFields = [
   'signingDate'
 ];
 
+/**
+ * @typedef {object} userJoiningReturn
+ * @property {string} mandateReference
+ * @property {string} recurringAmount
+ * @property {string} initialAmount
+ */
+
 /** Interface */
 
 /**
@@ -153,6 +160,7 @@ export const userJoiningFields = [
  * save new member to sheet
  * @callback saveNewMember
  * @param {userJoiningDetails} userJoiningDetails
+ * @returns {Promise<userJoiningReturn>}
  */
 
 /**

@@ -210,9 +210,45 @@
           "description": "",
           "is_required": true,
           "name": "signingDate"
+        },
+        "adminChannel": {
+          "type": "slack#/types/channel_id",
+          "title": "Admin Channel",
+          "description": "Channel, in den der Kontakt geschickt wird",
+          "is_required": true,
+          "name": "adminChannel"
         }
       },
-      "output_parameters": {}
+      "output_parameters": {
+        "mandateReference": {
+          "type": "string",
+          "title": "Mandatsreferenz",
+          "description": "",
+          "is_required": true,
+          "name": "mandateReference"
+        },
+        "contactCardMessageLink": {
+          "type": "string",
+          "title": "Link zur Kontaktnachricht",
+          "description": "",
+          "is_required": true,
+          "name": "contactCardMessageLink"
+        },
+        "initialAmount": {
+          "type": "string",
+          "title": "Erstmaliger Einzugsbetrag",
+          "description": "Exkl. Aufnahmegebühr",
+          "is_required": true,
+          "name": "initialAmount"
+        },
+        "recurringAmount": {
+          "type": "string",
+          "title": "Wiederkehrender Betrag",
+          "description": "Halbjährlich",
+          "is_required": true,
+          "name": "recurringAmount"
+        }
+      }
     },
     "setLeaveDate": {
       "title": "Setzt das Austrittsdatum eines Mitglieds",

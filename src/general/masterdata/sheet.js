@@ -43,8 +43,11 @@ const allgDatenColumns = {
 const bankDatenColumns = {
   IBAN: 4,
   BIC: 5,
+  recurringAmount: 6,
+  mandateReference: 8,
   signingDate: 9,
-  accountOwner: 10
+  accountOwner: 10,
+  initialAmount: 11
 };
 
 //* ******************* Private functions ********************//
@@ -283,6 +286,7 @@ async function saveLeaveDate(ids, leaveDate) {
 /**
  * save new member to sheet
  * @param {types.userJoiningDetails} userJoiningDetails
+ * @returns {Promise<types.userJoiningReturn>} mandateReference
  */
 async function saveNewMember(userJoiningDetails) {
   // cleanup data
@@ -334,6 +338,20 @@ async function saveNewMember(userJoiningDetails) {
 
   // Wait for all updates to finish in parallel
   await Promise.all(promises);
+
+  // get return fields
+  const fields = (
+    await sheet.getCells(
+      process.env.SPREADSHEET_ID_MASTERDATA,
+      `${bankDatenSheetName}!A${newIdx}:${util.convertNumberToColumn(bankDatenColumns.initialAmount)}${newIdx}`
+    )
+  )[0];
+
+  return {
+    mandateReference: fields[bankDatenColumns.mandateReference - 1],
+    recurringAmount: fields[bankDatenColumns.recurringAmount - 1],
+    initialAmount: fields[bankDatenColumns.initialAmount - 1]
+  };
 }
 
 /**
