@@ -189,7 +189,7 @@ in Schritt 8 den custom Step einfügen wie hier zu sehen (Bei File ID Dropdown "
 Die Mitgliederaufnahme ist über den Workflow Builder eingerichtet. Der Bot implementiert mehrere Custom Workflow Steps, welche die Interaktion mit Google Drive ermöglichen.
 
 Ausgelöst wird der Prozess durch einen unterschriebenen Aufnahmeantrag über [DocuSeal](https://docuseal.com/).
-Unter Einstellungen - API - Webhooks kann die URL für den Webhook im Signatures Ordner mitgegeben werden. Außerdem sollte ein Webhook Secret gesetzt und bei Aufruf des Webhooks verifiziert werden.
+Unter Einstellungen - API - Webhooks kann die URL für den Webhook in der Datei [`/signatures/webhooks.js`](/src/signatures/webhooks.js) mitgegeben werden. Außerdem sollte ein Webhook Secret gesetzt und bei Aufruf des Webhooks verifiziert werden. Das Secret und der dazugehörige Header sind in den Environment Variablen gespeichert.
 Der Webhook muss für unsere Zwecke für `form.completed` aktiv sein.
 
 Weitere Vorraussetzung ist, dass wie im Kapitel [1. Google APIs einrichten](#1-google-apis-einrichten) beschrieben, der Service Account dem Google Drive Ordner als Bearbeiter hinzugefügt wurde.
@@ -198,9 +198,49 @@ Der Slack Workflow muss manuell hinzugefügt werden, da zum Zeitpunkt der Implem
 Der Workflow startet mit einem Custom Trigger "Von einem Webhook". Die Datenvariablen sind im Objekt "userJoiningDetails" in den [Masterdata-Types](/src/general/masterdata/types.js) definiert. Alle Variablen sind Typ String.
 Die URL des Custom Triggers muss in der .env Datei hinterlegt werden.
 
+Flowchart des Workflows:
+
+```mermaid
+sequenceDiagram
+  participant DocuSeal as DocuSeal
+  participant SAM Service Bot as SAM Service Bot
+  participant Slack Workflow as Slack Workflow
+  participant Slack User as Slack User
+  participant Slack Admin ToDo List
+  participant Gmail as Gmail
+  DocuSeal ->>+ SAM Service Bot: Webhook form.completed
+  Note over SAM Service Bot: /src/signatures/webhooks.js
+  SAM Service Bot ->> DocuSeal: HTTP 200
+  SAM Service Bot ->>- Slack Workflow: Custom Workflow Trigger<br>with attributes of form
+  activate Slack Workflow
+  Slack Workflow ->>+ Slack User: send notification
+  deactivate Slack Workflow
+  Slack User ->>- Slack Workflow: approve and<br/>maintain sex
+  activate Slack Workflow
+  Slack Workflow ->> Gmail: send E-Mail with join information to member
+  Slack Workflow ->>+ SAM Service Bot: save new member<br/>Information to sheet
+  deactivate Slack Workflow
+  SAM Service Bot ->> Slack Workflow: send user contact card
+  SAM Service Bot ->>- Slack Workflow: return bank details +<br>link to contact card
+  activate Slack Workflow
+  Slack Workflow ->> Slack Admin ToDo List: "add user to Slack and WhatsApp" ToDo
+  Slack Workflow ->>+ SAM Service Bot: save signed form to drive
+  deactivate Slack Workflow
+  SAM Service Bot ->>- Slack Workflow: successful save
+  activate Slack Workflow
+  Slack Workflow ->> Slack Admin ToDo List: "create SEPA mandate" ToDo
+  Slack Workflow ->>+ Slack User: send notification
+  deactivate Slack Workflow
+  Slack User ->>- Slack Workflow: complete ToDo and<br>set first direct debit date
+  activate Slack Workflow
+  Slack Workflow ->> Slack Admin ToDo List: complete "create SEPA mandate"
+  Slack Workflow ->> Gmail: send E-Mail with SEPA information to member
+  deactivate Slack Workflow
+```
+
 Screenshots der Konfiguration:
 
-<img src="/images/%5BAPPLICATION%5D%20Workflow%20configuration.png" style="width: 300px;" alt="Konfiguration Workflow"> <img src="/images/%5BAPPLICATION%5D%20Workflow%20step%20-%20save%20member%20information%20to%20drive.png" style="width: 300px;" alt="Konfiguration Workflow Schritt Mitgliedsinfos speichern"> <img src="/images/%5BAPPLICATION%5D%20Workflow%20step%20-%20save%20member%20form%20to%20drive.png" style="width: 300px;" alt="Konfiguration Workflow Schritt Mitgliedsantrag ablegen">
+<img src="/images/%5BAPPLICATION%5D%20Workflow%20configuration.png" style="width: 250px;" alt="Konfiguration Workflow"> <img src="/images/%5BAPPLICATION%5D%20Workflow%20step%20-%20save%20member%20information%20to%20drive.png" style="width: 250px;" alt="Konfiguration Workflow Schritt Mitgliedsinfos speichern"> <img src="/images/%5BAPPLICATION%5D%20Workflow%20step%20-%20save%20member%20form%20to%20drive.png" style="width: 250px;" alt="Konfiguration Workflow Schritt Mitgliedsantrag ablegen">
 
 ## Upgrades & Contribution
 
