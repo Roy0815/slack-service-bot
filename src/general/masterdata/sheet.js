@@ -132,6 +132,29 @@ async function getUserFromId({ id, slackId }) {
 
 /**
  * Get a user line from sheet file by slack id
+ * @param {string} email
+ * @returns {Promise<types.user|undefined>}
+ */
+async function getUserFromEmail(email) {
+  if (!email || email === '') return undefined;
+
+  const data = await sheet.getCells(
+    process.env.SPREADSHEET_ID_MASTERDATA,
+    allgDatenSheetName
+  );
+  if (!data) return undefined;
+
+  // search by email
+  const user = data.find(
+    (element) => element[allgDatenColumns.email - 1] === email
+  );
+  if (!user) return undefined;
+
+  return moveUserLineToObject(user);
+}
+
+/**
+ * Get a user line from sheet file by slack id
  * @param {types.ids} ids
  * @returns {Promise<types.userContactCard|undefined>}
  */
@@ -360,6 +383,7 @@ async function saveNewMember(userJoiningDetails) {
  */
 export const googleSheetMasterdataService = {
   getUserFromId,
+  getUserFromEmail,
   getUserContactCardFromId,
   saveMasterdataChanges,
   isUserRegistered,
