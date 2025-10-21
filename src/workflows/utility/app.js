@@ -19,10 +19,24 @@ function setupApp(app) {
 
     await complete({
       outputs: {
-        formattedDate: 
-          outputFormat.replace(/YYYY/g, year)
+        formattedDate: outputFormat
+          .replace(/YYYY/g, year)
           .replace(/MM/g, month)
           .replace(/DD/g, day)
+      }
+    });
+  });
+
+  app.function('encodeURL', async ({ client, inputs, fail, complete }) => {
+    // post 200 to acknowledge receipt of workflow step
+    await awsRtAPI.sendResponse();
+
+    let encodedString = encodeURI(/** @type {string} */ (inputs.input));
+    console.log(encodedString);
+
+    await complete({
+      outputs: {
+        encodedString
       }
     });
   });
