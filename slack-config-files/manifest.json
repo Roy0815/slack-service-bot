@@ -7,7 +7,7 @@
   "features": {
     "app_home": {
       "home_tab_enabled": true,
-      "messages_tab_enabled": false,
+      "messages_tab_enabled": true,
       "messages_tab_read_only_enabled": false
     },
     "bot_user": {
@@ -73,8 +73,9 @@
         "im:read",
         "im:write",
         "mpim:read",
+        "team:read",
         "users:read",
-        "team:read"
+        "users:read.email"
       ]
     }
   },
@@ -95,6 +96,36 @@
     "function_runtime": "remote"
   },
   "functions": {
+    "formatDate": {
+      "title": "Format a date",
+      "description": "",
+      "input_parameters": {
+        "date": {
+          "type": "slack#/types/date",
+          "title": "Datum",
+          "description": "Zu formatierendes Datum (bspw. aus Formular)",
+          "is_required": true,
+          "name": "date"
+        },
+        "format": {
+          "type": "string",
+          "title": "Format",
+          "description": "",
+          "is_required": true,
+          "hint": "DD.MM.YYYY",
+          "name": "format"
+        }
+      },
+      "output_parameters": {
+        "formattedDate": {
+          "type": "string",
+          "title": "Formatiertes Datum",
+          "description": "",
+          "is_required": true,
+          "name": "formattedDate"
+        }
+      }
+    },
     "saveNewMember": {
       "title": "Save new Member Information",
       "description": "",

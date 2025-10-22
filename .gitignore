@@ -3,3 +3,5 @@ node_modules/
 package-lock.json
 aws
 .serverless
+docs/.vitepress/dist
+docs/.vitepress/cache

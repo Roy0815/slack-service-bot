@@ -117,6 +117,13 @@ export const userJoiningFields = [
  */
 
 /**
+ * get User object from email
+ * @callback getUserFromEmail
+ * @param {string} email
+ * @returns {Promise<user|undefined>}
+ */
+
+/**
  * get contact card object from id
  * @callback getUserContactCardFromId
  * @param {ids} ids
@@ -167,6 +174,7 @@ export const userJoiningFields = [
  * Interface to be implemented by the active userservice
  * @typedef {object} userService
  * @property {getUserFromId} getUserFromId
+ * @property {getUserFromEmail} getUserFromEmail
  * @property {getUserContactCardFromId} getUserContactCardFromId
  * @property {saveMasterdataChanges} saveMasterdataChanges
  * @property {isUserRegistered} isUserRegistered
