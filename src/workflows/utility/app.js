@@ -12,8 +12,8 @@ function setupApp(app) {
     // post 200 to acknowledge receipt of workflow step
     await awsRtAPI.sendResponse();
 
-    let sourceDate = /** @type {string} */ (inputs.date);
-    let outputFormat = /** @type {string} */ (inputs.format);
+    const sourceDate = /** @type {string} */ (inputs.date);
+    const outputFormat = /** @type {string} */ (inputs.format);
 
     const [year, month, day] = sourceDate.split('-');
 
@@ -31,8 +31,7 @@ function setupApp(app) {
     // post 200 to acknowledge receipt of workflow step
     await awsRtAPI.sendResponse();
 
-    let encodedString = encodeURI(/** @type {string} */ (inputs.input));
-    console.log(encodedString);
+    const encodedString = encodeURI(/** @type {string} */ (inputs.input));
 
     await complete({
       outputs: {
