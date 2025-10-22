@@ -7,7 +7,10 @@
   "scripts": {
     "start": "node app.js",
     "lint": "eslint src/",
-    "prettier-format": "prettier --config .prettierrc src/"
+    "prettier-format": "prettier --config .prettierrc src/",
+    "docs:dev": "vitepress dev docs",
+    "docs:build": "vitepress build docs",
+    "docs:preview": "vitepress preview docs"
   },
   "dependencies": {
     "@slack/bolt": "^4.2.0",
@@ -15,7 +18,7 @@
     "node-fetch": "^3.3.2"
   },
   "engines": {
-    "node": "20.x"
+    "node": ">=20.19.0"
   },
   "repository": {
     "type": "git",
@@ -37,6 +40,7 @@
     "eslint-plugin-n": "^16.6.2",
     "eslint-plugin-promise": "^6.6.0",
     "prettier": "^3.4.2",
-    "serverless-offline": "^14.4.0"
+    "serverless-offline": "^14.4.0",
+    "vitepress": "^2.0.0-alpha.12"
   }
 }

@@ -50,6 +50,22 @@ app.command('/test', async ({ ack, respond, command, client }) => {
   await respond('Test erfolgreich!');
 });
 
+app.shortcut('extractInvoice', async ({ ack, respond, shortcut, client }) => {
+  await ack();
+
+  if (shortcut.user.id !== process.env.APP_ADMIN) {
+    await respond('Sorry, nur der Admin darf diesen Befehl ausführen.');
+    return;
+  }
+
+  await app.client.filesUploadV2({
+    channel_id: process.env.APP_ADMIN_CHANNEL,
+    filename: 'shortcut.js',
+    title: 'shortcut',
+    content: JSON.stringify(shortcut, null, '\t')
+  });
+});
+
 //* ******************* Error notifies Admin ********************//
 // @ts-ignore
 app.error(async ({ error, context, body }) => {

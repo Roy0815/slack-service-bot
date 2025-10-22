@@ -37,6 +37,7 @@ package:
     - '!.eslintrc.json*'
     - '!.prettierrc'
     - '!example.env'
+    - '!docs/**'
 
 functions:
   slack-service-bot:
