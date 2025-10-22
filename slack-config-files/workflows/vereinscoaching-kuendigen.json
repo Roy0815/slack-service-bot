@@ -1,0 +1,262 @@
+{
+  "workflow": {
+    "id": "Wf09DCBHBDL1",
+    "title": "Vereinscoaching kündigen",
+    "description": "Vereinscoaching Kündigung anstoßen",
+    "icon": "https://avatars.slack-edge.com/2025-09-10/9478872712743_6ef5dcc38741d8bc7d36_192.png",
+    "input_parameters": {
+      "Ft09DCBHCL57__interactivity": {
+        "type": "slack#/types/interactivity",
+        "name": "Ft09DCBHCL57__interactivity",
+        "description": "Interactivity context",
+        "title": "Interaktivitätskontext",
+        "is_hidden": true
+      },
+      "Ft09DCBHCL57__user_id": {
+        "type": "slack#/types/user_id",
+        "name": "Ft09DCBHCL57__user_id",
+        "description": "Person who used this workflow",
+        "title": "Person, die diesen Workflow verwendet hat"
+      }
+    },
+    "steps": [
+      {
+        "id": "92dfab86-a69f-4ca1-9650-520357458b99",
+        "function_id": "Fn010N",
+        "inputs": {
+          "title": {
+            "hidden": false,
+            "locked": false,
+            "value": "Vereinscoaching kündigen"
+          },
+          "fields": {
+            "hidden": false,
+            "locked": false,
+            "value": {
+              "elements": [
+                {
+                  "name": "c2d225cf-9903-4334-9256-52ffc4466735",
+                  "type": "slack#/types/user_id",
+                  "title": "Welches Mitglied?",
+                  "default": "",
+                  "description": "Wer nimmt das Coaching in Anspruch?"
+                },
+                {
+                  "name": "3f4c7d26-ff20-43a1-92b7-5957c8bb6150",
+                  "type": "slack#/types/date",
+                  "title": "Wann?",
+                  "description": "(Nur Monatsende möglich)"
+                }
+              ],
+              "required": [
+                "c2d225cf-9903-4334-9256-52ffc4466735",
+                "3f4c7d26-ff20-43a1-92b7-5957c8bb6150"
+              ]
+            }
+          },
+          "interactivity": {
+            "hidden": false,
+            "locked": false,
+            "value": "{{inputs.Ft09DCBHCL57__interactivity}}"
+          }
+        }
+      },
+      {
+        "id": "fdaf2694-4115-4cf0-a1f6-64f0041bbad6",
+        "function_id": "Fn010M",
+        "inputs": {
+          "message": {
+            "hidden": false,
+            "locked": false,
+            "value": [
+              {
+                "type": "rich_text",
+                "elements": [
+                  {
+                    "type": "rich_text_section",
+                    "elements": [
+                      {
+                        "id": "{{inputs.Ft09DCBHCL57__user_id}}",
+                        "type": "workflowtoken",
+                        "property": "",
+                        "data_type": "slack#/types/user_id"
+                      },
+                      {
+                        "text": " hat dein Vereinscoaching zum ",
+                        "type": "text"
+                      },
+                      {
+                        "id": "{{steps.92dfab86-a69f-4ca1-9650-520357458b99.fields.3f4c7d26-ff20-43a1-92b7-5957c8bb6150}}",
+                        "type": "workflowtoken",
+                        "property": "",
+                        "data_type": "slack#/types/date"
+                      },
+                      {
+                        "text": " gekündigt.\nDie Kündigung ist hiermit bestätigt.\n\nSolltest du noch Fragen haben, melde dich direkt bei ",
+                        "type": "text"
+                      },
+                      {
+                        "id": "{{inputs.Ft09DCBHCL57__user_id}}",
+                        "type": "workflowtoken",
+                        "property": "",
+                        "data_type": "slack#/types/user_id"
+                      },
+                      { "text": " oder dem Vorstand.", "type": "text" }
+                    ]
+                  }
+                ]
+              }
+            ]
+          },
+          "user_id": {
+            "hidden": false,
+            "locked": false,
+            "value": "{{steps.92dfab86-a69f-4ca1-9650-520357458b99.fields.c2d225cf-9903-4334-9256-52ffc4466735}}"
+          }
+        }
+      },
+      {
+        "id": "7fc82621-380f-4d3f-a393-12980d3a9a2f",
+        "function_id": "Fn010M",
+        "inputs": {
+          "message": {
+            "hidden": false,
+            "locked": false,
+            "value": [
+              {
+                "type": "rich_text",
+                "elements": [
+                  {
+                    "type": "rich_text_section",
+                    "elements": [
+                      {
+                        "text": "Du hast das Vereinscoaching mit ",
+                        "type": "text"
+                      },
+                      {
+                        "id": "{{steps.92dfab86-a69f-4ca1-9650-520357458b99.fields.c2d225cf-9903-4334-9256-52ffc4466735}}",
+                        "type": "workflowtoken",
+                        "property": "",
+                        "data_type": "slack#/types/user_id"
+                      },
+                      { "text": " zum ", "type": "text" },
+                      {
+                        "id": "{{steps.92dfab86-a69f-4ca1-9650-520357458b99.fields.3f4c7d26-ff20-43a1-92b7-5957c8bb6150}}",
+                        "type": "workflowtoken",
+                        "property": "",
+                        "data_type": "slack#/types/date"
+                      },
+                      {
+                        "text": " gekündigt.\n\nHiermit ist deine Kündigung bestätigt.\n",
+                        "type": "text"
+                      },
+                      {
+                        "id": "{{steps.92dfab86-a69f-4ca1-9650-520357458b99.fields.c2d225cf-9903-4334-9256-52ffc4466735}}",
+                        "type": "workflowtoken",
+                        "property": "",
+                        "data_type": "slack#/types/user_id"
+                      },
+                      { "text": " wurde informiert.", "type": "text" }
+                    ]
+                  }
+                ]
+              }
+            ]
+          },
+          "user_id": {
+            "hidden": false,
+            "locked": false,
+            "value": "{{inputs.Ft09DCBHCL57__user_id}}"
+          }
+        }
+      },
+      {
+        "id": "2f6d101e-e303-48d1-a689-18fd487cb490",
+        "function_id": "Fn0102",
+        "inputs": {
+          "message": {
+            "hidden": false,
+            "locked": false,
+            "value": [
+              {
+                "type": "rich_text",
+                "elements": [
+                  {
+                    "type": "rich_text_section",
+                    "elements": [
+                      {
+                        "text": "Coaching kündigen",
+                        "type": "text",
+                        "style": { "code": true }
+                      },
+                      { "text": "\n", "type": "text" },
+                      {
+                        "id": "{slack.user_full_name(user_id={{steps.92dfab86-a69f-4ca1-9650-520357458b99.fields.c2d225cf-9903-4334-9256-52ffc4466735}})}",
+                        "type": "workflowtoken",
+                        "property": "",
+                        "data_type": "string"
+                      },
+                      { "text": " zum ", "type": "text" },
+                      {
+                        "id": "{{steps.92dfab86-a69f-4ca1-9650-520357458b99.fields.3f4c7d26-ff20-43a1-92b7-5957c8bb6150}}",
+                        "type": "workflowtoken",
+                        "property": "",
+                        "data_type": "slack#/types/date"
+                      }
+                    ]
+                  }
+                ]
+              }
+            ]
+          },
+          "channel_id": {
+            "hidden": false,
+            "locked": false,
+            "value": "GG7HSFU3B"
+          }
+        }
+      },
+      {
+        "id": "60312af4-6bc1-4fbd-b965-2946caabd237",
+        "function_id": "Fn0133",
+        "inputs": {
+          "columns": {
+            "hidden": false,
+            "locked": false,
+            "value": {
+              "name": "Vereinscoaching kündigen {{steps.92dfab86-a69f-4ca1-9650-520357458b99.fields.3f4c7d26-ff20-43a1-92b7-5957c8bb6150}} -{slack.user_display_name(user_id={{steps.92dfab86-a69f-4ca1-9650-520357458b99.fields.c2d225cf-9903-4334-9256-52ffc4466735}})}",
+              "Col08LRUJMGRL": "{{steps.2f6d101e-e303-48d1-a689-18fd487cb490.message_context}}",
+              "Col08M2A52QHY": "Opt1436M9XD",
+              "Col08M9UVR0HX": "OptFXY9DFYV",
+              "Col096NG6M0CF": "OptWIIZZQ1X"
+            }
+          },
+          "list_id": {
+            "hidden": false,
+            "locked": false,
+            "value": "F08LJQDNR9D"
+          }
+        }
+      }
+    ]
+  },
+  "triggers": [
+    {
+      "name": "Vereinscoaching kündigen",
+      "type": "shortcut",
+      "inputs": {
+        "Ft09DCBHCL57__user_id": {
+          "value": "{{data.user_id}}",
+          "locked": false,
+          "hidden": false
+        },
+        "Ft09DCBHCL57__interactivity": {
+          "value": "{{data.interactivity}}",
+          "locked": false,
+          "hidden": false
+        }
+      },
+      "shortcut": { "schema": {} }
+    }
+  ]
+}

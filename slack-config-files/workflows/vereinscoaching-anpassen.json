@@ -1,0 +1,308 @@
+{
+  "workflow": {
+    "id": "Wf08MEM77MSS",
+    "title": "Vereinscoaching anpassen",
+    "description": "Betrag des Vereinscoachings anpassen",
+    "icon": "https://avatars.slack-edge.com/2025-04-10/8740134771523_8dab9504b6534acab962_192.png",
+    "input_parameters": {
+      "Ft08MZ9RAZ97__interactivity": {
+        "type": "slack#/types/interactivity",
+        "name": "Ft08MZ9RAZ97__interactivity",
+        "description": "Interactivity context",
+        "title": "Interaktivitätskontext",
+        "is_hidden": true
+      },
+      "Ft08MZ9RAZ97__user_id": {
+        "type": "slack#/types/user_id",
+        "name": "Ft08MZ9RAZ97__user_id",
+        "description": "Person who used this workflow",
+        "title": "Person, die diesen Workflow verwendet hat"
+      }
+    },
+    "steps": [
+      {
+        "id": "82bb1366-cc12-4917-bb44-672dc7fc0165",
+        "function_id": "Fn010N",
+        "inputs": {
+          "title": {
+            "hidden": false,
+            "locked": false,
+            "value": "Vereinscoaching ändern"
+          },
+          "fields": {
+            "hidden": false,
+            "locked": false,
+            "value": {
+              "elements": [
+                {
+                  "name": "c2d225cf-9903-4334-9256-52ffc4466735",
+                  "type": "slack#/types/user_id",
+                  "title": "Welches Mitglied?",
+                  "default": "",
+                  "description": "Wer nimmt das Coaching in Anspruch?"
+                },
+                {
+                  "name": "63fd421e-3235-44e2-8429-98ad7919e753",
+                  "type": "number",
+                  "title": "Auf welchen Betrag monatlich soll angepasst werden?",
+                  "description": "(in €)"
+                },
+                {
+                  "name": "9f4c1902-4afd-43e2-a412-2d25b71cab60",
+                  "type": "slack#/types/date",
+                  "title": "Ab wann?",
+                  "description": "Immer nur zum Monatsanfang möglich"
+                }
+              ],
+              "required": [
+                "c2d225cf-9903-4334-9256-52ffc4466735",
+                "63fd421e-3235-44e2-8429-98ad7919e753",
+                "9f4c1902-4afd-43e2-a412-2d25b71cab60"
+              ]
+            }
+          },
+          "interactivity": {
+            "hidden": false,
+            "locked": false,
+            "value": "{{inputs.Ft08MZ9RAZ97__interactivity}}"
+          }
+        }
+      },
+      {
+        "id": "3a4ae1b3-f700-4cdd-b278-ceeffd6f6e2f",
+        "function_id": "Fn010M",
+        "inputs": {
+          "message": {
+            "hidden": false,
+            "locked": false,
+            "value": [
+              {
+                "type": "rich_text",
+                "elements": [
+                  {
+                    "type": "rich_text_section",
+                    "elements": [
+                      {
+                        "id": "{{inputs.Ft08MZ9RAZ97__user_id}}",
+                        "type": "workflowtoken",
+                        "property": "",
+                        "data_type": "slack#/types/user_id"
+                      },
+                      {
+                        "text": " möchte dein Vereinscoaching anpassen auf: ",
+                        "type": "text"
+                      },
+                      {
+                        "id": "{{steps.82bb1366-cc12-4917-bb44-672dc7fc0165.fields.63fd421e-3235-44e2-8429-98ad7919e753}}",
+                        "type": "workflowtoken",
+                        "property": "",
+                        "data_type": "number"
+                      },
+                      { "text": " € ab dem ", "type": "text" },
+                      {
+                        "id": "{{steps.82bb1366-cc12-4917-bb44-672dc7fc0165.fields.9f4c1902-4afd-43e2-a412-2d25b71cab60}}",
+                        "type": "workflowtoken",
+                        "property": "",
+                        "data_type": "slack#/types/date"
+                      },
+                      {
+                        "text": "\n\nFalls das mit dir abgesprochen und in Ordnung ist, bitte bestätige diese Nachricht",
+                        "type": "text"
+                      }
+                    ]
+                  }
+                ]
+              }
+            ]
+          },
+          "user_id": {
+            "hidden": false,
+            "locked": false,
+            "value": "{{steps.82bb1366-cc12-4917-bb44-672dc7fc0165.fields.c2d225cf-9903-4334-9256-52ffc4466735}}"
+          },
+          "interactive_blocks": {
+            "hidden": false,
+            "locked": false,
+            "value": [
+              {
+                "type": "actions",
+                "elements": [
+                  {
+                    "text": {
+                      "text": "Zustimmen",
+                      "type": "plain_text",
+                      "emoji": true
+                    },
+                    "type": "button",
+                    "style": "primary",
+                    "value": "button",
+                    "action_id": "76308efc-f63b-4471-80b2-3daa062a04c6"
+                  }
+                ]
+              }
+            ]
+          },
+          "interactivity_configuration": {
+            "hidden": false,
+            "locked": false,
+            "value": {
+              "actions": {
+                "76308efc-f63b-4471-80b2-3daa062a04c6": {
+                  "is_button_multi_click": false,
+                  "is_mutually_exclusive": false
+                }
+              }
+            }
+          }
+        }
+      },
+      {
+        "id": "219eefcf-169e-4924-acb8-819da00b13d8",
+        "function_id": "Fn010M",
+        "inputs": {
+          "message": {
+            "hidden": false,
+            "locked": false,
+            "value": [
+              {
+                "type": "rich_text",
+                "elements": [
+                  {
+                    "type": "rich_text_section",
+                    "elements": [
+                      {
+                        "id": "{{steps.82bb1366-cc12-4917-bb44-672dc7fc0165.fields.c2d225cf-9903-4334-9256-52ffc4466735}}",
+                        "type": "workflowtoken",
+                        "property": "",
+                        "data_type": "slack#/types/user_id"
+                      },
+                      {
+                        "text": " hat der Anpassung des Coachings auf ",
+                        "type": "text"
+                      },
+                      {
+                        "id": "{{steps.82bb1366-cc12-4917-bb44-672dc7fc0165.fields.63fd421e-3235-44e2-8429-98ad7919e753}}",
+                        "type": "workflowtoken",
+                        "property": "",
+                        "data_type": "number"
+                      },
+                      {
+                        "text": " € zugestimmt. Die Zahlungen werden ab dem ",
+                        "type": "text"
+                      },
+                      {
+                        "id": "{{steps.82bb1366-cc12-4917-bb44-672dc7fc0165.fields.9f4c1902-4afd-43e2-a412-2d25b71cab60}}",
+                        "type": "workflowtoken",
+                        "property": "",
+                        "data_type": "slack#/types/date"
+                      },
+                      { "text": " vom Vorstand angepasst", "type": "text" }
+                    ]
+                  }
+                ]
+              }
+            ]
+          },
+          "user_id": {
+            "hidden": false,
+            "locked": false,
+            "value": "{{inputs.Ft08MZ9RAZ97__user_id}}"
+          }
+        }
+      },
+      {
+        "id": "a9a361f6-b831-41fb-9501-0113e34eaa9a",
+        "function_id": "Fn0102",
+        "inputs": {
+          "message": {
+            "hidden": false,
+            "locked": false,
+            "value": [
+              {
+                "type": "rich_text",
+                "elements": [
+                  {
+                    "type": "rich_text_section",
+                    "elements": [
+                      {
+                        "text": "Vereinscoaching anpassen ",
+                        "type": "text",
+                        "style": { "bold": true }
+                      },
+                      {
+                        "id": "{slack.user_full_name(user_id={{steps.82bb1366-cc12-4917-bb44-672dc7fc0165.fields.c2d225cf-9903-4334-9256-52ffc4466735}})}",
+                        "type": "workflowtoken",
+                        "property": "",
+                        "data_type": "string"
+                      },
+                      { "text": "  - neu ", "type": "text" },
+                      {
+                        "id": "{{steps.82bb1366-cc12-4917-bb44-672dc7fc0165.fields.63fd421e-3235-44e2-8429-98ad7919e753}}",
+                        "type": "workflowtoken",
+                        "property": "",
+                        "data_type": "number"
+                      },
+                      { "text": " € ab ", "type": "text" },
+                      {
+                        "id": "{{steps.82bb1366-cc12-4917-bb44-672dc7fc0165.fields.9f4c1902-4afd-43e2-a412-2d25b71cab60}}",
+                        "type": "workflowtoken",
+                        "property": "",
+                        "data_type": "slack#/types/date"
+                      }
+                    ]
+                  }
+                ]
+              }
+            ]
+          },
+          "channel_id": {
+            "hidden": false,
+            "locked": false,
+            "value": "GG7HSFU3B"
+          }
+        }
+      },
+      {
+        "id": "be500e79-2f3a-4aeb-9e99-b747c53e560d",
+        "function_id": "Fn0133",
+        "inputs": {
+          "columns": {
+            "hidden": false,
+            "locked": false,
+            "value": {
+              "name": "Vereinscoaching anpassen {{steps.82bb1366-cc12-4917-bb44-672dc7fc0165.fields.9f4c1902-4afd-43e2-a412-2d25b71cab60}}  {slack.user_display_name(user_id={{steps.82bb1366-cc12-4917-bb44-672dc7fc0165.fields.c2d225cf-9903-4334-9256-52ffc4466735}})} - {{steps.82bb1366-cc12-4917-bb44-672dc7fc0165.fields.63fd421e-3235-44e2-8429-98ad7919e753}} €",
+              "Col08LRUJMGRL": "{{steps.a9a361f6-b831-41fb-9501-0113e34eaa9a.message_context}}",
+              "Col08M2A52QHY": "Opt1436M9XD",
+              "Col08M9UVR0HX": "OptFXY9DFYV",
+              "Col096NG6M0CF": "OptWIIZZQ1X"
+            }
+          },
+          "list_id": {
+            "hidden": false,
+            "locked": false,
+            "value": "F08LJQDNR9D"
+          }
+        }
+      }
+    ]
+  },
+  "triggers": [
+    {
+      "name": "Vereinscoaching anpassen",
+      "type": "shortcut",
+      "inputs": {
+        "Ft08MZ9RAZ97__user_id": {
+          "value": "{{data.user_id}}",
+          "locked": false,
+          "hidden": false
+        },
+        "Ft08MZ9RAZ97__interactivity": {
+          "value": "{{data.interactivity}}",
+          "locked": false,
+          "hidden": false
+        }
+      },
+      "shortcut": { "schema": {} }
+    }
+  ]
+}
