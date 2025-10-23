@@ -9,7 +9,7 @@
 - uploadFileToGoogleDrive
   :::
 
-Die `.env` Umgebungsvariablen für den [Google Drive und Slack](../../getting-started/aws-lambda#umgebungsvariablen-definieren) Zugriff müssen gesetzt sein.
+Die `.env` Umgebungsvariablen für den [Google Drive und Slack](../hosting-and-slack/aws-lambda#umgebungsvariablen-definieren) Zugriff müssen gesetzt sein.
 
 ### Stammdaten
 

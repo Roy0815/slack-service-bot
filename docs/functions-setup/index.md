@@ -6,6 +6,6 @@ Der Slack Bot besteht aus verschiedenen Komponenten. Es gibt eigenständige Unte
 
 Diese Apps implementieren End-to-End Prozesse komplett selbststäntig. Dafür nutzen sie beispielsweise Eintrittspunkte wie so genannte `slash commands` und implementieren alle Schritte der Prozesse vollständig.
 
-Im Ordner `/general` sind zentrale Abhängigkeiten angelegt. Dennoch können einzelne Unterapps gelegentlich von der App [Arbeitsstunden](./components/arbeitsstunden) abhängig sein, da diese sehr ausführlich die Integration mit den Mitgliedsstammdaten implementiert.
+Im Ordner `/general` sind zentrale Abhängigkeiten angelegt. Dennoch können einzelne Unterapps gelegentlich von der App [Arbeitsstunden](components#arbeitsstunden) abhängig sein, da diese sehr ausführlich die Integration mit den Mitgliedsstammdaten implementiert.
 
-Die Einrichtung der Unterapps wird im Kapitel [Komponenten](./components/arbeitsstunden) vorgestellt.
+Die Einrichtung der Unterapps wird im Kapitel [Komponenten](components) vorgestellt.

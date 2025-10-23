@@ -8,7 +8,7 @@
 
 Für diese Komponente müssen die Umgebungsvariablen `SPREADSHEET_ID_MASTERDATA`, `GOOGLE_SERVICE_ACC_EMAIL` und `GOOGLE_SERVICE_ACC_PRIVATE_KEY` ausgefüllt werden.
 
-`GOOGLE_SERVICE_ACC_EMAIL` und `GOOGLE_SERVICE_ACC_PRIVATE_KEY` sollten bereits im Kapitel [Setup - AWS Lambda aufsetzen](../getting-started/aws-lambda.md) ausgefüllt worden sein.
+`GOOGLE_SERVICE_ACC_EMAIL` und `GOOGLE_SERVICE_ACC_PRIVATE_KEY` sollten bereits im Kapitel [Setup - AWS Lambda aufsetzen](../hosting-and-slack/aws-lambda#umgebungsvariablen-definieren) ausgefüllt worden sein.
 
 Die `SPREADSHEET_ID_MASTERDATA` findet man in der URL der Tabelle mit den Mitgliederstammdaten. Sie steht zwischen `docs.google.com/spreadsheets/d/` und dem nächsten `/`.
 
