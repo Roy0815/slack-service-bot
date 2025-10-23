@@ -36,7 +36,7 @@ package:
     - '!.github/**'
     - '!.eslintrc.json*'
     - '!.prettierrc'
-    - '!example.env'
+    - '!.env.example'
     - '!docs/**'
 
 functions:
