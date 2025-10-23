@@ -64,7 +64,7 @@ function setupApp(app) {
 VERSION:3.0
 N:${newMemberInfo.lastname};${newMemberInfo.firstname}
 EMAIL:${newMemberInfo.email}
-TEL;TYPE=voice:${newMemberInfo.phone}
+TEL;TYPE=voice:${newMemberInfo.phone.replace(`'`, '')}
 END:VCARD`
         }),
         // get team info
