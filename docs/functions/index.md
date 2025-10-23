@@ -1,3 +1,3 @@
-# Functions
+# Funktionen
 
 Under construction 👷🚧🏗️

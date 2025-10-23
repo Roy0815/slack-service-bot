@@ -1,6 +1,8 @@
-# Konfiguration
+# Workflow Schritte
 
-## Google Drive
+## Konfiguration
+
+### Google Drive
 
 ::: details Workflow Steps {open}
 
@@ -9,7 +11,7 @@
 
 Die `.env` Umgebungsvariablen für den [Google Drive und Slack](../../getting-started/aws-lambda#umgebungsvariablen-definieren) Zugriff müssen gesetzt sein.
 
-## Stammdaten
+### Stammdaten
 
 ::: details Workflow Steps {open}
 
@@ -19,7 +21,7 @@ Die `.env` Umgebungsvariablen für den [Google Drive und Slack](../../getting-st
 
 Keine besondere Konfiguration nötig.
 
-## Utility
+### Utility
 
 ::: details Workflow Steps {open}
 

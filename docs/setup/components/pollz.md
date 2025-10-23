@@ -1,3 +1,0 @@
-# Pollz
-
-### Kein Setup notwendig

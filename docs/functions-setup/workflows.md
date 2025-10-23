@@ -1,7 +1,9 @@
-# Workflows anlegen
+# Workflows
 
 Hier werden einige Workflows, die wir aktuell nutzen vorgestellt.
 Die Liste wird nach Möglichkeit aktuell gehalten.
+
+[[toc]]
 
 ## ADMIN Neues Mitglied
 
@@ -23,9 +25,9 @@ Under construction 👷🚧🏗️
 
 Komplettes Setup möglich per JSON upload.
 
-::: details workflow.json
+::: details vereinscoaching-anpassen.json
 
-<<< ../../../slack-config-files/workflows/vereinscoaching-anpassen.json
+<<< ../../slack-config-files/workflows/vereinscoaching-anpassen.json
 
 :::
 
@@ -33,8 +35,8 @@ Komplettes Setup möglich per JSON upload.
 
 Komplettes Setup möglich per JSON upload.
 
-::: details workflow.json
+::: details vereinscoaching-kuendigen.json
 
-<<< ../../../slack-config-files/workflows/vereinscoaching-kuendigen.json
+<<< ../../slack-config-files/workflows/vereinscoaching-kuendigen.json
 
 :::

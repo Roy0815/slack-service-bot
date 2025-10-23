@@ -1,4 +1,4 @@
-# Introduction
+# Einführung
 
 Der Slack Bot besteht aus verschiedenen Komponenten. Es gibt eigenständige Unterapps, welche in `/src` einen eigenen Ordner haben, einzelne Workflow Schritte und externe Webhook Implementierungen.
 
