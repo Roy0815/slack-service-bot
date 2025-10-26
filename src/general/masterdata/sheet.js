@@ -81,7 +81,7 @@ function moveUserLineToObject(userLine) {
  * @returns {types.userContactCard}
  */
 function moveUserLineToContactCard(userLine) {
-  if (typeof userLine === 'undefined'){
+  if (typeof userLine === 'undefined') {
     return undefined;
   }
   return {
