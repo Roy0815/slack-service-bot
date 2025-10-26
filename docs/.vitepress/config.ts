@@ -37,6 +37,11 @@ export default defineConfig({
     ],
     search: { provider: 'local' },
     docFooter: { next: 'Nächste Seite', prev: 'Vorherige Seite' },
+    editLink: {
+      pattern:
+        'https://github.com/Roy0815/slack-service-bot/edit/main/docs/:path',
+      text: 'Auf GitHub editieren'
+    },
     nav: [
       { text: 'Home', link: '/' },
       {
@@ -84,6 +89,10 @@ export default defineConfig({
           {
             text: 'Zugangsdaten holen',
             link: 'get-secrets.md'
+          },
+          {
+            text: 'Entwicklungsumgebung einrichten',
+            link: 'dev-environment-setup'
           },
           {
             text: 'AWS Lambda aufsetzen',

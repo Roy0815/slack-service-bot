@@ -1,9 +1,10 @@
 # Google APIs einrichten
 
-**Zu Testzwecken wird keine Google Cloud Console und auch kein Dienstaccount benötigt. Ein normaler Google Account genügt, um der App Zugriff auf Drive/Sheets zu geben**
+**Zu Testzwecken wird keine Google Cloud Console und auch kein Dienstaccount benötigt. Ein normaler Google Account genügt, um der App Zugriff auf Drive/Sheets zu geben.**
 
 Für die Integration mit Google Sheets und Google Drive werden die offiziellen Google APIs genutzt, die über eine sehr gute [Dokumentation](https://developers.google.com/) verfügt.
-In der [Google Cloud Console](https://console.cloud.google.com/welcome) können die persönlichen Projekte eingesehen werden. Das Projekt hängt in der Schwerathletik Mannheim Organisation und mehrere Nutzer von uns sind Inhaber.
+
+In der [Google Cloud Console](https://console.cloud.google.com/welcome) können die persönlichen Projekte eingesehen werden. Für unseren Verein hängt das Projekt in der Schwerathletik Mannheim Organisation und mehrere Nutzer von uns sind Inhaber.
 
 Die benötigten APIs müssen im Projekt aktiviert werden:
 
