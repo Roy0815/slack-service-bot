@@ -278,7 +278,7 @@ export function getUserRegisterEndMessage({ slackId, name, approved }) {
     channel: slackId,
     text: `Deine Registrierung als ${name} wurde ${
       approved
-        ? 'genehmigt. Du kannst jetzt deine Arbeitsstunden, Stammdaten erfassen und abrufen und dich für Wettkämpfe melden.'
+        ? 'genehmigt. Du kannst jetzt deine Arbeitsstunden erfassen, deine Stammdaten ändern und dich für Wettkämpfe melden.'
         : 'abgelehnt.'
     }`
   };
