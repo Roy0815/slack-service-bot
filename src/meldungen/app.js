@@ -28,7 +28,6 @@ function setupApp(app) {
       slackId: command.user_id
     });
 
-    /** @todo do i need to await? */
     await meldungCommand(client, command.trigger_id, command.channel_id, user);
   });
 
@@ -195,7 +194,6 @@ function setupApp(app) {
         body
       );
 
-      /** @todo do i need to await? */
       await meldungCommand(client, blockAction.trigger_id, body.user.id, user);
     }
   );
@@ -229,7 +227,7 @@ function setupApp(app) {
 
       switch (actionID) {
         case constants.competitionRegistrationAdminActions.confirm:
-          actionSpecificText = `*angenommen*:heavy_check_mark:`;
+          actionSpecificText = `*Angenommen*:heavy_check_mark:`;
           break;
         case constants.competitionRegistrationAdminActions.deny:
           actionSpecificText = `*Abgelehnt*:x:. Bitte wende dich an per mail an kdk@schwerathletik-mannheim.de`;
@@ -244,7 +242,7 @@ function setupApp(app) {
 
       switch (actionID) {
         case constants.competitionRegistrationAdminActions.confirm:
-          actionSpecificText = `:heavy_check_mark: *angenommen*`;
+          actionSpecificText = `:heavy_check_mark: *Angenommen*`;
           break;
         case constants.competitionRegistrationAdminActions.deny:
           actionSpecificText = `:x: *Abgelehnt*`;
@@ -270,17 +268,10 @@ function setupApp(app) {
         text: `Die Wettkampfmeldung von <@${competitionRegistrationData.slackID}> wurde durch <@${blockAction.user.id}> ${actionSpecificText}.`
       });
 
-      let competitionRegistrationState;
-      switch (actionID) {
-        case constants.competitionRegistrationAdminActions.confirm:
-          competitionRegistrationState =
-            constants.competitionRegistrationState.okay;
-          break;
-        case constants.competitionRegistrationAdminActions.deny:
-          competitionRegistrationState =
-            constants.competitionRegistrationState.problem;
-          break;
-      }
+      let competitionRegistrationState =
+        actionID === constants.competitionRegistrationAdminActions.confirm
+          ? constants.competitionRegistrationState.okay
+          : constants.competitionRegistrationState.problem;
 
       // update the row in the competition sheet with the new state
       await meldungenSheets.updateCompetitionRegistrationState(

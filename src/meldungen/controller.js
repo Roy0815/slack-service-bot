@@ -75,7 +75,7 @@ async function fillCompetitionDropdown(block) {
     throw new NoCompetitionsFoundError();
   }
 
-  await fillDropdownOptions(dropdown, optionContents);
+  fillDropdownOptions(dropdown, optionContents);
 }
 
 /**
@@ -84,7 +84,6 @@ async function fillCompetitionDropdown(block) {
  * @param {masterdataTypes.user} user
  */
 async function fillWeightClassDropdown(block, user) {
-  /** @todo get weight class array depending on sex */
   const weightClasses = [];
   switch (user.sex) {
     case masterdataTypes.userSex.female:

@@ -1,7 +1,6 @@
 import * as types from './types.js';
 import * as generalSheets from '../general/sheet.js';
 import * as constants from './constants.js';
-import { sheets_v4 as sheetsV4 } from 'googleapis/build/src/apis/sheets/index.js';
 
 /**
  * Creates a new competition in the spreadsheet
@@ -122,7 +121,6 @@ export async function saveInitialCompetitionRegistration(
   competitionRegistrationData
 ) {
   // get name of the competition sheet
-  /** @type  {sheetsV4.Schema$Sheet[]} */
   const allSheets = await generalSheets.getSheets(
     process.env.SPREADSHEET_ID_MELDUNGEN
   );
@@ -182,7 +180,6 @@ export async function updateCompetitionRegistrationState(
   competitionRegistrationState
 ) {
   // get name of the competition sheet
-  /** @type  {sheetsV4.Schema$Sheet[]} */
   const allSheets = await generalSheets.getSheets(
     process.env.SPREADSHEET_ID_MELDUNGEN
   );
