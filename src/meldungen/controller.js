@@ -9,6 +9,9 @@ import * as types from './types.js';
 import * as sheet from './sheet.js';
 import * as masterdataTypes from '../general/masterdata/types.js';
 
+export * from './sheet.js';
+export * from './constants.js';
+
 /**
  * Get part of the home view
  * @returns {import("@slack/types").KnownBlock[]}

@@ -1,12 +1,8 @@
 // local imports
 import * as controller from './controller.js';
-import * as constants from './constants.js';
-import * as types from './types.js';
 import * as util from '../general/util.js';
 import * as asController from '../arbeitsstunden/controller.js';
-import * as meldungenSheets from './sheet.js';
 import { masterdataService } from '../general/masterdata/service.js';
-import * as masterdataTypes from '../general/masterdata/types.js';
 import * as awsRtAPI from '../general/aws-runtime-api.js';
 
 /** @type {import('../general/types.js').appComponent} */
@@ -23,7 +19,7 @@ function setupApp(app) {
     // already send HTTP 200 so slack does not time out
     await awsRtAPI.sendResponse();
 
-    /** @type {masterdataTypes.user} */
+    /** @type {import('../general/masterdata/types.js').user} */
     const user = await masterdataService.getUserFromId({
       slackId: command.user_id
     });
@@ -57,7 +53,7 @@ function setupApp(app) {
   //* ****************** Views ******************//
   // Runs when the /meldung form is submitted
   app.view(
-    constants.competitionRegistrationView.viewName,
+    controller.competitionRegistrationView.viewName,
     async ({ body, ack, client }) => {
       await ack();
       // already send HTTP 200 that slack does not time out
@@ -66,12 +62,12 @@ function setupApp(app) {
       /** User inputs into modal */
       const selectedValues = body.view.state.values;
 
-      /** @type {masterdataTypes.user} */
+      /** @type {import('../general/masterdata/types.js').user} */
       const userDataFromSheet = await masterdataService.getUserFromId({
         slackId: body.user.id
       });
 
-      /** @type {types.competitionRegistrationData} */
+      /** @type {import('./types.js').competitionRegistrationData} */
       const competitionRegistrationData =
         await controller.extractCompetitionRegistrationData(
           selectedValues,
@@ -112,7 +108,7 @@ function setupApp(app) {
 
   // Runs when the /wettkampf-erstellen form is submitted
   app.view(
-    constants.competitionCreationView.viewName,
+    controller.competitionCreationView.viewName,
     async ({ body, ack, client }) => {
       try {
         await ack();
@@ -124,8 +120,8 @@ function setupApp(app) {
         // convert selected date to our format
         const dateInput =
           selectedValues[
-            constants.competitionCreationView.blockCompetitionDate
-          ][constants.competitionCreationView.actionCompetitionDate]
+            controller.competitionCreationView.blockCompetitionDate
+          ][controller.competitionCreationView.actionCompetitionDate]
             .selected_date;
 
         const convertedCompetitionDate = util.formatDate(
@@ -133,22 +129,22 @@ function setupApp(app) {
           new Date(dateInput)
         );
 
-        /** @type {types.competitionData} */
+        /** @type {import('./types.js').competitionData} */
         const competitionData = {
           name: selectedValues[
-            constants.competitionCreationView.blockCompetitionName
-          ][constants.competitionCreationView.actionCompetitionName].value,
+            controller.competitionCreationView.blockCompetitionName
+          ][controller.competitionCreationView.actionCompetitionName].value,
           date: convertedCompetitionDate,
           location:
             selectedValues[
-              constants.competitionCreationView.blockCompetitionLocation
-            ][constants.competitionCreationView.actionCompetitionLocation]
+              controller.competitionCreationView.blockCompetitionLocation
+            ][controller.competitionCreationView.actionCompetitionLocation]
               .value,
           ID: '' // will be set later
         };
 
         if (
-          (await meldungenSheets.createNewCompetition(competitionData)) ===
+          (await controller.createNewCompetition(competitionData)) ===
           false
         ) {
           await client.chat.postMessage({
@@ -179,13 +175,13 @@ function setupApp(app) {
 
   //* ****************** Actions ******************//
   app.action(
-    constants.homeView.actionMeldungInput,
+    controller.homeView.actionMeldungInput,
     async ({ ack, body, client, action }) => {
       await ack();
       // already send HTTP 200 that slack does not time out
       await awsRtAPI.sendResponse();
 
-      /** @type {masterdataTypes.user} */
+      /** @type {import('../general/masterdata/types.js').user} */
       const user = await masterdataService.getUserFromId({
         slackId: body.user.id
       });
@@ -200,7 +196,7 @@ function setupApp(app) {
 
   app.action(
     new RegExp(
-      `^(${constants.competitionRegistrationAdminActions.confirm})|(${constants.competitionRegistrationAdminActions.deny})$`
+      `^(${controller.competitionRegistrationAdminActions.confirm})|(${controller.competitionRegistrationAdminActions.deny})$`
     ),
     async ({ ack, body, client, action }) => {
       await ack();
@@ -216,20 +212,20 @@ function setupApp(app) {
         body
       );
 
-      /** @type {constants.competitionRegistrationAdminActions} */
+      /** @type {controller.competitionRegistrationAdminActions} */
       const actionID = btnAction.action_id;
 
-      /** @type {types.competitionRegistrationData} */
+      /** @type {import('./types.js').competitionRegistrationData} */
       const competitionRegistrationData = JSON.parse(btnAction.value);
 
       /** @type {string} Text that depends on the which button was pressed */
       let actionSpecificText;
 
       switch (actionID) {
-        case constants.competitionRegistrationAdminActions.confirm:
+        case controller.competitionRegistrationAdminActions.confirm:
           actionSpecificText = `*Angenommen*:heavy_check_mark:`;
           break;
-        case constants.competitionRegistrationAdminActions.deny:
+        case controller.competitionRegistrationAdminActions.deny:
           actionSpecificText = `*Abgelehnt*:x:. Bitte wende dich an per mail an kdk@schwerathletik-mannheim.de`;
           break;
       }
@@ -241,10 +237,10 @@ function setupApp(app) {
       });
 
       switch (actionID) {
-        case constants.competitionRegistrationAdminActions.confirm:
+        case controller.competitionRegistrationAdminActions.confirm:
           actionSpecificText = `:heavy_check_mark: *Angenommen*`;
           break;
-        case constants.competitionRegistrationAdminActions.deny:
+        case controller.competitionRegistrationAdminActions.deny:
           actionSpecificText = `:x: *Abgelehnt*`;
           break;
       }
@@ -269,12 +265,12 @@ function setupApp(app) {
       });
 
       let competitionRegistrationState =
-        actionID === constants.competitionRegistrationAdminActions.confirm
-          ? constants.competitionRegistrationState.okay
-          : constants.competitionRegistrationState.problem;
+        actionID === controller.competitionRegistrationAdminActions.confirm
+          ? controller.competitionRegistrationState.okay
+          : controller.competitionRegistrationState.problem;
 
       // update the row in the competition sheet with the new state
-      await meldungenSheets.updateCompetitionRegistrationState(
+      await controller.updateCompetitionRegistrationState(
         competitionRegistrationData,
         competitionRegistrationState
       );
@@ -287,7 +283,7 @@ function setupApp(app) {
  * @param {import("@slack/bolt").webApi.WebClient} client
  * @param {string} triggerId
  * @param {string} channelID
- * @param {masterdataTypes.user} user
+ * @param {import('../general/masterdata/types.js').user} user
  * @returns {Promise<void>}
  */
 async function meldungCommand(client, triggerId, channelID, user) {
