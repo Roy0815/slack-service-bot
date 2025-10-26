@@ -23,8 +23,8 @@ function setupApp(app) {
     // already send HTTP 200 so slack does not time out
     await awsRtAPI.sendResponse();
 
-    /** @type {masterdataTypes.userContactCard} */
-    const user = await masterdataService.getUserContactCardFromId({
+    /** @type {masterdataTypes.user} */
+    const user = await masterdataService.getUserFromId({
       slackId: command.user_id
     });
 
@@ -186,8 +186,8 @@ function setupApp(app) {
       // already send HTTP 200 that slack does not time out
       await awsRtAPI.sendResponse();
 
-      /** @type {masterdataTypes.userContactCard} */
-      const user = await masterdataService.getUserContactCardFromId({
+      /** @type {masterdataTypes.user} */
+      const user = await masterdataService.getUserFromId({
         slackId: body.user.id
       });
 
@@ -296,7 +296,7 @@ function setupApp(app) {
  * @param {import("@slack/bolt").webApi.WebClient} client
  * @param {string} triggerId
  * @param {string} channelID
- * @param {masterdataTypes.userContactCard} user
+ * @param {masterdataTypes.user} user
  * @returns {Promise<void>}
  */
 async function meldungCommand(client, triggerId, channelID, user) {

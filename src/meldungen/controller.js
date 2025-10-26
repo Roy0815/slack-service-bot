@@ -21,7 +21,7 @@ export function getHomeView() {
 /**
  * Get initial pop up for competition registration
  * @param {string} triggerId
- * @param {masterdataTypes.userContactCard} user
+ * @param {masterdataTypes.user} user
  * @returns {Promise<import("@slack/web-api").ViewsOpenArguments>}
  * @throws {NoCompetitionsFoundError} if no competitions are found
  */
