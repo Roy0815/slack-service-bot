@@ -405,14 +405,39 @@ function setupApp(app) {
 
   //* ******************* Events Submissions ********************//
   app.event('team_join', async ({ event, client }) => {
-    // log in case of bot user analysis
-    console.log(event);
+    // acknowledge event
+    await awsRtAPI.sendResponse();
 
     // ignore bot users
     if (event.user && event.user.is_bot) return;
 
-    await client.chat.postMessage(
-      await controller.getAutoRegisterMessage(event.user.id)
+    // get user email
+    const user = (
+      await client.users.info({
+        user: event.user.id
+      })
+    )?.user;
+
+    // check if user can be identified by email
+    const masterdataUser = await masterdataService.getUserFromEmail(
+      user?.profile?.email
     );
+
+    // no email or no ID found: manual admin registration
+    if (!user || !masterdataUser) {
+      await client.chat.postMessage(
+        await controller.getAutoRegisterMessage(event.user.id)
+      );
+      return;
+    }
+
+    // email match found: save slack ID
+    await masterdataService.saveSlackId(masterdataUser.id, event.user.id);
+
+    // notify admins
+    await client.chat.postMessage({
+      channel: await controller.getAdminChannel(),
+      text: `Neuer User automatisch registriert: <@${event.user.id}> :arrow_right: ${masterdataUser.firstname} ${masterdataUser.lastname} (${user.profile.email})`
+    });
   });
 }

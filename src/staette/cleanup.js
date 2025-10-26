@@ -27,13 +27,13 @@ export async function run(event, context) {
   // log deleted messages
   await app.client.filesUploadV2({
     channel_id: process.env.APP_ADMIN_CHANNEL,
-    filetype: 'javascript',
     initial_comment: `Job ran at ${util.formatDate(
       new Date()
     )} ${util.formatTime(new Date())} and deleted ${result.length} Message${
       result.length === 1 ? '' : 's'
     }`,
     title: 'Messages',
+    filename: 'messages.js',
     content: JSON.stringify(result, null, '\t')
   });
 }
