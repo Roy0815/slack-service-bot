@@ -92,14 +92,14 @@ function setupApp(app) {
 
       // Send to admin channel for validation
       await client.chat.postMessage(
-        await controller.getAdminConfirmMessageCompetitionRegistration(
+        controller.getAdminConfirmMessageCompetitionRegistration(
           competitionRegistrationData
         )
       );
 
       // Send confirmation message to user
       await client.chat.postMessage(
-        await controller.getUserConfirmMessageCompetitionCreation(
+        controller.getUserConfirmMessageCompetitionCreation(
           competitionRegistrationData
         )
       );
@@ -176,7 +176,7 @@ function setupApp(app) {
   //* ****************** Actions ******************//
   app.action(
     controller.homeView.actionMeldungInput,
-    async ({ ack, body, client, action }) => {
+    async ({ ack, body, client}) => {
       await ack();
       // already send HTTP 200 that slack does not time out
       await awsRtAPI.sendResponse();
@@ -264,7 +264,7 @@ function setupApp(app) {
         text: `Die Wettkampfmeldung von <@${competitionRegistrationData.slackID}> wurde durch <@${blockAction.user.id}> ${actionSpecificText}.`
       });
 
-      let competitionRegistrationState =
+      const competitionRegistrationState =
         actionID === controller.competitionRegistrationAdminActions.confirm
           ? controller.competitionRegistrationState.okay
           : controller.competitionRegistrationState.problem;
