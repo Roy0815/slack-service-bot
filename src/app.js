@@ -22,7 +22,7 @@ const app = new slack.default.App({
   extendedErrorHandler: true /*,
   // Sometimes useful for debugging
   developerMode: true,
-  socketMode: false*/
+  socketMode: false */
 });
 
 //* ******************* Setup listeners ********************//
