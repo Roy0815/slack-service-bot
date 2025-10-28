@@ -116,6 +116,13 @@ Die Implementierung umfasst einen Webhook, welcher von Docuseal ausgelöst wird,
 ### Template anlegen
 
 1. Template bei Docuseal für den Aufnahmeantrag erstellen
+
+::: warning WARNUNG
+Die Namen der Felder im Aufnahmeantrag müssen 1:1 den technischen Feldnamen im `/src/general/masterdata/types.js` entsprechen (Anzeigename für die Felder kann separat geändert werden):
+
+<<< ../../src/general/masterdata/types.js#userJoiningFields
+:::
+
 2. Template ID aus Docuseal ermitteln `https://docuseal.eu/templates/{TEMPLATE_ID}`
 3. In `.env` Umgebungsvariablen pflegen
 
