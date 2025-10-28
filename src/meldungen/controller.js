@@ -227,10 +227,13 @@ export function getAdminConfirmMessageCompetitionCreation(
  * Saves a competition registration to the correct sheet for the competition
  * with the initial state
  * @param {types.competitionRegistrationData} competitionRegistrationData
- * @returns {Promise<boolean>} return false if the registration already exists
+ * @throws {CompetitionRegistrationAlreadyExistsError}
+ * @returns {Promise<void>}
  */
 export async function saveCompetitionRegistration(competitionRegistrationData) {
-  return sheet.saveInitialCompetitionRegistration(competitionRegistrationData);
+  return await sheet.saveInitialCompetitionRegistration(
+    competitionRegistrationData
+  );
 }
 
 /**
@@ -362,7 +365,31 @@ export async function extractCompetitionRegistrationData(selectedValues, user) {
 }
 
 export class NoCompetitionsFoundError extends Error {
-  constructor(message = '') {
+  constructor(message = 'No competitions were found') {
+    super(message);
+  }
+}
+
+export class WrongChannelError extends Error {
+  constructor(message = 'This command can only be used in the admin channel') {
+    super(message);
+  }
+}
+
+export class UserNotRegisteredError extends Error {
+  constructor(message = 'User is not registered') {
+    super(message);
+  }
+}
+
+export class CompetitionAlreadyExistsError extends Error {
+  constructor(message = 'Competition already exists') {
+    super(message);
+  }
+}
+
+export class CompetitionRegistrationAlreadyExistsError extends Error {
+  constructor(message = 'Competition registration already exists') {
     super(message);
   }
 }

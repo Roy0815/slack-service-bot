@@ -1,11 +1,15 @@
 import * as types from './types.js';
 import * as generalSheets from '../general/sheet.js';
 import * as constants from './constants.js';
+import {
+  CompetitionRegistrationAlreadyExistsError,
+  CompetitionAlreadyExistsError
+} from './controller.js';
 
 /**
  * Creates a new competition in the spreadsheet
  * @param {types.competitionData} competitionData
- * @returns {Promise<boolean>} return false if the competition already exists
+ * @throws {CompetitionAlreadyExistsError}
  */
 export async function createNewCompetition(competitionData) {
   // check if the competition already exists
@@ -17,12 +21,11 @@ export async function createNewCompetition(competitionData) {
       competition.location === competitionData.location
   );
   if (existingCompetition) {
-    return false; // competition already exists
+    throw new CompetitionAlreadyExistsError();
   }
 
   const newSheetName = await createNewCompetitionSheet(competitionData);
   appendCompetitionDataToMainSheet(competitionData, newSheetName);
-  return true;
 }
 
 /**
@@ -115,7 +118,7 @@ export async function getLiveCompetitions() {
  * Saves a competition registration to the correct sheet for the competition
  * with the initial state
  * @param {types.competitionRegistrationData} competitionRegistrationData
- * @returns {Promise<boolean>} return false if the registration already exists
+ * @throws {CompetitionRegistrationAlreadyExistsError}
  */
 export async function saveInitialCompetitionRegistration(
   competitionRegistrationData
@@ -151,7 +154,7 @@ export async function saveInitialCompetitionRegistration(
         competitionRegistrationData.first_name
   );
   if (existingRow !== -1) {
-    return false;
+    throw new CompetitionRegistrationAlreadyExistsError();
   }
 
   const competitionSheetName = competitionSheet.properties.title;
@@ -167,7 +170,6 @@ export async function saveInitialCompetitionRegistration(
       [competitionRegistrationData.handler_needed]
     ]
   });
-  return true;
 }
 
 /**
