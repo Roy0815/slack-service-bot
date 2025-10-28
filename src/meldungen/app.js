@@ -1,6 +1,8 @@
 // local imports
 import * as controller from './controller.js';
-
+import * as util from '../general/util.js';
+import * as asController from '../arbeitsstunden/controller.js';
+import { masterdataService } from '../general/masterdata/service.js';
 import * as awsRtAPI from '../general/aws-runtime-api.js';
 
 /** @type {import('../general/types.js').appComponent} */
@@ -10,19 +12,311 @@ export const meldungenApp = { setupApp, getHomeView: controller.getHomeView };
  * @param {import("@slack/bolt").App} app
  */
 function setupApp(app) {
+  //* ****************** Commands ******************//
   // Allow a user to register for a competition
-  app.command('/wettkampf-meldung', async ({ ack, command, client }) => {
+  app.command('/meldung', async ({ ack, command, client }) => {
     await ack();
-    // already send HTTP 200 that slack does not time out
+    // already send HTTP 200 so slack does not time out
     await awsRtAPI.sendResponse();
 
-    /**
-     * @todo Check if user is registered. Error or forward to registration if
-     * not
-     */
+    /** @type {import('../general/masterdata/types.js').user} */
+    const user = await masterdataService.getUserFromId({
+      slackId: command.user_id
+    });
 
-    await client.views.open(
-      controller.getCompetitionRegistrationView(command.trigger_id)
-    );
+    await meldungCommand(client, command.trigger_id, command.channel_id, user);
   });
+
+  // Create a new competition
+  app.command('/wettkampf-erstellen', async ({ ack, command, client }) => {
+    await ack();
+    // already send HTTP 200 so slack does not time out
+    await awsRtAPI.sendResponse();
+
+    try {
+      // check if command was sent from meldungen admin channel
+      if (command.channel_id !== process.env.MELDUNGEN_ADMIN_CHANNEL) {
+        throw new controller.WrongChannelError();
+      }
+
+      await client.views.open(
+        controller.getCompetitionCreationView(command.trigger_id)
+      );
+    } catch (error) {
+      if (error instanceof controller.WrongChannelError) {
+        await client.chat.postMessage({
+          channel: command.user_id,
+          text:
+            'Dieser Befehl kann nur im <#' +
+            process.env.MELDUNGEN_ADMIN_CHANNEL +
+            '> Kanal verwendet werden.'
+        });
+      } else {
+        throw error;
+      }
+    }
+  });
+
+  //* ****************** Views ******************//
+  // Runs when the /meldung form is submitted
+  app.view(
+    controller.competitionRegistrationView.viewName,
+    async ({ body, ack, client }) => {
+      await ack();
+      // already send HTTP 200 that slack does not time out
+      await awsRtAPI.sendResponse();
+
+      /** User inputs into modal */
+      const selectedValues = body.view.state.values;
+
+      /** @type {import('../general/masterdata/types.js').user} */
+      const userDataFromSheet = await masterdataService.getUserFromId({
+        slackId: body.user.id
+      });
+
+      /** @type {import('./types.js').competitionRegistrationData} */
+      const competitionRegistrationData =
+        await controller.extractCompetitionRegistrationData(
+          selectedValues,
+          userDataFromSheet
+        );
+
+      try {
+        await controller.saveCompetitionRegistration(
+          competitionRegistrationData
+        );
+
+        // Send to admin channel for validation
+        await client.chat.postMessage(
+          controller.getAdminConfirmMessageCompetitionRegistration(
+            competitionRegistrationData
+          )
+        );
+
+        // Send confirmation message to user
+        await client.chat.postMessage(
+          controller.getUserConfirmMessageCompetitionCreation(
+            competitionRegistrationData
+          )
+        );
+      } catch (error) {
+        if (
+          error instanceof controller.CompetitionRegistrationAlreadyExistsError
+        ) {
+          await client.chat.postMessage({
+            channel: body.user.id,
+            text:
+              `Du hast dich bereits für diesen Wettkampf angemeldet. ` +
+              `<https://docs.google.com/spreadsheets/d/${process.env.SPREADSHEET_ID_MELDUNGEN}/edit#gid=${competitionRegistrationData.competition.ID}|${competitionRegistrationData.competition.name}>\n\n` +
+              `Bitte kontaktiere uns, wenn du deine Anmeldung ändern möchtest.\n` +
+              `kdk@schwerathletik-mannheim.de`
+          });
+        } else {
+          throw error;
+        }
+      }
+    }
+  );
+
+  // Runs when the /wettkampf-erstellen form is submitted
+  app.view(
+    controller.competitionCreationView.viewName,
+    async ({ body, ack, client }) => {
+      await ack();
+      // already send HTTP 200 that slack does not time out
+      await awsRtAPI.sendResponse();
+
+      const selectedValues = body.view.state.values;
+
+      // convert selected date to our format
+      const dateInput =
+        selectedValues[controller.competitionCreationView.blockCompetitionDate][
+          controller.competitionCreationView.actionCompetitionDate
+        ].selected_date;
+
+      const convertedCompetitionDate = util.formatDate(
+        /** @type {Date} */
+        new Date(dateInput)
+      );
+
+      /** @type {import('./types.js').competitionData} */
+      const competitionData = {
+        name: selectedValues[
+          controller.competitionCreationView.blockCompetitionName
+        ][controller.competitionCreationView.actionCompetitionName].value,
+        date: convertedCompetitionDate,
+        location:
+          selectedValues[
+            controller.competitionCreationView.blockCompetitionLocation
+          ][controller.competitionCreationView.actionCompetitionLocation].value,
+        ID: '' // will be set later
+      };
+
+      try {
+        await controller.createNewCompetition(competitionData);
+
+        // Notify admin channel about new competition and who created it
+        await client.chat.postMessage(
+          await controller.getAdminConfirmMessageCompetitionCreation(
+            competitionData,
+            body.user.id
+          )
+        );
+      } catch (error) {
+        if (error instanceof controller.CompetitionAlreadyExistsError) {
+          await client.chat.postMessage({
+            channel: body.user.id,
+            text:
+              `Wettkampf erstellen fehlgeschlagen!\n\n` +
+              `Ein Wettkampf mit diesen Daten:\n` +
+              `\t*Name:* ${competitionData.name}\n` +
+              `\t*Datum:* ${competitionData.date}\n` +
+              `\t*Ort:* ${competitionData.location}\n` +
+              `existiert bereits!`
+          });
+        } else {
+          throw error;
+        }
+      }
+    }
+  );
+
+  //* ****************** Actions ******************//
+  app.action(
+    controller.homeView.actionMeldungInput,
+    async ({ ack, body, client }) => {
+      await ack();
+      // already send HTTP 200 that slack does not time out
+      await awsRtAPI.sendResponse();
+
+      /** @type {import('../general/masterdata/types.js').user} */
+      const user = await masterdataService.getUserFromId({
+        slackId: body.user.id
+      });
+
+      const blockAction = /** @type {import("@slack/bolt").BlockAction} */ (
+        body
+      );
+
+      await meldungCommand(client, blockAction.trigger_id, body.user.id, user);
+    }
+  );
+
+  app.action(
+    new RegExp(
+      `^(${controller.competitionRegistrationAdminActions.confirm})|(${controller.competitionRegistrationAdminActions.deny})$`
+    ),
+    async ({ ack, body, client, action }) => {
+      await ack();
+      // already send HTTP 200 that slack does not time out
+      await awsRtAPI.sendResponse();
+
+      // get the competition registration data from the action value
+      const btnAction = /** @type {import("@slack/bolt").ButtonAction} */ (
+        action
+      );
+
+      const blockAction = /** @type {import("@slack/bolt").BlockAction} */ (
+        body
+      );
+
+      /** @type {controller.competitionRegistrationAdminActions} */
+      const actionID = btnAction.action_id;
+
+      /** @type {import('./types.js').competitionRegistrationData} */
+      const competitionRegistrationData = JSON.parse(btnAction.value);
+
+      /** @type {string} Text that depends on the which button was pressed */
+      let actionSpecificText;
+
+      switch (actionID) {
+        case controller.competitionRegistrationAdminActions.confirm:
+          actionSpecificText = `*Angenommen*:heavy_check_mark:`;
+          break;
+        case controller.competitionRegistrationAdminActions.deny:
+          actionSpecificText = `*Abgelehnt*:x:. Bitte wende dich an per mail an kdk@schwerathletik-mannheim.de`;
+          break;
+      }
+
+      // Notify user
+      await client.chat.postMessage({
+        channel: competitionRegistrationData.slackID,
+        text: `Deine Wettkampfmeldung wurde von <@${blockAction.user.id}> ${actionSpecificText}.`
+      });
+
+      switch (actionID) {
+        case controller.competitionRegistrationAdminActions.confirm:
+          actionSpecificText = `:heavy_check_mark: *Angenommen*`;
+          break;
+        case controller.competitionRegistrationAdminActions.deny:
+          actionSpecificText = `:x: *Abgelehnt*`;
+          break;
+      }
+
+      // Update the admin message
+      const blocks = blockAction.message.blocks.slice(0, -2); // Remove the last block (actions)
+      blocks.push({
+        type: 'context',
+        elements: [
+          {
+            type: 'mrkdwn',
+            text: `${actionSpecificText} von <@${blockAction.user.id}>`
+          }
+        ]
+      });
+
+      await client.chat.update({
+        channel: blockAction.channel.id,
+        ts: blockAction.message.ts,
+        blocks,
+        text: `Die Wettkampfmeldung von <@${competitionRegistrationData.slackID}> wurde durch <@${blockAction.user.id}> ${actionSpecificText}.`
+      });
+
+      const competitionRegistrationState =
+        actionID === controller.competitionRegistrationAdminActions.confirm
+          ? controller.competitionRegistrationState.okay
+          : controller.competitionRegistrationState.problem;
+
+      // update the row in the competition sheet with the new state
+      await controller.updateCompetitionRegistrationState(
+        competitionRegistrationData,
+        competitionRegistrationState
+      );
+    }
+  );
+}
+
+/**
+ *
+ * @param {import("@slack/bolt").webApi.WebClient} client
+ * @param {string} triggerId
+ * @param {string} channelID
+ * @param {import('../general/masterdata/types.js').user} user
+ * @returns {Promise<void>}
+ * @throws {controller.UserNotRegisteredError}
+ */
+async function meldungCommand(client, triggerId, channelID, user) {
+  // check if user is registered
+  if (!user) {
+    // send the register view to the user
+    await client.views.open(await asController.getRegisterView(triggerId));
+    throw new controller.UserNotRegisteredError();
+  }
+
+  try {
+    await client.views.open(
+      await controller.getCompetitionRegistrationView(triggerId, user)
+    );
+  } catch (error) {
+    if (error instanceof controller.NoCompetitionsFoundError) {
+      // Happens when the user selects the placeholder option.
+      // The placeholder option only appears when there are no competitions available
+      await client.chat.postMessage({
+        channel: channelID,
+        text: 'Es gibt aktuell keine Wettkämpfe, für die du dich anmelden kannst, oder es liegt ein technischer Fehler vor. Bitte versuche es später noch einmal.'
+      });
+    } else {
+      throw error;
+    }
+  }
 }

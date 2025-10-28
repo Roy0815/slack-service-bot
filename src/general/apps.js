@@ -3,6 +3,14 @@ import { staetteApp } from '../staette/app.js';
 import { pollzApp } from '../pollz/app.js';
 import { stammdatenApp } from '../stammdaten/app.js';
 import { workflowsApp } from '../workflows/app.js';
+import { meldungenApp } from '../meldungen/app.js';
 
 /** @type {import('./types.js').appComponent[]} */
-export const apps = [asApp, staetteApp, pollzApp, stammdatenApp, workflowsApp];
+export const apps = [
+  asApp,
+  staetteApp,
+  pollzApp,
+  stammdatenApp,
+  workflowsApp,
+  meldungenApp
+];
