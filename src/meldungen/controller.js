@@ -1,6 +1,16 @@
-import { homeView, competitionRegistrationView } from './views.js';
+import {
+  homeView,
+  competitionRegistrationView,
+  competitionCreationView
+} from './views.js';
 import * as util from '../general/util.js';
 import * as constants from './constants.js';
+import * as types from './types.js';
+import * as sheet from './sheet.js';
+import * as masterdataTypes from '../general/masterdata/types.js';
+
+export * from './sheet.js';
+export * from './constants.js';
 
 /**
  * Get part of the home view
@@ -14,34 +24,39 @@ export function getHomeView() {
 /**
  * Get initial pop up for competition registration
  * @param {string} triggerId
- * @returns {import("@slack/web-api").ViewsOpenArguments}
+ * @param {masterdataTypes.user} user
+ * @returns {Promise<import("@slack/web-api").ViewsOpenArguments>}
+ * @throws {NoCompetitionsFoundError} if no competitions are found
  */
-export function getCompetitionRegistrationView(triggerId) {
+export async function getCompetitionRegistrationView(triggerId, user) {
   const view = util.deepCopy(competitionRegistrationView);
-  /**
-   * @todo get athlete information: Full name, Birthday, Sex.
-   * Maybe do that in app.js, since it will be required again later in the
-   * proccess
-   */
   // iterate over blocks to make changes e.g. add options to dropdowns
-  view.blocks.forEach((block) => {
-    switch (block.block_id) {
-      case constants.competitionRegistrationView.blockCompetition:
-        fillCompetitionDropdown(block);
-        break;
-      /** @todo case weightClass -> Fill dropdown with weight classes for athletes sex */
-      default:
-        break;
-    }
-  });
+  await Promise.all(
+    view.blocks.map(async (block) => {
+      switch (block.block_id) {
+        case constants.competitionRegistrationView.blockCompetitionSelect:
+          await fillCompetitionDropdown(block);
+          break;
+        case constants.competitionRegistrationView.blockWeightClassSelect:
+          fillWeightClassDropdown(block, user);
+          break;
+        case constants.competitionRegistrationView.blockHandlerNeededSelect:
+          fillHandlerNeededDropdown(block);
+          break;
+        default:
+          break;
+      }
+    })
+  );
   return { trigger_id: triggerId, view };
 }
 
 /**
  * Fills the competition dropdown with competitions
  * @param {import('@slack/types').AnyBlock} block
+ * @throws {NoCompetitionsFoundError} if no competitions are found
  */
-function fillCompetitionDropdown(block) {
+async function fillCompetitionDropdown(block) {
   const inputBlock =
     /** @type {import('@slack/types').InputBlock} */
     (block);
@@ -49,27 +64,332 @@ function fillCompetitionDropdown(block) {
     /** @type {import('@slack/types').StaticSelect} */
     (inputBlock.element);
 
-  // Dropping example values from view
+  /** @type {types.competitionData[]} */
+  const competitions = await sheet.getLiveCompetitions();
+
+  // Map 'competitions' to the format expected by fillDropdownOptions()
+  /** @type {types.dropdownOptionPlainText[]} */
+  const optionContents = competitions.map((competition) => ({
+    text: competition.name,
+    value: competition.ID
+  }));
+
+  if (optionContents.length <= 0) {
+    throw new NoCompetitionsFoundError();
+  }
+
+  fillDropdownOptions(dropdown, optionContents);
+}
+
+/**
+ * Fills the weight class dropdown with the weight classes for the athletes sex
+ * @param {import('@slack/types').AnyBlock} block
+ * @param {masterdataTypes.user} user
+ */
+async function fillWeightClassDropdown(block, user) {
+  const weightClasses = [];
+  switch (user.sex) {
+    case masterdataTypes.userSex.female:
+      weightClasses.push(...Object.values(constants.weightClassesFemale));
+      break;
+    case masterdataTypes.userSex.male:
+      weightClasses.push(...Object.values(constants.weightClassesMale));
+      break;
+    default:
+      weightClasses.push(...Object.values(constants.weightClassesFemale));
+      weightClasses.push(...Object.values(constants.weightClassesMale));
+  }
+
+  const inputBlock =
+    /** @type {import('@slack/types').InputBlock} */
+    (block);
+  const dropdown =
+    /** @type {import('@slack/types').StaticSelect} */
+    (inputBlock.element);
+
+  // Map 'weightClases' to the format expected by fillDropdownOptions()
+  /** @type {types.dropdownOptionPlainText[]} */
+  const optionContents = weightClasses.map((weightClass) => ({
+    text: weightClass,
+    value: weightClass
+  }));
+
+  fillDropdownOptions(dropdown, optionContents);
+}
+
+/**
+ * Fills the "handler needed" dropdown with the correct options
+ * @param {import('@slack/types').AnyBlock} block
+ */
+function fillHandlerNeededDropdown(block) {
+  const inputBlock =
+    /** @type {import('@slack/types').InputBlock} */
+    (block);
+  const dropdown =
+    /** @type {import('@slack/types').StaticSelect} */
+    (inputBlock.element);
+
+  const handlerNeededOptions = Object.values(constants.handlerNeeded);
+
+  // Map 'handlerNeededOptions' to the format expected by fillDropdownOptions()
+  /** @type {types.dropdownOptionPlainText[]} */
+  const optionContents = handlerNeededOptions.map((handlerNeededOption) => ({
+    text: handlerNeededOption,
+    value: handlerNeededOption
+  }));
+  fillDropdownOptions(dropdown, optionContents);
+}
+
+/**
+ *
+ * @param {import('@slack/types').StaticSelect} dropdown
+ * @param {types.dropdownOptionPlainText[]} optionContents
+ */
+function fillDropdownOptions(dropdown, optionContents) {
+  // Dropping existing values from dropdown
   dropdown.options = [];
-  const competitions = getLiveCompetitions();
-  competitions.forEach((competition) => {
+
+  optionContents.forEach((optionContent) => {
     /** @type {import('@slack/types').PlainTextOption} */
     const newDropdownOption = {
-      text: { type: 'plain_text', text: competition.name, emoji: true },
-      value: competition.id
+      text: { type: 'plain_text', text: optionContent.text, emoji: true },
+      value: optionContent.value
     };
     dropdown.options.push(newDropdownOption);
   });
 }
 
 /**
- * Retrieves competition information from Google Sheet
- * @returns {{id: string, name: string}[]} Array of Competitions
+ * Message to notify user that competition registration has been requested
+ * @param {types.competitionRegistrationData} competitionRegistrationData
+ * @returns {import("@slack/web-api").ChatPostMessageArguments}
  */
-function getLiveCompetitions() {
-  /** @todo Actually get from google sheet */
-  return [
-    { id: 'compID1', name: 'Test-Comp-1' },
-    { id: 'compID2', name: 'Test-Comp-2' }
-  ];
+export function getUserConfirmMessageCompetitionCreation(
+  competitionRegistrationData
+) {
+  return {
+    channel: competitionRegistrationData.slackID,
+    text:
+      `Deine Meldeanfrage wurde mit folgenden Daten erfasst:` +
+      `\n*Wettkampf*:` +
+      `\n\t*ID*: ${competitionRegistrationData.competition.ID}` +
+      `\n\t*Name*: ${competitionRegistrationData.competition.name}` +
+      `\n\t*Datum*: ${competitionRegistrationData.competition.date}` +
+      `\n\t*Ort*: ${competitionRegistrationData.competition.location}` +
+      `\n*Gewichtsklasse*: ${competitionRegistrationData.weight_class}` +
+      `\n*Handler benötigt*: ${competitionRegistrationData.handler_needed}` +
+      `\n*Zahlungsbeleg*: <${competitionRegistrationData.payment_record_file_permalink}|Hier klicken>` +
+      `\n*Bemerkungen*:\n${competitionRegistrationData.user_remarks}` +
+      `\n\n` +
+      `\nDie Anfrage wird an die Admins weitergeleitet und geprüft. ` +
+      `\nBitte überprüfe den Status deiner Meldung unter ` +
+      `<https://docs.google.com/spreadsheets/d/${process.env.SPREADSHEET_ID_MELDUNGEN}|Wettkämpfe> ` +
+      `bzw. direkter Link: <https://docs.google.com/spreadsheets/d/${process.env.SPREADSHEET_ID_MELDUNGEN}/edit#gid=${competitionRegistrationData.competition.ID}|${competitionRegistrationData.competition.name}>` +
+      `\n\nFalls der Bot deine Meldung nicht umgehend im Spreadsheet einträgt, oder etwas schief gelaufen ist, melde dich unbedingt per Mail an ` +
+      `kdk@schwerathletik-mannheim.de`
+  };
+}
+
+/**
+ * Get pop up for competition creation
+ * @param {string} triggerId
+ * @returns {import("@slack/web-api").ViewsOpenArguments}
+ */
+export function getCompetitionCreationView(triggerId) {
+  const view = util.deepCopy(competitionCreationView);
+
+  return { trigger_id: triggerId, view };
+}
+
+/**
+ * Message to notify admin that a new competition has been created
+ * @param {types.competitionData} competitionData
+ * @param {string} userId
+ * @returns {import("@slack/web-api").ChatPostMessageArguments}
+ */
+export function getAdminConfirmMessageCompetitionCreation(
+  competitionData,
+  userId
+) {
+  return {
+    channel: process.env.MELDUNGEN_ADMIN_CHANNEL,
+    text:
+      `Ein neuer Wettkampf wurde erstellt von <@${userId}>:` +
+      `\n*ID*: ${competitionData.ID}` +
+      `\n*Name*: ${competitionData.name}` +
+      `\n*Datum*: ${competitionData.date}` +
+      `\n*Ort*: ${competitionData.location}` +
+      `\n<https://docs.google.com/spreadsheets/d/${process.env.SPREADSHEET_ID_MELDUNGEN}/edit#gid=${competitionData.ID}|Direkter Link>`
+  };
+}
+
+/**
+ * Saves a competition registration to the correct sheet for the competition
+ * with the initial state
+ * @param {types.competitionRegistrationData} competitionRegistrationData
+ * @throws {CompetitionRegistrationAlreadyExistsError}
+ * @returns {Promise<void>}
+ */
+export async function saveCompetitionRegistration(competitionRegistrationData) {
+  return await sheet.saveInitialCompetitionRegistration(
+    competitionRegistrationData
+  );
+}
+
+/**
+ * Message for admin channel to confirm or deny a competition registration
+ * @param {types.competitionRegistrationData} competitionRegistrationData
+ * @returns {import("@slack/web-api").ChatPostMessageArguments}
+ */
+export function getAdminConfirmMessageCompetitionRegistration(
+  competitionRegistrationData
+) {
+  return {
+    channel: process.env.MELDUNGEN_ADMIN_CHANNEL,
+    text: `Eine neue Wettkampfmeldung wurde eingereicht von <@${competitionRegistrationData.slackID}>:`,
+    blocks: [
+      {
+        type: 'section',
+        text: {
+          type: 'mrkdwn',
+          text:
+            `*Neue Wettkampfmeldung von <@${competitionRegistrationData.slackID}>*\n` +
+            `*Wettkampf:*\n` +
+            `\t*ID*: ${competitionRegistrationData.competition.ID}\n` +
+            `\t*Name*: ${competitionRegistrationData.competition.name}\n` +
+            `\t*Datum*: ${competitionRegistrationData.competition.date}\n` +
+            `\t*Ort*: ${competitionRegistrationData.competition.location}\n` +
+            `*Name:* ${competitionRegistrationData.first_name} ${competitionRegistrationData.last_name}\n` +
+            `*Geburtsjahr:* ${competitionRegistrationData.birthyear}\n` +
+            `*Gewichtsklasse:* ${competitionRegistrationData.weight_class}\n` +
+            `*Handler benötigt:* ${competitionRegistrationData.handler_needed}\n` +
+            `*Zahlungsbeleg:* <${competitionRegistrationData.payment_record_file_permalink}|Hier klicken>\n` +
+            `*Bemerkungen:*\n${competitionRegistrationData.user_remarks}\n\n` +
+            `direker link zum Wettkampf sheet: <https://docs.google.com/spreadsheets/d/${process.env.SPREADSHEET_ID_MELDUNGEN}/edit#gid=${competitionRegistrationData.competition.ID}|${competitionRegistrationData.competition.name}>\n\n`
+        }
+      },
+      {
+        type: 'section',
+        text: {
+          type: 'mrkdwn',
+          text: `Bitte bestätigt oder lehnt die Wettkampfmeldung ab.`
+        }
+      },
+      {
+        // This block gets deleted after one of the buttons is pressed
+        type: 'actions',
+        elements: [
+          {
+            type: 'button',
+            text: {
+              type: 'plain_text',
+              text: 'Bestätigen'
+            },
+            style: 'primary',
+            value: JSON.stringify(competitionRegistrationData),
+            action_id: constants.competitionRegistrationAdminActions.confirm
+          },
+          {
+            type: 'button',
+            text: {
+              type: 'plain_text',
+              text: 'Ablehnen'
+            },
+            style: 'danger',
+            value: JSON.stringify(competitionRegistrationData),
+            action_id: constants.competitionRegistrationAdminActions.deny
+          }
+        ]
+      }
+    ]
+  };
+}
+
+/**
+ * Extracts competition registration data from Slack view submission
+ * @param {object} selectedValues
+ * @param {masterdataTypes.user} user
+ * @returns {Promise<types.competitionRegistrationData>}
+ */
+export async function extractCompetitionRegistrationData(selectedValues, user) {
+  /** @type {string} */
+  const competitionID =
+    selectedValues[
+      constants.competitionRegistrationView.blockCompetitionSelect
+    ][constants.competitionRegistrationView.actionCompetitionSelect]
+      .selected_option.value;
+
+  /** @type {types.competitionData} */
+  const competitionData = await sheet.getCompetitionDataFromID(competitionID);
+
+  // userRemarks is an Optional field -> May be null
+  let userRemarks =
+    selectedValues[constants.competitionRegistrationView.blockRemarksInput][
+      constants.competitionRegistrationView.actionRemarksInput
+    ].value;
+  if (!userRemarks) {
+    userRemarks = '';
+  }
+
+  /** @type {types.competitionRegistrationData} */
+  const competitionRegistrationData = {
+    slackID: user.slackId,
+    first_name: user.firstname,
+    last_name: user.lastname,
+    birthyear: Number(user.birthday.slice(-4)),
+
+    competition: competitionData,
+
+    weight_class:
+      selectedValues[
+        constants.competitionRegistrationView.blockWeightClassSelect
+      ][constants.competitionRegistrationView.actionWeightClassSelect]
+        .selected_option.value,
+
+    handler_needed:
+      selectedValues[
+        constants.competitionRegistrationView.blockHandlerNeededSelect
+      ][constants.competitionRegistrationView.actionHandlerNeededSelect]
+        .selected_option.value,
+
+    payment_record_file_permalink:
+      selectedValues[
+        constants.competitionRegistrationView.blockPaymentRecordUpload
+      ][constants.competitionRegistrationView.actionPaymentRecordUpload]
+        .files[0].permalink,
+
+    user_remarks: userRemarks
+  };
+
+  return competitionRegistrationData;
+}
+
+export class NoCompetitionsFoundError extends Error {
+  constructor(message = 'No competitions were found') {
+    super(message);
+  }
+}
+
+export class WrongChannelError extends Error {
+  constructor(message = 'This command can only be used in the admin channel') {
+    super(message);
+  }
+}
+
+export class UserNotRegisteredError extends Error {
+  constructor(message = 'User is not registered') {
+    super(message);
+  }
+}
+
+export class CompetitionAlreadyExistsError extends Error {
+  constructor(message = 'Competition already exists') {
+    super(message);
+  }
+}
+
+export class CompetitionRegistrationAlreadyExistsError extends Error {
+  constructor(message = 'Competition registration already exists') {
+    super(message);
+  }
 }

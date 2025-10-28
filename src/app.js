@@ -19,7 +19,10 @@ const awsLambdaReceiver = new slack.default.AwsLambdaReceiver({
 const app = new slack.default.App({
   token: process.env.SLACK_BOT_TOKEN,
   receiver: awsLambdaReceiver,
-  extendedErrorHandler: true
+  extendedErrorHandler: true /*,
+  // Sometimes useful for debugging
+  developerMode: true,
+  socketMode: false */
 });
 
 //* ******************* Setup listeners ********************//
