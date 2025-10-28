@@ -8,5 +8,5 @@ Das kann in der Slack App unter _App Manifest_ modifiziert werden. Die einzige A
 
 Um als Admin Logs und Fehler zu erhalten musst du nachfolgenden beiden Variablen in den `.env` Umgebungsvariablen füllen. Bitte beachte für den Admin Channel, dass der Bot in diesen Channel aufgenommen werden muss.
 ::: details Beispiel in [`.env.example`](https://github.com/Roy0815/slack-service-bot/blob/main/.env.example) {open}
-<<< ../../.env.example{6,8}
+<<< ../../.env.example{15,17}
 :::

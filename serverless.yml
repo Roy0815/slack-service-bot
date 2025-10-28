@@ -31,7 +31,6 @@ provider:
     GOOGLE_SERVICE_ACC_PRIVATE_KEY: ${env:GOOGLE_SERVICE_ACC_PRIVATE_KEY}
     MELDUNGEN_ADMIN_CHANNEL: ${env:MELDUNGEN_ADMIN_CHANNEL}
 
-
 package:
   patterns:
     - '!aws/**'

@@ -13,7 +13,7 @@ Für diese Komponente müssen die Umgebungsvariablen `SPREADSHEET_ID_MASTERDATA`
 Die `SPREADSHEET_ID_MASTERDATA` findet man in der URL der Tabelle mit den Mitgliederstammdaten. Sie steht zwischen `docs.google.com/spreadsheets/d/` und dem nächsten `/`.
 
 ::: details Beispiel in [`.env.example`](https://github.com/Roy0815/slack-service-bot/blob/main/.env.example)
-<<< ../../.env.example{20-28}
+<<< ../../.env.example{30,5-12}
 :::
 
 ### Google Sheet Struktur
@@ -110,7 +110,7 @@ Die Implementierung umfasst einen Webhook, welcher von Docuseal ausgelöst wird,
    - Werte in `.env` Umgebungsvariablen pflegen
 
 ::: details Beispiel in [`.env.example`](https://github.com/Roy0815/slack-service-bot/blob/main/.env.example)
-<<< ../../.env.example{14-16}
+<<< ../../.env.example{24-25}
 :::
 
 ### Template anlegen
@@ -120,7 +120,7 @@ Die Implementierung umfasst einen Webhook, welcher von Docuseal ausgelöst wird,
 3. In `.env` Umgebungsvariablen pflegen
 
 ::: details Beispiel in [`.env.example`](https://github.com/Roy0815/slack-service-bot/blob/main/.env.example)
-<<< ../../.env.example{17}
+<<< ../../.env.example{26}
 :::
 
 ## Stätte
@@ -129,7 +129,7 @@ In den `.env` Umgebungsvariablen muss der Channel gepflegt werden, in dem die Ab
 Außerdem kann der App Admin optional benachrichtigt werden, wenn alte Nachrichten nachts gelöscht werden.
 
 ::: details Beispiel in [`.env.example`](https://github.com/Roy0815/slack-service-bot/blob/main/.env.example) {open}
-<<< ../../.env.example{10-12}
+<<< ../../.env.example{19-21}
 :::
 
 ## Stammdaten

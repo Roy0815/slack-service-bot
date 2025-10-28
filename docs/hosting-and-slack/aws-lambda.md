@@ -6,7 +6,7 @@ Bevor mit dem AWS Lambda Setup gestartet wird, muss eine lokale .env Datei angel
 
 Beispiel in [`.env.example`](https://github.com/Roy0815/slack-service-bot/blob/main/.env.example)
 
-<<< ../../.env.example{1-3,22-28}
+<<< ../../.env.example{1-3,5-12}
 
 ## AWS Lambda Setup für Slack
 
