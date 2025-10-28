@@ -18,6 +18,6 @@ npm install
 
 ## Setup zum Entwickeln am Bot
 
-1. [Prettier](https://marketplace.visualstudio.com/items?itemName=esbenp.prettier-vscode) und [ESLint](https://marketplace.visualstudio.com/items?itemName=dbaeumer.vscode-eslint) Plugins installieren
+1. [Prettier](https://marketplace.visualstudio.com/items?itemName=esbenp.prettier-vscode) und [ESLint](https://marketplace.visualstudio.com/items?itemName=dbaeumer.vscode-eslint) Plugins installieren (VS Code)
 
 2. [ngrok](https://ngrok.com/download/) installieren
