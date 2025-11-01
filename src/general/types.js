@@ -8,11 +8,13 @@
  * @returns {import("@slack/types").KnownBlock[]}
  */
 
+// #region appComponent
 /**
  * @typedef {object} appComponent
  * @property {fnSetup} setupApp
  * @property {fnHomeView|null} getHomeView
  */
+// #endregion appComponent
 
 /** Error during view submissions */
 class SlackViewSubmissionError extends Error {

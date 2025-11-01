@@ -39,14 +39,14 @@ export default defineConfig({
     docFooter: { next: 'Nächste Seite', prev: 'Vorherige Seite' },
     editLink: {
       pattern:
-        'https://github.com/Roy0815/slack-service-bot/edit/main/docs/:path',
+        'https://github.com/Roy0815/slack-service-bot/edit/dev/docs/:path',
       text: 'Auf GitHub editieren'
     },
     nav: [
       { text: 'Home', link: '/' },
       {
         text: 'Setup',
-        activeMatch: '^/hosting-and-slack/|^/functions-setup/|^/contributions/',
+        activeMatch: '^/hosting-and-slack/|^/functions-setup/|^/contributing/',
         items: [
           {
             text: 'Einführung',
@@ -63,9 +63,9 @@ export default defineConfig({
             activeMatch: '/functions-setup/'
           },
           {
-            text: 'Contribution',
-            link: '/contribution',
-            activeMatch: '/contribution/'
+            text: 'Contributing',
+            link: '/contributing',
+            activeMatch: '/contributing/'
           }
         ]
       },
@@ -155,8 +155,29 @@ export default defineConfig({
         ]
       },
       {
-        text: 'Contribution',
-        link: '/contribution/'
+        text: 'Contributing',
+        link: '/',
+        base: '/contributing/',
+        collapsed: true,
+        items: [
+          { text: 'Projektstrukur', link: '#projektstrukur' },
+          {
+            text: 'Komponenten und Workflow Schritte',
+            link: '#komponenten-und-workflow-schritte'
+          },
+          {
+            text: 'Design Pattern',
+            link: '#design-pattern'
+          },
+          {
+            text: 'Entwicklung starten',
+            link: 'start-development.md'
+          },
+          {
+            text: 'Dokumentation',
+            link: 'documentation.md'
+          }
+        ]
       },
       {
         text: 'Funktionen',

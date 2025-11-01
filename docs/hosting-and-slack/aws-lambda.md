@@ -2,7 +2,7 @@
 
 ## Umgebungsvariablen definieren
 
-Bevor mit dem AWS Lambda Setup gestartet wird, muss eine lokale .env Datei im Root Ordner des Projekts angelegt werden. Hier werden alle Variablen definiert, die die Umgebung benötigt. Zusätzlich werden auch die Daten des Bot Benutzers für Google Sheets als Environment Variablen gespeichert.
+Bevor mit dem AWS Lambda Setup gestartet wird, muss eine lokale `.env` Datei im Root Ordner des Projekts angelegt werden. Hier werden alle Variablen definiert, die die Umgebung benötigt. Zusätzlich werden auch die Daten des Bot Benutzers für Google Sheets als Environment Variablen gespeichert.
 
 Beispiel in [`.env.example`](https://github.com/Roy0815/slack-service-bot/blob/main/.env.example)
 

@@ -77,6 +77,7 @@ export const userSex = {
  * @property {string} [docusealFileURL]
  */
 
+// #region userJoiningFields
 /**
  * @readonly
  * @type {string[]}
@@ -99,6 +100,7 @@ export const userJoiningFields = [
   'accountOwner',
   'signingDate'
 ];
+// #endregion userJoiningFields
 
 /**
  * @typedef {object} userJoiningReturn
