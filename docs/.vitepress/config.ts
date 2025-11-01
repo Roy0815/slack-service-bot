@@ -46,7 +46,7 @@ export default defineConfig({
       { text: 'Home', link: '/' },
       {
         text: 'Setup',
-        activeMatch: '^/hosting-and-slack/|^/functions-setup/|^/contributions/',
+        activeMatch: '^/hosting-and-slack/|^/functions-setup/|^/contributing/',
         items: [
           {
             text: 'Einführung',
@@ -63,9 +63,9 @@ export default defineConfig({
             activeMatch: '/functions-setup/'
           },
           {
-            text: 'Contribution',
-            link: '/contribution',
-            activeMatch: '/contribution/'
+            text: 'Contributing',
+            link: '/contributing',
+            activeMatch: '/contributing/'
           }
         ]
       },
@@ -155,9 +155,9 @@ export default defineConfig({
         ]
       },
       {
-        text: 'Contribution',
+        text: 'Contributing',
         link: '/',
-        base: '/contribution/',
+        base: '/contributing/',
         collapsed: true,
         items: [
           { text: 'Projektstrukur', link: '#projektstrukur' },
