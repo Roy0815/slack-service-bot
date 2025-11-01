@@ -1,5 +1,8 @@
 // ordnet die actor-top und actor-bottom Gruppen mit passenden Indizes
 export function tagActorGroups() {
+  // exit in server side rendering, weil kein DOM vorhanden
+  if (typeof document === 'undefined') return;
+
   const svgs = document.querySelectorAll<SVGSVGElement>('svg');
 
   svgs.forEach((svg, svgIndex) => {
@@ -59,6 +62,9 @@ export function tagActorGroups() {
 // wartet, bis alle SVGs wirklich gerendert wurden
 export function waitForAllSVGs(selector = 'svg > g', timeout = 200) {
   return new Promise<void>((resolve) => {
+    // exit in server side rendering, weil kein DOM vorhanden
+    if (typeof document === 'undefined') return;
+
     const start = performance.now();
     const check = () => {
       const svgs = document.querySelectorAll(selector);
