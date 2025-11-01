@@ -26,14 +26,17 @@ export default {
       renderer.renderMermaidDiagrams();
 
       // reagiert, wenn neue SVGs in den DOM kommen
-      const observer = new MutationObserver((mutations) => {
-        const added = mutations.some((m) =>
-          Array.from(m.addedNodes).some((n) => n instanceof SVGElement)
-        );
-        if (added) requestAnimationFrame(() => auxiliary.tagActorGroups());
-      });
+      // Nur im Browser verfügbar
+      if (typeof MutationObserver !== 'undefined') {
+        const observer = new MutationObserver((mutations) => {
+          const added = mutations.some((m) =>
+            Array.from(m.addedNodes).some((n) => n instanceof SVGElement)
+          );
+          if (added) requestAnimationFrame(() => auxiliary.tagActorGroups());
+        });
 
-      observer.observe(document.body, { childList: true, subtree: true });
+        observer.observe(document.body, { childList: true, subtree: true });
+      }
 
       // initiales Tagging nach dem ersten Render
       await auxiliary.waitForAllSVGs('svg > g', 400);
