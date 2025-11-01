@@ -1,0 +1,52 @@
+:root {
+  --actor-fill: #fafafa;
+}
+html.dark {
+  --actor-fill: #1f2020;
+}
+
+.mermaid > svg {
+  width: 100%;
+  height: auto;
+}
+
+g[data-actor-index='1'] rect {
+  stroke: #e879f9 !important;
+  fill: var(--actor-fill) !important;
+}
+g[data-actor-index='2'] rect {
+  stroke: #2dd4bf !important;
+  fill: var(--actor-fill) !important;
+}
+g[data-actor-index='3'] rect {
+  stroke: #fb923c !important;
+  fill: var(--actor-fill) !important;
+}
+g[data-actor-index='4'] rect {
+  stroke: #22d3ee !important;
+  fill: var(--actor-fill) !important;
+}
+g[data-actor-index='5'] rect {
+  stroke: #4ade80 !important;
+  fill: var(--actor-fill) !important;
+}
+g[data-actor-index='6'] rect {
+  stroke: #a78bfa !important;
+  fill: var(--actor-fill) !important;
+}
+g[data-actor-index='7'] rect {
+  stroke: #f87171 !important;
+  fill: var(--actor-fill) !important;
+}
+g[data-actor-index='8'] rect {
+  stroke: #facc15 !important;
+  fill: var(--actor-fill) !important;
+}
+g[data-actor-index='9'] rect {
+  stroke: #818cf8 !important;
+  fill: var(--actor-fill) !important;
+}
+g[data-actor-index='10'] rect {
+  stroke: #a3e635 !important;
+  fill: var(--actor-fill) !important;
+}
