@@ -158,7 +158,6 @@ function handleSubmit(event) {
       clonedBlocks,
       'ERWEITERTER_VORSTAND'
     );
-
   } else if (formId === formIdProbetrainingExtern) {
     sendToSlack(
       `Neue Übermittlung des Formulars: *${formTitle}*`,
