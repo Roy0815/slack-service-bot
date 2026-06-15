@@ -14,11 +14,11 @@
   },
   "dependencies": {
     "@slack/bolt": "^4.2.0",
-    "googleapis": "^107.0.0",
+    "googleapis": "^173.0.0",
     "node-fetch": "^3.3.2"
   },
   "engines": {
-    "node": ">=20.19.0"
+    "node": ">=22.0.0"
   },
   "repository": {
     "type": "git",
@@ -41,7 +41,7 @@
     "eslint-plugin-promise": "^6.6.0",
     "prettier": "^3.4.2",
     "serverless-offline": "^14.4.0",
-    "vitepress": "^2.0.0-alpha.12",
+    "vitepress": "^1.6.4",
     "vitepress-mermaid-renderer": "^1.0.18"
   }
 }

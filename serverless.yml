@@ -6,7 +6,7 @@ service: slack-service-bot
 provider:
   name: aws
   region: eu-central-1
-  runtime: nodejs20.x
+  runtime: nodejs22.x
   timeout: 29
   environment:
     # Slack config

@@ -67,30 +67,25 @@ export async function getFileInfo(client, file) {
 export async function uploadFileToDriveFolder(file) {
   const drive = await auth();
 
-  // create streamable instance for upload
-  const readStream = new stream.PassThrough();
+  // download file from slack or public URL
+  const response = await fetch(file.publicFileURL || file.fileURL, {
+    method: 'get',
+    headers: file.publicFileURL
+      ? {}
+      : { Authorization: `Bearer ${process.env.SLACK_BOT_TOKEN}` }
+  });
 
-  // download file from slack or public and pipe into stream
-  (
-    await fetch(file.publicFileURL || file.fileURL, {
-      method: 'get',
-      headers: file.publicFileURL
-        ? {}
-        : { Authorization: `Bearer ${process.env.SLACK_BOT_TOKEN}` }
-    })
-  ).body.pipe(readStream);
+  if (!response.body) throw new Error('No response body');
 
   // upload file to drive folder
   await drive.files.create({
-    requestBody: {
-      name: file.fileName,
-      parents: [file.driveFolderID]
-    },
+    requestBody: { name: file.fileName, parents: [file.driveFolderID] },
     media: {
       mimeType: file.mimetype,
-      body: readStream
+      body: stream.Readable.fromWeb(/** @type {any} */ (response.body))
     }
   });
+
 }
 
 /**
