@@ -1,7 +1,7 @@
 // eslint-disable-next-line camelcase
 import { drive_v3, google } from 'googleapis';
 import fetch from 'node-fetch';
-import stream from 'node:stream';
+import { Readable } from 'node:stream';
 
 import * as types from './types.js';
 import * as util from '../../general/util.js';
@@ -39,6 +39,7 @@ export async function getFileInfo(client, file) {
   // for public files, no need to fetch from slack
   if (file.publicFileURL) {
     file.mimetype =
+      // @ts-ignore
       types.mimeTypes[file.fileName.split('.').pop()] ||
       'application/octet-stream';
     return;
@@ -54,10 +55,10 @@ export async function getFileInfo(client, file) {
   file.fileName += `.${/[^.]*$/.exec(fileInfo.file.name)[0]}`;
 
   // set mimetype
-  file.mimetype = fileInfo.file.mimetype;
+  file.mimetype = fileInfo.file?.mimetype;
 
   // get URL
-  file.fileURL = fileInfo.file.url_private_download;
+  file.fileURL = fileInfo.file?.url_private_download;
 }
 
 /**
@@ -75,6 +76,12 @@ export async function uploadFileToDriveFolder(file) {
       : { Authorization: `Bearer ${process.env.SLACK_BOT_TOKEN}` }
   });
 
+  // convert body if necessary
+  const body =
+    response.body instanceof Readable
+      ? response.body
+      : Readable.fromWeb(/** @type {any} */ (response.body));
+
   if (!response.body) throw new Error('No response body');
 
   // upload file to drive folder
@@ -82,7 +89,7 @@ export async function uploadFileToDriveFolder(file) {
     requestBody: { name: file.fileName, parents: [file.driveFolderID] },
     media: {
       mimeType: file.mimetype,
-      body: stream.Readable.fromWeb(/** @type {any} */ (response.body))
+      body: body
     }
   });
 
