@@ -29,7 +29,7 @@ function setupApp(app) {
       await complete();
     } catch (error) {
       await fail({
-        error: `An error occurred while saving the leave date: ${error.message}`
+        error: `An error occurred while saving the leave date: ${error instanceof Error ? error.message : String(error)}`
       });
     }
   });
@@ -43,6 +43,7 @@ function setupApp(app) {
 
     // extract user values from inputs
     mdTypes.userJoiningFields.forEach((key) => {
+      // @ts-ignore
       newMemberInfo[key] = inputs[key];
     });
 
@@ -64,7 +65,7 @@ function setupApp(app) {
 VERSION:3.0
 N:${newMemberInfo.lastname};${newMemberInfo.firstname}
 EMAIL:${newMemberInfo.email}
-TEL;TYPE=voice:${newMemberInfo.phone.replace(`'`, '')}
+TEL;TYPE=voice:${newMemberInfo.phone?.replace(`'`, '') ?? ''}
 END:VCARD`
         }),
         // get team info
@@ -85,22 +86,22 @@ END:VCARD`
 
       // get file info
       const fileInfo = await client.files.info({
-        file: fileUploadResult.files[0].files[0].id
+        file: fileUploadResult.files?.[0]?.files?.[0]?.id ?? ''
       });
-      const channelId = Object.keys(fileInfo.file.shares.private)[0];
-      const ts = fileInfo.file.shares.private[channelId][0].ts;
+      const channelId = Object.keys(fileInfo.file?.shares?.private ?? {})[0];
+      const ts = fileInfo.file?.shares?.private?.[channelId]?.[0]?.ts;
 
       await complete({
         outputs: {
           mandateReference: bankDetails.mandateReference,
           initialAmount: bankDetails.initialAmount,
           recurringAmount: bankDetails.recurringAmount,
-          contactCardMessageLink: `${teamInfo.team.url}archives/${channelId}/p${ts.replace('.', '')}`
+          contactCardMessageLink: `${teamInfo?.team?.url}archives/${channelId}/p${ts?.replace('.', '')}`
         }
       });
     } catch (error) {
       await fail({
-        error: `An error occurred while saving the new member information: ${error.message}`
+        error: `An error occurred while saving the new member information: ${error instanceof Error ? error.message : String(error)}`
       });
     }
   });

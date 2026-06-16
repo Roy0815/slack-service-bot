@@ -93,7 +93,7 @@ function setupApp(app) {
       } catch (error) {
         client.chat.postEphemeral({
           user: body.user.id,
-          channel: body.channel.id,
+          channel: body.channel?.id || '',
           text: `Beim Hochladen der Datei \`${file.fileName}\` ist ein Fehler aufgetreten. Bitte versuche es erneut.`
         });
       }
