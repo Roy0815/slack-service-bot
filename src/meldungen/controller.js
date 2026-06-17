@@ -147,16 +147,12 @@ function fillHandlerNeededDropdown(block) {
  */
 function fillDropdownOptions(dropdown, optionContents) {
   // Dropping existing values from dropdown
-  dropdown.options = [];
-
-  optionContents.forEach((optionContent) => {
-    /** @type {import('@slack/types').PlainTextOption} */
-    const newDropdownOption = {
+  dropdown.options = optionContents.map((optionContent) => (
+    /** @type {import('@slack/types').PlainTextOption} */ ({
       text: { type: 'plain_text', text: optionContent.text, emoji: true },
       value: optionContent.value
-    };
-    dropdown.options.push(newDropdownOption);
-  });
+    })
+  ));
 }
 
 /**
@@ -212,7 +208,7 @@ export function getAdminConfirmMessageCompetitionCreation(
   userId
 ) {
   return {
-    channel: process.env.MELDUNGEN_ADMIN_CHANNEL,
+    channel: process.env.MELDUNGEN_ADMIN_CHANNEL ?? '',
     text:
       `Ein neuer Wettkampf wurde erstellt von <@${userId}>:` +
       `\n*ID*: ${competitionData.ID}` +
@@ -245,7 +241,7 @@ export function getAdminConfirmMessageCompetitionRegistration(
   competitionRegistrationData
 ) {
   return {
-    channel: process.env.MELDUNGEN_ADMIN_CHANNEL,
+    channel: process.env.MELDUNGEN_ADMIN_CHANNEL ?? '',
     text: `Eine neue Wettkampfmeldung wurde eingereicht von <@${competitionRegistrationData.slackID}>:`,
     blocks: [
       {

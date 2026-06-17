@@ -46,15 +46,14 @@ export function setupApp(app) {
     controller.changeMasterdataViewName,
     async ({ body, ack, client }) => {
       // check inputs: phone number filled and correct format. Accept +xx notation as well as 0xx
-      if (
+      const phoneValue =
         body.view.state.values[controller.changeMasterdataViewBlocks.phone][
           controller.changeMasterdataViewActions.phone
-        ].value &&
-        !/^(\++|0{1})\d*$/.test(
-          body.view.state.values[controller.changeMasterdataViewBlocks.phone][
-            controller.changeMasterdataViewActions.phone
-          ].value
-        )
+        ].value;
+
+      if (
+        typeof phoneValue === 'string' &&
+        !/^(\++|0{1})\d*$/.test(phoneValue)
       ) {
         // send error to user
         await ack({
@@ -78,7 +77,10 @@ export function setupApp(app) {
         await ack({
           response_action: 'errors',
           errors: {
-            [controller.changeMasterdataViewBlocks.firstname]: error.toString()
+            [controller.changeMasterdataViewBlocks.firstname]:
+              error instanceof Error
+                ? error.message
+                : String(error)
           }
         });
         return;
@@ -120,7 +122,7 @@ export function setupApp(app) {
       // send the register view to the user
       await client.views.open(
         await asController.getRegisterView(
-          /** @type {import("@slack/bolt").BlockAction} */ (body).trigger_id
+          /** @type {import("@slack/bolt").BlockAction} */(body).trigger_id
         )
       );
       return;
@@ -147,7 +149,7 @@ export function setupApp(app) {
 
       /** @type {mdTypes.approvalObject} */
       const maintObj = JSON.parse(
-        /** @type {import("@slack/bolt").ButtonAction} */ (action).value
+        /** @type {import("@slack/bolt").ButtonAction} */(action).value ?? '{}'
       );
 
       const approved =
@@ -161,8 +163,7 @@ export function setupApp(app) {
       await respond(
         `<@${body.user.id}> hat folgende Stammdatenänderung um ${util.formatTime(
           new Date()
-        )} Uhr am ${util.formatDate(new Date())} ${
-          approved ? '`freigegeben`' : '`abgelehnt`'
+        )} Uhr am ${util.formatDate(new Date())} ${approved ? '`freigegeben`' : '`abgelehnt`'
         }:\n<@${maintObj.slackId}>${changeMessage}.`
       );
 

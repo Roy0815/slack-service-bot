@@ -52,7 +52,7 @@ export async function getFileInfo(client, file) {
 
   // add infos to file object
   // find extension in filename in slack and add to filename
-  file.fileName += `.${/[^.]*$/.exec(fileInfo.file.name)[0]}`;
+  file.fileName += `.${/[^.]*$/.exec(fileInfo.file?.name ?? '')?.[0] ?? ''}`;
 
   // set mimetype
   file.mimetype = fileInfo.file?.mimetype;
@@ -68,8 +68,14 @@ export async function getFileInfo(client, file) {
 export async function uploadFileToDriveFolder(file) {
   const drive = await auth();
 
+  // check if file is available
+  const url = file.publicFileURL || file.fileURL;
+  if (!url) {
+    throw new Error('No file URL available');
+  }
+
   // download file from slack or public URL
-  const response = await fetch(file.publicFileURL || file.fileURL, {
+  const response = await fetch(url, {
     method: 'get',
     headers: file.publicFileURL
       ? {}
@@ -80,7 +86,7 @@ export async function uploadFileToDriveFolder(file) {
   const body =
     response.body instanceof Readable
       ? response.body
-      : Readable.fromWeb(/** @type {any} */ (response.body));
+      : Readable.fromWeb(/** @type {any} */(response.body));
 
   if (!response.body) throw new Error('No response body');
 
@@ -89,7 +95,7 @@ export async function uploadFileToDriveFolder(file) {
     requestBody: { name: file.fileName, parents: [file.driveFolderID] },
     media: {
       mimeType: file.mimetype,
-      body: body
+      body
     }
   });
 
@@ -108,20 +114,23 @@ export function getUploadFailureMessage(file, approverChannel) {
   view.channel = approverChannel;
 
   // set text in notification
-  view.text = `Beim Hochladen der Datei \`${file.fileName}\` ist ein Fehler aufgetreten. Bitte versuche es erneut.`;
+  if ('text' in view) { // required for typing
+    view.text = `Beim Hochladen der Datei \`${file.fileName}\` ist ein Fehler aufgetreten. Bitte versuche es erneut.`;
+  }
 
   // required for correct typing
   if ('blocks' in view) {
-    // save file info in button
-    /** @type {import('@slack/types').Button } */ (
-      /** @type {import('@slack/types').SectionBlock } */ (view.blocks[0])
-        .accessory
-    ).value = JSON.stringify(file);
+    const block = /** @type {import('@slack/types').SectionBlock} */ (view.blocks[0]);
 
-    // set text in block
-    /** @type {import('@slack/types').SectionBlock } */ (
-      view.blocks[0]
-    ).text.text = view.text;
+    if (block) {
+    // save file info in button
+    /** @type {import('@slack/types').Button} */ (block.accessory).value = JSON.stringify(file);
+
+      // set text in block
+      if ('text' in block && block.text) {
+        block.text.text = view.text ?? '';
+      }
+    }
   }
 
   return view;

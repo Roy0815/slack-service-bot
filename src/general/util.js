@@ -27,9 +27,8 @@ export function formatDate(date) {
     .split(', ')[0]
     .split('.');
 
-  return `${dateArray[0].length === 1 ? '0' : ''}${dateArray[0]}.${
-    dateArray[1].length === 1 ? '0' : ''
-  }${dateArray[1]}.${dateArray[2]}`; // DD.MM.YYYY
+  return `${dateArray[0].length === 1 ? '0' : ''}${dateArray[0]}.${dateArray[1].length === 1 ? '0' : ''
+    }${dateArray[1]}.${dateArray[2]}`; // DD.MM.YYYY
 }
 
 /**
@@ -69,9 +68,9 @@ export async function getChannelInfo(channelName, client) {
       limit: 999,
       types: 'public_channel,private_channel,mpim'
     })
-  ).channels.filter((channel) => channel.id === channelName);
+  ).channels?.filter((channel) => channel.id === channelName);
 
-  return channels.length > 0 ? channels[0] : null;
+  return channels && channels.length > 0 ? channels[0] : null;
 }
 
 /**
