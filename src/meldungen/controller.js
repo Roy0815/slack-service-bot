@@ -304,7 +304,7 @@ export function getAdminConfirmMessageCompetitionRegistration(
 
 /**
  * Extracts competition registration data from Slack view submission
- * @param {object} selectedValues
+ * @param {Record<string, any>} selectedValues
  * @param {masterdataTypes.user} user
  * @returns {Promise<types.competitionRegistrationData>}
  */
@@ -316,7 +316,7 @@ export async function extractCompetitionRegistrationData(selectedValues, user) {
     ][constants.competitionRegistrationView.actionCompetitionSelect]
       .selected_option.value;
 
-  /** @type {types.competitionData} */
+  /** @type {types.competitionData | undefined} */
   const competitionData = await sheet.getCompetitionDataFromID(competitionID);
 
   // userRemarks is an Optional field -> May be null
@@ -335,7 +335,7 @@ export async function extractCompetitionRegistrationData(selectedValues, user) {
     last_name: user.lastname,
     birthyear: Number(user.birthday.slice(-4)),
 
-    competition: competitionData,
+    competition: /** @type {types.competitionData} */ (competitionData),
 
     weight_class:
       selectedValues[

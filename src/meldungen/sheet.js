@@ -6,6 +6,8 @@ import {
   CompetitionAlreadyExistsError
 } from './controller.js';
 
+const SPREADSHEET_ID_MELDUNGEN = /** @type {string} */ (process.env.SPREADSHEET_ID_MELDUNGEN);
+
 /**
  * Creates a new competition in the spreadsheet
  * @param {types.competitionData} competitionData
@@ -36,17 +38,17 @@ export async function createNewCompetition(competitionData) {
 async function createNewCompetitionSheet(competitionData) {
   const newSheetName = getSheetNameFromCompetitionData(competitionData);
   const copyName = await generalSheets.copySheet(
-    process.env.SPREADSHEET_ID_MELDUNGEN,
+    SPREADSHEET_ID_MELDUNGEN,
     'Vorlage Wettkampf'
   );
   await generalSheets.renameSheet(
-    process.env.SPREADSHEET_ID_MELDUNGEN,
+    SPREADSHEET_ID_MELDUNGEN,
     copyName,
     newSheetName
   );
 
   const newSheetID = await generalSheets.getSheetID(
-    process.env.SPREADSHEET_ID_MELDUNGEN,
+    SPREADSHEET_ID_MELDUNGEN,
     newSheetName
   );
 
@@ -62,8 +64,8 @@ async function createNewCompetitionSheet(competitionData) {
  * @param {string} sheetName
  */
 async function appendCompetitionDataToMainSheet(competitionData, sheetName) {
-  const googleSheetsLink = `=HYPERLINK("https://docs.google.com/spreadsheets/d/${process.env.SPREADSHEET_ID_MELDUNGEN}/edit#gid=${competitionData.ID}"; "${sheetName}")`;
-  generalSheets.appendRow(process.env.SPREADSHEET_ID_MELDUNGEN, {
+  const googleSheetsLink = `=HYPERLINK("https://docs.google.com/spreadsheets/d/${SPREADSHEET_ID_MELDUNGEN}/edit#gid=${competitionData.ID}"; "${sheetName}")`;
+  generalSheets.appendRow(SPREADSHEET_ID_MELDUNGEN, {
     range: constants.nameOfCompetitionSheet + '!A:E',
     values: [
       [competitionData.ID],
@@ -91,7 +93,7 @@ function getSheetNameFromCompetitionData(competitionData) {
 export async function getLiveCompetitions() {
   /** @type {any[][]} */
   const cells = await generalSheets.getCells(
-    process.env.SPREADSHEET_ID_MELDUNGEN,
+    SPREADSHEET_ID_MELDUNGEN,
     constants.nameOfCompetitionSheet
   );
 
@@ -125,13 +127,13 @@ export async function saveInitialCompetitionRegistration(
 ) {
   // get name of the competition sheet
   const allSheets = await generalSheets.getSheets(
-    process.env.SPREADSHEET_ID_MELDUNGEN
+    SPREADSHEET_ID_MELDUNGEN
   );
 
   // find 'title' where 'sheetId' matches competitionRegistrationData.competition.ID
   const competitionSheet = allSheets.find(
     (sheet) =>
-      sheet.properties.sheetId.toString() ===
+      sheet.properties?.sheetId?.toString() ===
       competitionRegistrationData.competition.ID
   );
 
@@ -143,8 +145,8 @@ export async function saveInitialCompetitionRegistration(
 
   // check if the registration already exists
   const cells = await generalSheets.getCells(
-    process.env.SPREADSHEET_ID_MELDUNGEN,
-    competitionSheet.properties.title
+    SPREADSHEET_ID_MELDUNGEN,
+    competitionSheet.properties?.title ?? ''
   );
   const existingRow = cells.findIndex(
     (row) =>
@@ -157,9 +159,9 @@ export async function saveInitialCompetitionRegistration(
     throw new CompetitionRegistrationAlreadyExistsError();
   }
 
-  const competitionSheetName = competitionSheet.properties.title;
+  const competitionSheetName = competitionSheet.properties?.title ?? '';
 
-  await generalSheets.appendRow(process.env.SPREADSHEET_ID_MELDUNGEN, {
+  await generalSheets.appendRow(SPREADSHEET_ID_MELDUNGEN, {
     range: competitionSheetName + '!A:F',
     values: [
       [competitionRegistrationData.last_name],
@@ -183,13 +185,13 @@ export async function updateCompetitionRegistrationState(
 ) {
   // get name of the competition sheet
   const allSheets = await generalSheets.getSheets(
-    process.env.SPREADSHEET_ID_MELDUNGEN
+    SPREADSHEET_ID_MELDUNGEN
   );
 
   // find 'title' where 'sheetId' matches competitionRegistrationData.competition.ID
   const competitionSheet = allSheets.find(
     (sheet) =>
-      sheet.properties.sheetId.toString() ===
+      sheet.properties?.sheetId?.toString() ===
       competitionRegistrationData.competition.ID
   );
 
@@ -199,11 +201,11 @@ export async function updateCompetitionRegistrationState(
     );
   }
 
-  const competitionSheetName = competitionSheet.properties.title;
+  const competitionSheetName = competitionSheet.properties?.title ?? '';
 
   // find row from last_name and first_name
   const cells = await generalSheets.getCells(
-    process.env.SPREADSHEET_ID_MELDUNGEN,
+    SPREADSHEET_ID_MELDUNGEN,
     competitionSheetName
   );
 
@@ -216,7 +218,7 @@ export async function updateCompetitionRegistrationState(
   );
 
   // update the status in the sheet
-  await generalSheets.updateCell(process.env.SPREADSHEET_ID_MELDUNGEN, {
+  await generalSheets.updateCell(SPREADSHEET_ID_MELDUNGEN, {
     range: competitionSheetName + '!E' + (row + 1),
     values: [[competitionRegistrationState]]
   });
@@ -225,7 +227,7 @@ export async function updateCompetitionRegistrationState(
 /**
  * Retrieves competition data from the main competition sheet
  * @param {string} competitionID
- * @returns {Promise<types.competitionData>}
+ * @returns {Promise<types.competitionData | undefined>}
  */
 export async function getCompetitionDataFromID(competitionID) {
   /** @type {types.competitionData[]} */

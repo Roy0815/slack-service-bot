@@ -98,27 +98,27 @@ export const nameOfCompetitionSheet = 'Wettk\u00e4mpfe';
 
 /**
  * @readonly
- * @enum {string}
+ * @enum {number}
  */
 export const competitionMainSheetColumns = {
-  competitionID: '0',
-  competitionName: '1',
-  competitionDate: '2',
-  competitionLocation: '3',
-  googleSheetsLink: '4'
+  competitionID: 0,
+  competitionName: 1,
+  competitionDate: 2,
+  competitionLocation: 3,
+  googleSheetsLink: 4
 };
 
 /**
  * @readonly
- * @enum {string}
+ * @enum {number}
  */
 export const competitionSheetColumns = {
-  lastName: '0',
-  firstName: '1',
-  birhtyear: '2',
-  weightClass: '3',
-  status: '4',
-  handlerNeeded: '5'
+  lastName: 0,
+  firstName: 1,
+  birhtyear: 2,
+  weightClass: 3,
+  status: 4,
+  handlerNeeded: 5
 };
 
 /**

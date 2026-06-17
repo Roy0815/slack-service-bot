@@ -45,14 +45,14 @@ function setupApp(app) {
 
       // do nothing if answer text is empty
       if (
-        action.view.state.values[constants.creationModalBlocks.newAnswer][
+        action.view?.state.values[constants.creationModalBlocks.newAnswer][
           constants.creationModalActions.newAnswerInput
         ].value == null
       ) {
         return;
       }
 
-      await client.views.update(controller.addAnswer(action.view));
+      await client.views.update(controller.addAnswer(/** @type {import('@slack/bolt').ViewOutput} */ (action.view)));
     }
   );
 
@@ -66,7 +66,7 @@ function setupApp(app) {
 
       await client.views.update(
         controller.deleteAnswer(
-          /** @type {import('@slack/bolt').BlockButtonAction} */ (body).view,
+          /** @type {import('@slack/bolt').ViewOutput} */ (/** @type {import('@slack/bolt').BlockButtonAction} */ (body).view),
           /** @type {import('@slack/bolt').ButtonAction } */ (action)
         )
       );
@@ -120,7 +120,7 @@ function setupApp(app) {
       ) {
         await client.chat.postEphemeral({
           token: process.env.SLACK_BOT_TOKEN,
-          channel: body.channel.id,
+          channel: body.channel?.id ?? '',
           text: 'Du bist nicht der Fragesteller',
           user: body.user.id
         });
@@ -183,7 +183,7 @@ function setupApp(app) {
       });
 
       await client.chat.update(
-        controller.addAnswerMessage(view, result.messages[0])
+        controller.addAnswerMessage(view, (result.messages ?? [])[0])
       );
     }
   );

@@ -58,6 +58,7 @@ export function getHoursDisplayResponse(hoursObj, yearText) {
       }
     );
 
+    /** @type {string[]} */
     const detailsTextArray = [];
 
     // save details in blocks of max 3000 chars
@@ -118,10 +119,9 @@ export function getHomeView() {
     view[2]
   );
 
+  const yearSelect = /** @type {any} */ (actionBlock.elements[1]);
   while (year >= 2022) {
-    /** @type {import('@slack/types').StaticSelect} */ (
-      actionBlock.elements[1]
-    ).options.push({
+    yearSelect.options.push({
       text: {
         type: 'plain_text',
         text: `${year}`,
@@ -132,11 +132,7 @@ export function getHomeView() {
     year--;
   }
 
-  /** @type {import('@slack/types').StaticSelect} */ (
-    actionBlock.elements[1]
-  ).initial_option = /** @type {import('@slack/types').StaticSelect} */ (
-    actionBlock.elements[1]
-  ).options[0];
+  yearSelect.initial_option = yearSelect.options[0];
 
   return view;
 }
@@ -154,7 +150,7 @@ export async function getRegisterView(triggerId) {
   ).element;
 
   for (const user of await sheet.getAllUsers()) {
-    /** @type {import("@slack/types").StaticSelect} */ (element).options.push({
+    (/** @type {any} */ (element)).options.push({
       text: {
         type: 'plain_text',
         text: `${user.firstname} ${user.lastname}`,
@@ -176,14 +172,11 @@ export async function getAutoRegisterMessage(slackId) {
   const view = util.deepCopy(basicConfirmDialogView);
   view.channel = await sheet.getAdminChannel();
 
-  // required for typing
   if (!('blocks' in view)) {
-    return;
+    throw new Error('basicConfirmDialogView missing blocks');
   }
 
-  view.text = /** @type {import('@slack/types').SectionBlock} */ (
-    view.blocks[0]
-  ).text.text =
+  view.text = (/** @type {any} */ (view.blocks[0])).text.text =
     `<@${slackId}> ist beigetreten und noch nicht registriert. Bitte wähle den Namen aus:`;
 
   const actionBlock = /** @type {import('@slack/types').ActionsBlock} */ (
@@ -226,14 +219,11 @@ export async function getRegisterConfirmDialog(registerObj) {
   const view = util.deepCopy(basicConfirmDialogView);
   view.channel = await sheet.getAdminChannel();
 
-  // required for correct typing
   if (!('blocks' in view)) {
-    return;
+    throw new Error('basicConfirmDialogView missing blocks');
   }
 
-  view.text = /** @type {import('@slack/types').SectionBlock} */ (
-    view.blocks[0]
-  ).text.text =
+  view.text = (/** @type {any} */ (view.blocks[0])).text.text =
     `<@${registerObj.slackId}> möchte sich als ${registerObj.name} registrieren`;
 
   const actionBlock = /** @type {import('@slack/types').ActionsBlock} */ (
@@ -307,9 +297,8 @@ export function getMaintainHoursView(triggerId) {
 export async function getMaintainConfirmDialog(hoursObjMaint) {
   const view = util.deepCopy(basicConfirmDialogView);
 
-  // required for correct typing
   if (!('blocks' in view)) {
-    return;
+    throw new Error('basicConfirmDialogView missing blocks');
   }
 
   const [year, month, day] = hoursObjMaint.date.split('-');
@@ -317,9 +306,7 @@ export async function getMaintainConfirmDialog(hoursObjMaint) {
 
   view.channel = await sheet.getAdminChannel();
 
-  view.text = /** @type {import('@slack/types').SectionBlock} */ (
-    view.blocks[0]
-  ).text.text = `<@${
+  view.text = (/** @type {any} */ (view.blocks[0])).text.text = `<@${
     hoursObjMaint.slackId
   }> möchte folgenden Arbeitseinsatz erfassen:\n${hoursObjMaint.description}: ${
     hoursObjMaint.hours
@@ -400,15 +387,16 @@ export function getDataFromHoursMaintView(body) {
     description:
       body.view.state.values[constants.maintainHoursView.blockDescription][
         constants.maintainHoursView.actionDescription
-      ].value,
+      ].value ?? '',
     hours: Number(
-      body.view.state.values[constants.maintainHoursView.blockHours][
+      (body.view.state.values[constants.maintainHoursView.blockHours][
         constants.maintainHoursView.actionHours
-      ].value.replace(',', '.')
+      ].value ?? '0').replace(',', '.')
     ),
-    date: body.view.state.values[constants.maintainHoursView.blockDate][
-      constants.maintainHoursView.actionDate
-    ].selected_date
+    date:
+      body.view.state.values[constants.maintainHoursView.blockDate][
+        constants.maintainHoursView.actionDate
+      ].selected_date ?? ''
   };
 
   // validate year
