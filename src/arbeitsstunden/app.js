@@ -91,15 +91,18 @@ function setupApp(app) {
 
     const blckAction = /** @type {import("@slack/bolt").BlockAction} */ (body);
 
-    const year =
-      /** @type {import('@slack/bolt').ViewStateValue} */ (blckAction.view?.state.values[constants.homeView.inputBlockId][
+    const year = /** @type {import('@slack/bolt').ViewStateValue} */ (
+      blckAction.view?.state.values[constants.homeView.inputBlockId][
         constants.homeView.yearSelect
-      ]).selected_option?.value;
+      ]
+    ).selected_option?.value;
 
     const details =
-      (/** @type {import('@slack/bolt').ViewStateValue} */ (blckAction.view?.state.values[constants.homeView.inputBlockId][
-        constants.homeView.detailsSelect
-      ]).selected_options?.length ?? 0) > 0;
+      /** @type {import('@slack/bolt').ViewStateValue} */ ((
+        blckAction.view?.state.values[constants.homeView.inputBlockId][
+          constants.homeView.detailsSelect
+        ]
+      ).selected_options?.length ?? 0) > 0;
 
     const hoursObj = await controller.getHoursFromSlackId({
       id: body.user.id,
@@ -185,7 +188,8 @@ function setupApp(app) {
       await respond(
         `<@${body.user.id}> hat folgende Registrierung um ${util.formatTime(
           new Date()
-        )} Uhr am ${util.formatDate(new Date())} ${registerObj.approved ? 'freigegeben' : 'abgelehnt'
+        )} Uhr am ${util.formatDate(new Date())} ${
+          registerObj.approved ? 'freigegeben' : 'abgelehnt'
         }:\n<@${registerObj.slackId}> => ${registerObj.name}`
       );
 
@@ -222,17 +226,19 @@ function setupApp(app) {
 
       // edit approval message to show final result
       await respond(
-        `<@${blckAction.user.id
+        `<@${
+          blckAction.user.id
         }> hat folgende Registrierung um ${util.formatTime(
           new Date()
-        )} Uhr am ${util.formatDate(new Date())} vorgenommen:\n<@${btnAction.value
+        )} Uhr am ${util.formatDate(new Date())} vorgenommen:\n<@${
+          btnAction.value
         }> => ${selOpt.text.text}`
       );
 
       // update data in sheet
       await controller.saveSlackId({
         id: Number(selOpt.value),
-        slackId: btnAction.value ?? '',
+        slackId: btnAction.value ?? ''
       });
 
       // provide admins the contact
@@ -246,7 +252,7 @@ function setupApp(app) {
         channel_id: await controller.getAdminChannel(),
         filename: `${contact.firstname} ${contact.lastname}.vcf`,
         title: `${contact.firstname} ${contact.lastname}`,
-        content: contact.vCardContent ?? '',
+        content: contact.vCardContent ?? ''
       });
     }
   );
@@ -278,8 +284,10 @@ function setupApp(app) {
       await respond(
         `<@${body.user.id}> hat folgende Stunden um ${util.formatTime(
           new Date()
-        )} Uhr am ${util.formatDate(new Date())} ${maintObj.approved ? '`freigegeben`' : '`abgelehnt`'
-        }:\n<@${maintObj.slackId}>: "${maintObj.description}" - ${maintObj.hours
+        )} Uhr am ${util.formatDate(new Date())} ${
+          maintObj.approved ? '`freigegeben`' : '`abgelehnt`'
+        }:\n<@${maintObj.slackId}>: "${maintObj.description}" - ${
+          maintObj.hours
         } Stunde${maintObj.hours === 1 ? '' : 'n'} am ${util.formatDate(date)}.`
       );
 

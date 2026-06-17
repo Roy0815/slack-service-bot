@@ -147,12 +147,13 @@ function fillHandlerNeededDropdown(block) {
  */
 function fillDropdownOptions(dropdown, optionContents) {
   // Dropping existing values from dropdown
-  dropdown.options = optionContents.map((optionContent) => (
-    /** @type {import('@slack/types').PlainTextOption} */ ({
-      text: { type: 'plain_text', text: optionContent.text, emoji: true },
-      value: optionContent.value
-    })
-  ));
+  dropdown.options = optionContents.map(
+    (optionContent) =>
+      /** @type {import('@slack/types').PlainTextOption} */ ({
+        text: { type: 'plain_text', text: optionContent.text, emoji: true },
+        value: optionContent.value
+      })
+  );
 }
 
 /**

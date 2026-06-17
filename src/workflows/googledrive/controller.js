@@ -86,7 +86,7 @@ export async function uploadFileToDriveFolder(file) {
   const body =
     response.body instanceof Readable
       ? response.body
-      : Readable.fromWeb(/** @type {any} */(response.body));
+      : Readable.fromWeb(/** @type {any} */ (response.body));
 
   if (!response.body) throw new Error('No response body');
 
@@ -98,7 +98,6 @@ export async function uploadFileToDriveFolder(file) {
       body
     }
   });
-
 }
 
 /**
@@ -114,17 +113,21 @@ export function getUploadFailureMessage(file, approverChannel) {
   view.channel = approverChannel;
 
   // set text in notification
-  if ('text' in view) { // required for typing
+  if ('text' in view) {
+    // required for typing
     view.text = `Beim Hochladen der Datei \`${file.fileName}\` ist ein Fehler aufgetreten. Bitte versuche es erneut.`;
   }
 
   // required for correct typing
   if ('blocks' in view) {
-    const block = /** @type {import('@slack/types').SectionBlock} */ (view.blocks[0]);
+    const block = /** @type {import('@slack/types').SectionBlock} */ (
+      view.blocks[0]
+    );
 
     if (block) {
-    // save file info in button
-    /** @type {import('@slack/types').Button} */ (block.accessory).value = JSON.stringify(file);
+      // save file info in button
+      /** @type {import('@slack/types').Button} */ (block.accessory).value =
+        JSON.stringify(file);
 
       // set text in block
       if ('text' in block && block.text) {

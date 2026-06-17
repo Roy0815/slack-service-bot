@@ -27,8 +27,9 @@ export function formatDate(date) {
     .split(', ')[0]
     .split('.');
 
-  return `${dateArray[0].length === 1 ? '0' : ''}${dateArray[0]}.${dateArray[1].length === 1 ? '0' : ''
-    }${dateArray[1]}.${dateArray[2]}`; // DD.MM.YYYY
+  return `${dateArray[0].length === 1 ? '0' : ''}${dateArray[0]}.${
+    dateArray[1].length === 1 ? '0' : ''
+  }${dateArray[1]}.${dateArray[2]}`; // DD.MM.YYYY
 }
 
 /**
