@@ -98,11 +98,9 @@ function setupApp(app) {
     ).selected_option?.value;
 
     const details =
-      /** @type {import('@slack/bolt').ViewStateValue} */ ((
-        blckAction.view?.state.values[constants.homeView.inputBlockId][
-          constants.homeView.detailsSelect
-        ]
-      ).selected_options?.length ?? 0) > 0;
+      ((blckAction.view?.state.values[constants.homeView.inputBlockId]?.[
+        constants.homeView.detailsSelect
+      ]?.selected_options?.length) ?? 0) > 0;
 
     const hoursObj = await controller.getHoursFromSlackId({
       id: body.user.id,

@@ -57,7 +57,7 @@ export function setupApp(app) {
     await ack();
 
     let date = /** @type {import('@slack/bolt').BlockAction} */ (body).view
-      .state.values[views.homeViewInputBlockId][views.homeViewDatePickerAction]
+      ?.state.values[views.homeViewInputBlockId][views.homeViewDatePickerAction]
       .selected_date;
 
     if (date != null) {
@@ -106,14 +106,14 @@ export function setupApp(app) {
         views.updateWhoIsThereMessage(
           {
             user: blockAction.user.id,
-            time: blockAction.state.values[views.whoIsThereInputBlockName][
+            time: blockAction.state?.values[views.whoIsThereInputBlockName][
               views.whoIsThereTimePickerName
-            ].selected_time,
+            ].selected_time ?? '',
             xdelete:
               /** @type {import('@slack/bolt').ButtonAction} */ (action)
                 .value === 'delete'
           },
-          blockAction.message
+          blockAction.message ?? {}
         )
       );
     }
@@ -136,7 +136,7 @@ export function setupApp(app) {
       ) {
         await client.chat.postEphemeral({
           token: process.env.SLACK_BOT_TOKEN,
-          channel: body.channel.id,
+          channel: body.channel?.id ?? '',
           text: 'Du bist nicht der Fragesteller',
           user: body.user.id
         });

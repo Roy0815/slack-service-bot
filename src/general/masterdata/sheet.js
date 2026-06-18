@@ -2,6 +2,8 @@ import * as types from './types.js';
 import * as sheet from '../sheet.js';
 import * as util from '../util.js';
 
+const SPREADSHEET_ID_MASTERDATA = /** @type {string} */ (process.env.SPREADSHEET_ID_MASTERDATA);
+
 /**
  * @readonly
  * @type {string}
@@ -78,7 +80,7 @@ function moveUserLineToObject(userLine) {
 /**
  * TODO: refactor to dynamic keys
  * @param {string[]} userLine
- * @returns {types.userContactCard}
+ * @returns {types.userContactCard | undefined}
  */
 function moveUserLineToContactCard(userLine) {
   if (typeof userLine === 'undefined') {
@@ -112,7 +114,7 @@ async function getUserFromId({ id, slackId }) {
   if (!id && !slackId) return undefined;
 
   const data = await sheet.getCells(
-    process.env.SPREADSHEET_ID_MASTERDATA,
+    SPREADSHEET_ID_MASTERDATA,
     allgDatenSheetName
   );
   if (!data) return undefined;
@@ -142,7 +144,7 @@ async function getUserFromEmail(email) {
   if (!email || email === '') return undefined;
 
   const data = await sheet.getCells(
-    process.env.SPREADSHEET_ID_MASTERDATA,
+    SPREADSHEET_ID_MASTERDATA,
     allgDatenSheetName
   );
   if (!data) return undefined;
@@ -166,7 +168,7 @@ async function getUserContactCardFromId({ id, slackId }) {
 
   /** @type {string[][]} */
   const data = await sheet.getCells(
-    process.env.SPREADSHEET_ID_MASTERDATA,
+    SPREADSHEET_ID_MASTERDATA,
     allgDatenSheetName
   );
   if (!data) return undefined;
@@ -205,13 +207,15 @@ async function saveMasterdataChanges(maintObj) {
 
   // update fields
   // run all calls in parallel and wait until all finished
+  if (!user) return;
+
   await Promise.all(
     updatedFields.map(async (key) => {
-      await sheet.updateCell(process.env.SPREADSHEET_ID_MASTERDATA, {
+      await sheet.updateCell(SPREADSHEET_ID_MASTERDATA, {
         range: `'${allgDatenSheetName}'!${util.convertNumberToColumn(
-          allgDatenColumns[key]
+          (/** @type {Record<string, any>} */ (allgDatenColumns))[key]
         )}${user.id + 1}`,
-        values: [[maintObj[key]]]
+        values: [[(/** @type {Record<string, any>} */ (maintObj))[key]]]
       });
     })
   );
@@ -234,7 +238,7 @@ async function isUserRegistered(ids) {
  */
 async function getAllActiveUsers() {
   const array = await sheet.getCells(
-    process.env.SPREADSHEET_ID_MASTERDATA,
+    SPREADSHEET_ID_MASTERDATA,
     allgDatenSheetName
   );
   if (!array) return [];
@@ -277,7 +281,7 @@ async function getAllActiveUsers() {
  * @param {string} slackId
  */
 async function saveSlackId(id, slackId) {
-  await sheet.updateCell(process.env.SPREADSHEET_ID_MASTERDATA, {
+  await sheet.updateCell(SPREADSHEET_ID_MASTERDATA, {
     range: `'${allgDatenSheetName}'!${util.convertNumberToColumn(
       allgDatenColumns.slackId
     )}${id + 1}`, // google sheet functions count rows starting from 1
@@ -301,7 +305,7 @@ async function saveLeaveDate(ids, leaveDate) {
     ids.id = user.id;
   }
 
-  await sheet.updateCell(process.env.SPREADSHEET_ID_MASTERDATA, {
+  await sheet.updateCell(SPREADSHEET_ID_MASTERDATA, {
     range: `'${allgDatenSheetName}'!${util.convertNumberToColumn(
       allgDatenColumns.leaveDate
     )}${ids.id + 1}`, // google sheet functions count rows starting from 1
@@ -324,13 +328,13 @@ async function saveNewMember(userJoiningDetails) {
       : '';
 
   // escape + and spaces in phone numbers
-  userJoiningDetails.phone = userJoiningDetails.phone
+  userJoiningDetails.phone = (userJoiningDetails.phone ?? '')
     .replace(/\s+/g, '')
     .replace(/^(\+)/, "'$1");
 
   // get last row
   const ids = await sheet.getCells(
-    process.env.SPREADSHEET_ID_MASTERDATA,
+    SPREADSHEET_ID_MASTERDATA,
     `${allgDatenSheetName}!${util.convertNumberToColumn(allgDatenColumns.id)}:${util.convertNumberToColumn(allgDatenColumns.id)}`
   );
 
@@ -341,23 +345,26 @@ async function saveNewMember(userJoiningDetails) {
   /** @type {Promise<void>[]} */
   const promises = [];
 
+  /** @type {Record<string, any>} */
+  const allgCols = allgDatenColumns;
+  /** @type {Record<string, any>} */
+  const bankCols = bankDatenColumns;
+  /** @type {Record<string, any>} */
+  const joiningDetails = userJoiningDetails;
+
   Object.keys(userJoiningDetails).forEach((key) => {
     // not in general or bank infos
-    if (!allgDatenColumns[key] && !bankDatenColumns[key]) return;
+    if (!allgCols[key] && !bankCols[key]) return;
 
     // get correct sheet and column
-    const sheetName = allgDatenColumns[key]
-      ? allgDatenSheetName
-      : bankDatenSheetName;
+    const sheetName = allgCols[key] ? allgDatenSheetName : bankDatenSheetName;
 
-    const column = util.convertNumberToColumn(
-      allgDatenColumns[key] || bankDatenColumns[key]
-    );
+    const column = util.convertNumberToColumn(allgCols[key] || bankCols[key]);
 
     promises.push(
-      sheet.updateCell(process.env.SPREADSHEET_ID_MASTERDATA, {
+      sheet.updateCell(SPREADSHEET_ID_MASTERDATA, {
         range: `'${sheetName}'!${column}${newIdx}`,
-        values: [[userJoiningDetails[key]]]
+        values: [[joiningDetails[key]]]
       })
     );
   });
@@ -368,7 +375,7 @@ async function saveNewMember(userJoiningDetails) {
   // get return fields
   const fields = (
     await sheet.getCells(
-      process.env.SPREADSHEET_ID_MASTERDATA,
+      SPREADSHEET_ID_MASTERDATA,
       `${bankDatenSheetName}!A${newIdx}:${util.convertNumberToColumn(bankDatenColumns.initialAmount)}${newIdx}`
     )
   )[0];

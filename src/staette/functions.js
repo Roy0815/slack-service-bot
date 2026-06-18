@@ -5,27 +5,29 @@
  * @returns {Promise<import('@slack/web-api/dist/types/response/ConversationsHistoryResponse').MessageElement[]>}
  */
 export async function cleanup({ client }) {
+  const STAETTE_CHANNEL = /** @type {string} */ (process.env.STAETTE_CHANNEL);
+
   // get bot ID
   const botId = (
     await client.auth.test({
       token: process.env.SLACK_BOT_TOKEN
     })
-  ).bot_id;
+  ).bot_id ?? '';
 
   // get messages in channel
   const result = await client.conversations.history({
     // The token you used to initialize your app
     token: process.env.SLACK_BOT_TOKEN,
-    channel: process.env.STAETTE_CHANNEL
+    channel: STAETTE_CHANNEL
   });
 
-  const filtered = result.messages.filter(
+  const filtered = (result.messages ?? []).filter(
     (msg) =>
       msg.bot_id === botId && // messages from this user
       msg.blocks &&
       msg.blocks.length > 0 &&
       msg.blocks[0].text &&
-      /^`[0-3]\d\.[0-1]\d\.20[2-9]\d`$/.test(msg.blocks[0].text.text) // messages with date
+      /^`[0-3]\d\.[0-1]\d\.20[2-9]\d`$/.test(msg.blocks[0].text.text ?? '') // messages with date
   );
 
   const cutoffDate = new Date();
@@ -36,7 +38,7 @@ export async function cleanup({ client }) {
 
   filtered.forEach((msg) => {
     // get date from message
-    const text = msg.blocks[0].text.text.replace(/`/g, '');
+    const text = /** @type {string} */ ((/** @type {any} */ (msg.blocks))[0].text.text).replace(/`/g, '');
 
     const [day, month, year] = text.split('.');
     const date = new Date(Number(year), Number(month) - 1, Number(day));
@@ -44,8 +46,8 @@ export async function cleanup({ client }) {
     if (date < cutoffDate) {
       // ASYNC! delete message
       client.chat.delete({
-        channel: process.env.STAETTE_CHANNEL,
-        ts: msg.ts,
+        channel: STAETTE_CHANNEL,
+        ts: msg.ts ?? '',
         token: process.env.SLACK_BOT_TOKEN
       });
       returnObj.push(msg);
@@ -62,36 +64,39 @@ export async function cleanup({ client }) {
  * @param {import('@slack/web-api').WebClient} obj.client
  */
 export async function sortMessages({ client, date }) {
+  const STAETTE_CHANNEL = /** @type {string} */ (process.env.STAETTE_CHANNEL);
+
   // get bot ID
   const botId = (
     await client.auth.test({
       token: process.env.SLACK_BOT_TOKEN
     })
-  ).bot_id;
+  ).bot_id ?? '';
 
   // get messages in channel
   const result = await client.conversations.history({
     token: process.env.SLACK_BOT_TOKEN,
-    channel: process.env.STAETTE_CHANNEL
+    channel: STAETTE_CHANNEL
   });
 
-  const filtered = result.messages.filter(
+  const filtered = (result.messages ?? []).filter(
     (msg) =>
       msg.bot_id === botId && // messages from this user
       msg.blocks &&
       msg.blocks.length > 0 &&
       msg.blocks[0].text &&
-      /^`[0-3]\d\.[0-1]\d\.20[2-9]\d`$/.test(msg.blocks[0].text.text) && // messages with date
+      /^`[0-3]\d\.[0-1]\d\.20[2-9]\d`$/.test(msg.blocks[0].text.text ?? '') && // messages with date
       msg.blocks[0].text.text !== `\`${date}\`` // not current date
   );
 
   // get messages with date later than current message
   const [day, month, year] = date.split('.');
   const currDate = new Date(Number(year), Number(month) - 1, Number(day));
+  /** @type {typeof filtered} */
   const messagesOrdered = [];
 
   filtered.forEach((msg) => {
-    const text = msg.blocks[0].text.text.replace(/`/g, '');
+    const text = /** @type {string} */ ((/** @type {any} */ (msg.blocks))[0].text.text).replace(/`/g, '');
 
     const [day, month, year] = text.split('.');
     const msgDate = new Date(Number(year), Number(month) - 1, Number(day));
@@ -103,16 +108,16 @@ export async function sortMessages({ client, date }) {
 
   messagesOrdered.forEach((msg) => {
     client.chat.delete({
-      channel: process.env.STAETTE_CHANNEL,
-      ts: msg.ts,
+      channel: STAETTE_CHANNEL,
+      ts: msg.ts ?? '',
       token: process.env.SLACK_BOT_TOKEN
     });
   });
 
   for (let index = 0; index < messagesOrdered.length; index++) {
     const msg = {
-      channel: process.env.STAETTE_CHANNEL,
-      text: messagesOrdered[index].blocks[1].text.text,
+      channel: STAETTE_CHANNEL,
+      text: /** @type {string} */ ((/** @type {any} */ (messagesOrdered[index].blocks))[1].text.text),
       blocks: messagesOrdered[index].blocks
     };
 
@@ -128,20 +133,22 @@ export async function sortMessages({ client, date }) {
  * @returns {Promise<boolean>}
  */
 export async function dateIsUnique({ client, date }) {
+  const STAETTE_CHANNEL = /** @type {string} */ (process.env.STAETTE_CHANNEL);
+
   // get bot ID
   const botId = (
     await client.auth.test({
       token: process.env.SLACK_BOT_TOKEN
     })
-  ).bot_id;
+  ).bot_id ?? '';
 
   // get messages in channel
   const result = await client.conversations.history({
     token: process.env.SLACK_BOT_TOKEN,
-    channel: process.env.STAETTE_CHANNEL
+    channel: STAETTE_CHANNEL
   });
 
-  const filtered = result.messages.filter(
+  const filtered = (result.messages ?? []).filter(
     (msg) =>
       msg.bot_id === botId && // messages from this user
       msg.blocks &&

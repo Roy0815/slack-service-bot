@@ -12,7 +12,7 @@ import { SlackViewSubmissionError } from '../general/types.js';
 export function getChannelFromView({ view }) {
   return view.state.values[constants.creationModalBlocks.conversationSelect][
     constants.creationModalActions.conversationSelect
-  ].selected_conversation;
+  ].selected_conversation ?? '';
 }
 
 /**
@@ -52,10 +52,10 @@ export function addAnswer({ id, hash, blocks, state }) {
   // create new block for the answer
   const newAnswerView = util.deepCopy(views.answerView);
 
-  newAnswerView.text.text =
+  (/** @type {any} */ (newAnswerView)).text.text =
     state.values[constants.creationModalBlocks.newAnswer][
       constants.creationModalActions.newAnswerInput
-    ].value;
+    ].value ?? '';
 
   /** @type {import('@slack/types').Button } */
   (newAnswerView.accessory).value = `${view.blocks.length + 1}`;
@@ -150,22 +150,20 @@ export function getPollMessage({ user, view }) {
     (actionsBlock.elements[1]);
 
   // set text in Message
-  /** @type {import('@slack/types').SectionBlock} */
-  (retViewBlocks[0]).text.text = `Neue Umfrage von <@${user.id}>\n*${
+  (/** @type {any} */ (retViewBlocks[0])).text.text = `Neue Umfrage von <@${user.id}>\n*${
     view.state.values[constants.creationModalBlocks.question][
       constants.creationModalActions.questionInput
-    ].value
+    ].value ?? ''
   }*`;
 
   // store admin in overflow button
-  /** @type {import('@slack/types').Overflow } */
-  (actionsBlock.elements[2]).options[0].value += `-${user.id}`;
+  (/** @type {any} */ (actionsBlock.elements[2])).options[0].value += `-${user.id}`;
 
   // -- set options --//
   // anonymous
   let option = view.state.values[constants.creationModalBlocks.options][
     constants.creationModalActions.options
-  ].selected_options.find(
+  ]?.selected_options?.find(
     (option) => option.value === constants.optionCheckboxes.anonym
   );
 
@@ -179,7 +177,7 @@ export function getPollMessage({ user, view }) {
   // multiple select
   option = view.state.values[constants.creationModalBlocks.options][
     constants.creationModalActions.options
-  ].selected_options.find(
+  ]?.selected_options?.find(
     (option) => option.value === constants.optionCheckboxes.multipleSelect
   );
 
@@ -196,7 +194,7 @@ export function getPollMessage({ user, view }) {
   // add answers
   option = view.state.values[constants.creationModalBlocks.options][
     constants.creationModalActions.options
-  ].selected_options.find(
+  ]?.selected_options?.find(
     (option) => option.value === constants.optionCheckboxes.addAllowed
   );
 
@@ -222,9 +220,8 @@ export function getPollMessage({ user, view }) {
       /** @type {import('@slack/types').Button} */
       (answerView.accessory).value = `${index}`;
 
-      answerView.text.text = `*${
-        /** @type {import('@slack/types').SectionBlock} */
-        (block).text.text
+      (/** @type {any} */ (answerView)).text.text = `*${
+        (/** @type {any} */ (block)).text?.text ?? ''
       }*`;
 
       const resultView = util.deepCopy(views.resultBlockMessage);
@@ -237,10 +234,10 @@ export function getPollMessage({ user, view }) {
     channel:
       view.state.values[constants.creationModalBlocks.conversationSelect][
         constants.creationModalActions.conversationSelect
-      ].selected_conversation,
+      ].selected_conversation ?? '',
     text: view.state.values[constants.creationModalBlocks.question][
       constants.creationModalActions.questionInput
-    ].value,
+    ].value ?? '',
     blocks: retViewBlocks
   };
 }
@@ -266,11 +263,11 @@ export function answerOptionsValid({ view }) {
 
   if (answers.length === 0) {
     // check options
-    const addAnswers = view.state.values[constants.creationModalBlocks.options][
+    const addAnswers = (view.state.values[constants.creationModalBlocks.options][
       constants.creationModalActions.options
-    ].selected_options.filter(
+    ]?.selected_options?.filter(
       (option) => option.value === constants.optionCheckboxes.addAllowed
-    );
+    ) ?? []);
 
     // add Options not selected: error
     if (addAnswers.length === 0) {
@@ -288,9 +285,11 @@ export function answerOptionsValid({ view }) {
  * @returns {import("@slack/bolt").RespondArguments}
  */
 export function vote({ message, user }, action) {
+  if (!message) return {};
+
   // take over blocks from original message
   /** @type {import("@slack/types").AnyBlock[]} */
-  const blocks = message.blocks;
+  const blocks = message.blocks ?? [];
 
   // get options from "delete my answers" button
   const options =
@@ -312,7 +311,7 @@ export function vote({ message, user }, action) {
       !sectionBlock.accessory ||
       !/^\d*/.test(
         /** @type {import('@slack/types').Button} */ (sectionBlock.accessory)
-          .value
+          .value ?? ''
       )
     )
       return;
@@ -322,7 +321,7 @@ export function vote({ message, user }, action) {
     );
 
     // get users that already voted + remove answer number
-    const users = accessory.value.split('-');
+    const users = (accessory.value ?? '').split('-');
 
     users.shift();
 
@@ -354,7 +353,7 @@ export function vote({ message, user }, action) {
       // or if "single select" is enabled (all other blocks are cleared from user)
       if (
         accessory.value !== action.value &&
-        options.includes(constants.optionCheckboxes.multipleSelect)
+        (options ?? '').includes(constants.optionCheckboxes.multipleSelect)
       ) {
         return;
       }
@@ -369,7 +368,7 @@ export function vote({ message, user }, action) {
     }
 
     // reset block
-    accessory.value = accessory.value.split('-')[0];
+    accessory.value = (accessory.value ?? '').split('-')[0];
     contextTextElement.text = '';
 
     users.forEach((user, idx) => {
@@ -377,7 +376,7 @@ export function vote({ message, user }, action) {
       accessory.value += `-${user}`;
 
       // fill text only if not anonymous
-      if (options.includes(constants.optionCheckboxes.anonym)) return; // goes into next iteration
+      if ((options ?? '').includes(constants.optionCheckboxes.anonym)) return; // goes into next iteration
 
       contextTextElement.text += `${idx !== 0 ? ', ' : ''}<@${user}>`;
     });
@@ -405,7 +404,7 @@ export function vote({ message, user }, action) {
 export function getAddAnswerView({ trigger_id, message, channel }) {
   const view = util.deepCopy(views.addAnswerView);
 
-  view.private_metadata = `${channel.id}-${message.ts}`;
+  view.private_metadata = `${channel?.id ?? ''}-${message?.ts ?? ''}`;
 
   // eslint-disable-next-line camelcase
   return { trigger_id, view };
@@ -420,8 +419,10 @@ export function getAddAnswerView({ trigger_id, message, channel }) {
 export function addAnswerMessage(
   // eslint-disable-next-line camelcase
   { private_metadata, state: { values } },
-  { blocks }
+  { blocks: rawBlocks }
 ) {
+  const blocks = rawBlocks ?? [];
+
   /** @type {import('@slack/web-api').ChatUpdateArguments} */
   const updateMessage = {
     token: process.env.SLACK_BOT_TOKEN,
@@ -436,7 +437,7 @@ export function addAnswerMessage(
   // count current answers to get index
   let idx = 0;
   blocks.forEach((block) => {
-    if (block.accessory && /^\d*/.test(block.accessory.value)) idx += 1;
+    if (block.accessory && /^\d*/.test((/** @type {import('@slack/types').Button} */ (block.accessory)).value ?? '')) idx += 1;
   });
 
   const answerView = util.deepCopy(views.answerBlockMessage);
@@ -444,7 +445,7 @@ export function addAnswerMessage(
   /** @type {import('@slack/types').Button} */
   (answerView.accessory).value = `${idx}`;
 
-  answerView.text.text = `*${
+  (/** @type {any} */ (answerView)).text.text = `*${
     values[constants.creationModalBlocks.newAnswer][
       constants.pollMessageActions.addAnswerViewTextInput
     ].value
@@ -452,7 +453,7 @@ export function addAnswerMessage(
 
   // required for typing
   if ('blocks' in updateMessage)
-    updateMessage.blocks.splice(
+    (/** @type {any} */ (updateMessage)).blocks.splice(
       blocks.length - 2,
       0,
       answerView,
