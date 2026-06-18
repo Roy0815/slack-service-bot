@@ -17,7 +17,7 @@ export const homeViewDatePickerAction = 'staette-home-datepicker-action';
 //* ******************* Views ********************//
 /** @type {import('@slack/web-api').ChatPostMessageArguments} */
 const whoIsThereMessage = {
-  channel: process.env.STAETTE_CHANNEL,
+  channel: /** @type {string} */ (process.env.STAETTE_CHANNEL),
   text: '', // Text in the notification, set in the method
   unfurl_links: false,
   blocks: [
@@ -162,26 +162,21 @@ export function getWhoIsThereMessage({ user_id, text }) {
 
   /** @type {import('@slack/types').Overflow} */
   // eslint-disable-next-line camelcase
-  (actionsBlock.elements[2]).options[0].value += `-${user_id}`;
+  actionsBlock.elements[2].options[0].value += `-${user_id}`;
 
   // get day description
   const day =
     text === `${util.formatDate(new Date())}` ? 'heute' : `am ${text}`;
 
   // set date
-  /** @type {import('@slack/types').SectionBlock} */
-  (view.blocks[0]).text.text = `\`${text}\``;
+  /** @type {any} */ (view.blocks[0]).text.text = `\`${text}\``;
 
   // set questions
-  view.text =
-    /** @type {import('@slack/types').SectionBlock} */
-    (
-      view.blocks[1]
-      // eslint-disable-next-line camelcase
-    ).text.text = `<@${user_id}> will wissen wer ${day} in der Stätte ist`;
+  // eslint-disable-next-line camelcase
+  view.text = /** @type {any} */ (view.blocks[1]).text.text =
+    `<@${user_id}> will wissen wer ${day} in der Stätte ist`;
 
-  /** @type {import('@slack/types').SectionBlock} */
-  (view.blocks[2]).text.text = `Wann bist du ${day} da?`;
+  /** @type {any} */ (view.blocks[2]).text.text = `Wann bist du ${day} da?`;
 
   return view;
 }
@@ -209,19 +204,17 @@ export function updateWhoIsThereMessage(
   // required for correct typing
   if (!('blocks' in view)) return view;
 
-  view.blocks = blocks;
+  view.blocks = blocks ?? view.blocks;
   view.text = text;
 
-  /** @type {import('@slack/types').SectionBlock} */
+  /** @type {any} */
   let userBlock;
 
   if (view.blocks[sectionUsers]) {
-    userBlock = /** @type {import('@slack/types').SectionBlock} */ (
-      view.blocks[sectionUsers]
-    );
+    userBlock = view.blocks[sectionUsers];
 
     // get user list
-    userBlock.text.text.split('\n').forEach((element) => {
+    userBlock.text.text.split('\n').forEach((/** @type {string} */ element) => {
       const userArr = element.split('\t');
       users.push({
         time: userArr[0],
@@ -287,9 +280,7 @@ export function updateWhoIsThereMessage(
     }
   );
 
-  userBlock = /** @type {import('@slack/types').SectionBlock} */ (
-    view.blocks[sectionUsers]
-  );
+  userBlock = view.blocks[sectionUsers];
 
   users.forEach((element, index) => {
     userBlock.text.text = `${userBlock.text.text}${index > 0 ? '\n' : ''}${

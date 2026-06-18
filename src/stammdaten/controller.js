@@ -29,12 +29,12 @@ export async function getChangeMasterdataView(slackId) {
     slackId
   });
 
+  if (!userInfo) return view;
+
   // set placeholders
   Object.keys(constants.changeMasterdataViewBlocks).forEach((key, index) => {
-    /** @type {import('@slack/types').PlainTextInput} */ (
-      /** @type {import('@slack/types').InputBlock} */ (view.blocks[index + 1])
-        .element
-    ).placeholder.text = userInfo[key];
+    /** @type {any} */ (view.blocks[index + 1]).element.placeholder.text =
+      /** @type {Record<string, any>} */ (userInfo)[key];
   });
 
   return view;
@@ -50,11 +50,15 @@ export function buildMaintainObject(body) {
   const maintObj = {};
 
   // extract data from view
+  const viewBlocks = /** @type {Record<string, any>} */ (
+    constants.changeMasterdataViewBlocks
+  );
+  const viewActions = /** @type {Record<string, any>} */ (
+    constants.changeMasterdataViewActions
+  );
   Object.keys(constants.changeMasterdataViewBlocks).forEach((key) => {
-    maintObj[key] =
-      body.view.state.values[constants.changeMasterdataViewBlocks[key]][
-        constants.changeMasterdataViewActions[key]
-      ].value;
+    /** @type {Record<string, any>} */ (maintObj)[key] =
+      body.view.state.values[viewBlocks[key]][viewActions[key]].value;
   });
 
   // check if any value is filled
@@ -78,15 +82,12 @@ export async function getMaintainConfirmDialog(maintObj, changesMessage) {
 
   view.channel = await getAdminChannel();
 
-  // required for correct typing
   if (!('blocks' in view)) {
-    return;
+    throw new Error('basicConfirmDialogView missing blocks');
   }
 
   // set text in blocks and message preview
-  view.text = /** @type {import('@slack/types').SectionBlock} */ (
-    view.blocks[0]
-  ).text.text =
+  view.text = /** @type {any} */ (view.blocks[0]).text.text =
     `<@${maintObj.slackId}> möchte folgende Änderungen den Stammdaten vornehmen:${changesMessage}`;
 
   const actionBlock = /** @type {import('@slack/types').ActionsBlock} */ (
@@ -121,17 +122,25 @@ export async function getChangesMessage(maintObj) {
 
   let text = ``;
 
+  if (!userInfo) return text;
+
+  const userInfoAny = /** @type {Record<string, any>} */ (userInfo);
+  const maintObjAny = /** @type {Record<string, any>} */ (maintObj);
+  const fieldNames = /** @type {Record<string, any>} */ (
+    constants.masterDataFieldNames
+  );
+
   Object.keys(maintObj).forEach((key) => {
     // check if field was filled and changed (except slackId)
     if (
       key === 'slackId' ||
-      !maintObj[key] ||
-      maintObj[key] === '' ||
-      maintObj[key] === userInfo[key]
+      !maintObjAny[key] ||
+      maintObjAny[key] === '' ||
+      maintObjAny[key] === userInfoAny[key]
     )
       return;
 
-    text += `\n\`${constants.masterDataFieldNames[key]}\`: ${userInfo[key]} :arrow_right: ${maintObj[key]}`;
+    text += `\n\`${fieldNames[key]}\`: ${userInfoAny[key]} :arrow_right: ${maintObjAny[key]}`;
   });
 
   return text;

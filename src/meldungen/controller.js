@@ -147,16 +147,13 @@ function fillHandlerNeededDropdown(block) {
  */
 function fillDropdownOptions(dropdown, optionContents) {
   // Dropping existing values from dropdown
-  dropdown.options = [];
-
-  optionContents.forEach((optionContent) => {
-    /** @type {import('@slack/types').PlainTextOption} */
-    const newDropdownOption = {
-      text: { type: 'plain_text', text: optionContent.text, emoji: true },
-      value: optionContent.value
-    };
-    dropdown.options.push(newDropdownOption);
-  });
+  dropdown.options = optionContents.map(
+    (optionContent) =>
+      /** @type {import('@slack/types').PlainTextOption} */ ({
+        text: { type: 'plain_text', text: optionContent.text, emoji: true },
+        value: optionContent.value
+      })
+  );
 }
 
 /**
@@ -212,7 +209,7 @@ export function getAdminConfirmMessageCompetitionCreation(
   userId
 ) {
   return {
-    channel: process.env.MELDUNGEN_ADMIN_CHANNEL,
+    channel: process.env.MELDUNGEN_ADMIN_CHANNEL ?? '',
     text:
       `Ein neuer Wettkampf wurde erstellt von <@${userId}>:` +
       `\n*ID*: ${competitionData.ID}` +
@@ -245,7 +242,7 @@ export function getAdminConfirmMessageCompetitionRegistration(
   competitionRegistrationData
 ) {
   return {
-    channel: process.env.MELDUNGEN_ADMIN_CHANNEL,
+    channel: process.env.MELDUNGEN_ADMIN_CHANNEL ?? '',
     text: `Eine neue Wettkampfmeldung wurde eingereicht von <@${competitionRegistrationData.slackID}>:`,
     blocks: [
       {
@@ -307,7 +304,7 @@ export function getAdminConfirmMessageCompetitionRegistration(
 
 /**
  * Extracts competition registration data from Slack view submission
- * @param {object} selectedValues
+ * @param {Record<string, any>} selectedValues
  * @param {masterdataTypes.user} user
  * @returns {Promise<types.competitionRegistrationData>}
  */
@@ -319,7 +316,7 @@ export async function extractCompetitionRegistrationData(selectedValues, user) {
     ][constants.competitionRegistrationView.actionCompetitionSelect]
       .selected_option.value;
 
-  /** @type {types.competitionData} */
+  /** @type {types.competitionData | undefined} */
   const competitionData = await sheet.getCompetitionDataFromID(competitionID);
 
   // userRemarks is an Optional field -> May be null
@@ -338,7 +335,7 @@ export async function extractCompetitionRegistrationData(selectedValues, user) {
     last_name: user.lastname,
     birthyear: Number(user.birthday.slice(-4)),
 
-    competition: competitionData,
+    competition: /** @type {types.competitionData} */ (competitionData),
 
     weight_class:
       selectedValues[

@@ -19,7 +19,7 @@ function setupApp(app) {
     // already send HTTP 200 so slack does not time out
     await awsRtAPI.sendResponse();
 
-    /** @type {import('../general/masterdata/types.js').user} */
+    /** @type {import('../general/masterdata/types.js').user | undefined} */
     const user = await masterdataService.getUserFromId({
       slackId: command.user_id
     });
@@ -69,10 +69,10 @@ function setupApp(app) {
       /** User inputs into modal */
       const selectedValues = body.view.state.values;
 
-      /** @type {import('../general/masterdata/types.js').user} */
-      const userDataFromSheet = await masterdataService.getUserFromId({
-        slackId: body.user.id
-      });
+      const userDataFromSheet =
+        /** @type {import('../general/masterdata/types.js').user} */ (
+          await masterdataService.getUserFromId({ slackId: body.user.id })
+        );
 
       /** @type {import('./types.js').competitionRegistrationData} */
       const competitionRegistrationData =
@@ -135,20 +135,22 @@ function setupApp(app) {
         ].selected_date;
 
       const convertedCompetitionDate = util.formatDate(
-        /** @type {Date} */
-        new Date(dateInput)
+        new Date(dateInput ?? '')
       );
 
       /** @type {import('./types.js').competitionData} */
       const competitionData = {
-        name: selectedValues[
-          controller.competitionCreationView.blockCompetitionName
-        ][controller.competitionCreationView.actionCompetitionName].value,
+        name:
+          selectedValues[
+            controller.competitionCreationView.blockCompetitionName
+          ][controller.competitionCreationView.actionCompetitionName].value ??
+          '',
         date: convertedCompetitionDate,
         location:
           selectedValues[
             controller.competitionCreationView.blockCompetitionLocation
-          ][controller.competitionCreationView.actionCompetitionLocation].value,
+          ][controller.competitionCreationView.actionCompetitionLocation]
+            .value ?? '',
         ID: '' // will be set later
       };
 
@@ -189,10 +191,10 @@ function setupApp(app) {
       // already send HTTP 200 that slack does not time out
       await awsRtAPI.sendResponse();
 
-      /** @type {import('../general/masterdata/types.js').user} */
-      const user = await masterdataService.getUserFromId({
-        slackId: body.user.id
-      });
+      const user =
+        /** @type {import('../general/masterdata/types.js').user} */ (
+          await masterdataService.getUserFromId({ slackId: body.user.id })
+        );
 
       const blockAction = /** @type {import("@slack/bolt").BlockAction} */ (
         body
@@ -224,10 +226,10 @@ function setupApp(app) {
       const actionID = btnAction.action_id;
 
       /** @type {import('./types.js').competitionRegistrationData} */
-      const competitionRegistrationData = JSON.parse(btnAction.value);
+      const competitionRegistrationData = JSON.parse(btnAction.value ?? '{}');
 
       /** @type {string} Text that depends on the which button was pressed */
-      let actionSpecificText;
+      let actionSpecificText = '';
 
       switch (actionID) {
         case controller.competitionRegistrationAdminActions.confirm:
@@ -254,7 +256,7 @@ function setupApp(app) {
       }
 
       // Update the admin message
-      const blocks = blockAction.message.blocks.slice(0, -2); // Remove the last block (actions)
+      const blocks = (blockAction.message?.blocks ?? []).slice(0, -2); // Remove the last block (actions)
       blocks.push({
         type: 'context',
         elements: [
@@ -266,8 +268,8 @@ function setupApp(app) {
       });
 
       await client.chat.update({
-        channel: blockAction.channel.id,
-        ts: blockAction.message.ts,
+        channel: blockAction.channel?.id ?? '',
+        ts: blockAction.message?.ts ?? '',
         blocks,
         text: `Die Wettkampfmeldung von <@${competitionRegistrationData.slackID}> wurde durch <@${blockAction.user.id}> ${actionSpecificText}.`
       });
@@ -291,7 +293,7 @@ function setupApp(app) {
  * @param {import("@slack/bolt").webApi.WebClient} client
  * @param {string} triggerId
  * @param {string} channelID
- * @param {import('../general/masterdata/types.js').user} user
+ * @param {import('../general/masterdata/types.js').user | undefined} user
  * @returns {Promise<void>}
  * @throws {controller.UserNotRegisteredError}
  */

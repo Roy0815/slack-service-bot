@@ -4,15 +4,19 @@ import { userJoiningFields } from '../general/masterdata/types.js';
 import fetch from 'node-fetch';
 
 // Handle webhook events from docuseal
-/** @type {import('aws-lambda').LambdaFunctionURLHandler } */
+/**
+ * @param {import('aws-lambda').APIGatewayProxyEventV2} event
+ * @param {import('aws-lambda').Context} context
+ */
 export async function handler(event, context) {
   // Set global AWS request ID for further processing
   awsRtAPI.globalData.awsRequestId = context.awsRequestId;
 
   // Verify the webhook signature
+  const SIGNATURE_HEADER_NAME = process.env.SIGNATURE_HEADER_NAME ?? '';
   if (
     !event.headers ||
-    event.headers[process.env.SIGNATURE_HEADER_NAME] !==
+    event.headers[SIGNATURE_HEADER_NAME] !==
       process.env.SIGNATURE_SIGNING_SECRET
   ) {
     return {
@@ -23,7 +27,7 @@ export async function handler(event, context) {
 
   try {
     // Parse the webhook payload
-    const payload = JSON.parse(event.body);
+    const payload = JSON.parse(event.body ?? '{}');
 
     switch (payload.event_type) {
       case 'form.completed':
@@ -66,7 +70,7 @@ export async function handler(event, context) {
 }
 
 /**
- * @param {import('aws-lambda').APIGatewayProxyEventV2} event
+ * @param {any} event
  */
 export async function handleFormCompleted(event) {
   const submission = JSON.parse(event.body);
@@ -88,11 +92,11 @@ export async function handleFormCompleted(event) {
     return;
   }
 
-  /** @type {import('../general/masterdata/types.js').userJoiningDetails} */
+  /** @type {Record<string, any>} */
   const applicationInfo = {};
 
   // Extract values from the submission
-  submission.data.values.forEach((value) => {
+  submission.data.values.forEach((/** @type {any} */ value) => {
     if (!userJoiningFields.includes(value.field)) return;
 
     if (/(joinedDate|birthday|signingDate)/.test(value.field)) {
@@ -108,8 +112,11 @@ export async function handleFormCompleted(event) {
   applicationInfo.docusealFileURL = submission.data.documents?.[0]?.url;
 
   // start slack workflow
-  await fetch(process.env.SIGNATURE_WORKFLOW_SLACK_WEBHOOK, {
-    method: 'post',
-    body: JSON.stringify(applicationInfo)
-  });
+  await fetch(
+    /** @type {string} */ (process.env.SIGNATURE_WORKFLOW_SLACK_WEBHOOK),
+    {
+      method: 'post',
+      body: JSON.stringify(applicationInfo)
+    }
+  );
 }

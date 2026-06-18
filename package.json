@@ -8,6 +8,7 @@
     "start": "node app.js",
     "lint": "eslint src/",
     "prettier-format": "prettier --config .prettierrc src/",
+    "typecheck": "tsc -p jsconfig.json --noEmit",
     "docs:dev": "vitepress dev docs",
     "docs:build": "vitepress build docs",
     "docs:preview": "vitepress preview docs"
@@ -32,6 +33,7 @@
     "lambda"
   ],
   "devDependencies": {
+    "@types/aws-lambda": "^8.10.162",
     "eslint": "^8.57.1",
     "eslint-config-prettier": "^9.1.0",
     "eslint-config-standard": "^17.1.0",
@@ -41,6 +43,7 @@
     "eslint-plugin-promise": "^6.6.0",
     "prettier": "^3.4.2",
     "serverless-offline": "^14.4.0",
+    "typescript": "^6.0.3",
     "vitepress": "^1.6.4",
     "vitepress-mermaid-renderer": "^1.0.18"
   }
