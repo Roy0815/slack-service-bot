@@ -6,7 +6,9 @@ import {
   CompetitionAlreadyExistsError
 } from './controller.js';
 
-const SPREADSHEET_ID_MELDUNGEN = /** @type {string} */ (process.env.SPREADSHEET_ID_MELDUNGEN);
+const SPREADSHEET_ID_MELDUNGEN = /** @type {string} */ (
+  process.env.SPREADSHEET_ID_MELDUNGEN
+);
 
 /**
  * Creates a new competition in the spreadsheet
@@ -126,9 +128,7 @@ export async function saveInitialCompetitionRegistration(
   competitionRegistrationData
 ) {
   // get name of the competition sheet
-  const allSheets = await generalSheets.getSheets(
-    SPREADSHEET_ID_MELDUNGEN
-  );
+  const allSheets = await generalSheets.getSheets(SPREADSHEET_ID_MELDUNGEN);
 
   // find 'title' where 'sheetId' matches competitionRegistrationData.competition.ID
   const competitionSheet = allSheets.find(
@@ -184,9 +184,7 @@ export async function updateCompetitionRegistrationState(
   competitionRegistrationState
 ) {
   // get name of the competition sheet
-  const allSheets = await generalSheets.getSheets(
-    SPREADSHEET_ID_MELDUNGEN
-  );
+  const allSheets = await generalSheets.getSheets(SPREADSHEET_ID_MELDUNGEN);
 
   // find 'title' where 'sheetId' matches competitionRegistrationData.competition.ID
   const competitionSheet = allSheets.find(

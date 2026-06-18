@@ -150,7 +150,7 @@ export async function getRegisterView(triggerId) {
   ).element;
 
   for (const user of await sheet.getAllUsers()) {
-    (/** @type {any} */ (element)).options.push({
+    /** @type {any} */ (element).options.push({
       text: {
         type: 'plain_text',
         text: `${user.firstname} ${user.lastname}`,
@@ -176,7 +176,7 @@ export async function getAutoRegisterMessage(slackId) {
     throw new Error('basicConfirmDialogView missing blocks');
   }
 
-  view.text = (/** @type {any} */ (view.blocks[0])).text.text =
+  view.text = /** @type {any} */ (view.blocks[0]).text.text =
     `<@${slackId}> ist beigetreten und noch nicht registriert. Bitte wähle den Namen aus:`;
 
   const actionBlock = /** @type {import('@slack/types').ActionsBlock} */ (
@@ -223,7 +223,7 @@ export async function getRegisterConfirmDialog(registerObj) {
     throw new Error('basicConfirmDialogView missing blocks');
   }
 
-  view.text = (/** @type {any} */ (view.blocks[0])).text.text =
+  view.text = /** @type {any} */ (view.blocks[0]).text.text =
     `<@${registerObj.slackId}> möchte sich als ${registerObj.name} registrieren`;
 
   const actionBlock = /** @type {import('@slack/types').ActionsBlock} */ (
@@ -306,7 +306,7 @@ export async function getMaintainConfirmDialog(hoursObjMaint) {
 
   view.channel = await sheet.getAdminChannel();
 
-  view.text = (/** @type {any} */ (view.blocks[0])).text.text = `<@${
+  view.text = /** @type {any} */ (view.blocks[0]).text.text = `<@${
     hoursObjMaint.slackId
   }> möchte folgenden Arbeitseinsatz erfassen:\n${hoursObjMaint.description}: ${
     hoursObjMaint.hours
@@ -389,9 +389,11 @@ export function getDataFromHoursMaintView(body) {
         constants.maintainHoursView.actionDescription
       ].value ?? '',
     hours: Number(
-      (body.view.state.values[constants.maintainHoursView.blockHours][
-        constants.maintainHoursView.actionHours
-      ].value ?? '0').replace(',', '.')
+      (
+        body.view.state.values[constants.maintainHoursView.blockHours][
+          constants.maintainHoursView.actionHours
+        ].value ?? '0'
+      ).replace(',', '.')
     ),
     date:
       body.view.state.values[constants.maintainHoursView.blockDate][

@@ -23,7 +23,8 @@ function setupApp(app) {
         file = {
           fileName: `${inputs.fileDate ? /** @type {string} */ (inputs.fileDate).replace(/-*/g, '') + ' ' : ''}${inputs.fileName}`,
           driveFolderID: /** @type {string} */ (inputs.driveFolderID),
-          fileID: (/** @type {any} */ (inputs.fileID))?.[0].elements[0].elements[0].text,
+          fileID: /** @type {any} */ (inputs.fileID)?.[0].elements[0]
+            .elements[0].text,
           publicFileURL: /** @type {string} */ (inputs?.fileURL)
         };
 
@@ -43,7 +44,9 @@ function setupApp(app) {
         await app.client.chat.postMessage(
           controller.getUploadFailureMessage(
             file,
-            /** @type {string} */ (/** @type {unknown} */ (inputs.approverChannel))
+            /** @type {string} */ (
+              /** @type {unknown} */ (inputs.approverChannel)
+            )
           )
         );
 

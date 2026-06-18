@@ -4,7 +4,9 @@ import * as sheet from '../general/sheet.js';
 import { masterdataService } from '../general/masterdata/service.js';
 import * as masterdataTypes from '../general/masterdata/types.js';
 
-const SPREADSHEET_ID_MASTERDATA = /** @type {string} */ (process.env.SPREADSHEET_ID_MASTERDATA);
+const SPREADSHEET_ID_MASTERDATA = /** @type {string} */ (
+  process.env.SPREADSHEET_ID_MASTERDATA
+);
 
 /**
  * @readonly
@@ -64,11 +66,7 @@ async function copySheetToNewYear(nameBase, year) {
   );
   const newName = `${nameBase} ${currYear}`;
 
-  await sheet.renameSheet(
-    SPREADSHEET_ID_MASTERDATA,
-    copiedName,
-    newName
-  );
+  await sheet.renameSheet(SPREADSHEET_ID_MASTERDATA, copiedName, newName);
 
   if (nameBase === sheetNames.stundenSumme) {
     // update year field in sheet

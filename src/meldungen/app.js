@@ -69,9 +69,10 @@ function setupApp(app) {
       /** User inputs into modal */
       const selectedValues = body.view.state.values;
 
-      const userDataFromSheet = /** @type {import('../general/masterdata/types.js').user} */ (
-        await masterdataService.getUserFromId({ slackId: body.user.id })
-      );
+      const userDataFromSheet =
+        /** @type {import('../general/masterdata/types.js').user} */ (
+          await masterdataService.getUserFromId({ slackId: body.user.id })
+        );
 
       /** @type {import('./types.js').competitionRegistrationData} */
       const competitionRegistrationData =
@@ -139,14 +140,17 @@ function setupApp(app) {
 
       /** @type {import('./types.js').competitionData} */
       const competitionData = {
-        name: selectedValues[
-          controller.competitionCreationView.blockCompetitionName
-        ][controller.competitionCreationView.actionCompetitionName].value ?? '',
+        name:
+          selectedValues[
+            controller.competitionCreationView.blockCompetitionName
+          ][controller.competitionCreationView.actionCompetitionName].value ??
+          '',
         date: convertedCompetitionDate,
         location:
           selectedValues[
             controller.competitionCreationView.blockCompetitionLocation
-          ][controller.competitionCreationView.actionCompetitionLocation].value ?? '',
+          ][controller.competitionCreationView.actionCompetitionLocation]
+            .value ?? '',
         ID: '' // will be set later
       };
 
@@ -187,9 +191,10 @@ function setupApp(app) {
       // already send HTTP 200 that slack does not time out
       await awsRtAPI.sendResponse();
 
-      const user = /** @type {import('../general/masterdata/types.js').user} */ (
-        await masterdataService.getUserFromId({ slackId: body.user.id })
-      );
+      const user =
+        /** @type {import('../general/masterdata/types.js').user} */ (
+          await masterdataService.getUserFromId({ slackId: body.user.id })
+        );
 
       const blockAction = /** @type {import("@slack/bolt").BlockAction} */ (
         body

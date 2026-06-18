@@ -52,7 +52,11 @@ function setupApp(app) {
         return;
       }
 
-      await client.views.update(controller.addAnswer(/** @type {import('@slack/bolt').ViewOutput} */ (action.view)));
+      await client.views.update(
+        controller.addAnswer(
+          /** @type {import('@slack/bolt').ViewOutput} */ (action.view)
+        )
+      );
     }
   );
 
@@ -66,7 +70,9 @@ function setupApp(app) {
 
       await client.views.update(
         controller.deleteAnswer(
-          /** @type {import('@slack/bolt').ViewOutput} */ (/** @type {import('@slack/bolt').BlockButtonAction} */ (body).view),
+          /** @type {import('@slack/bolt').ViewOutput} */ (
+            /** @type {import('@slack/bolt').BlockButtonAction} */ (body).view
+          ),
           /** @type {import('@slack/bolt').ButtonAction } */ (action)
         )
       );

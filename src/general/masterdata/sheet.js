@@ -2,7 +2,9 @@ import * as types from './types.js';
 import * as sheet from '../sheet.js';
 import * as util from '../util.js';
 
-const SPREADSHEET_ID_MASTERDATA = /** @type {string} */ (process.env.SPREADSHEET_ID_MASTERDATA);
+const SPREADSHEET_ID_MASTERDATA = /** @type {string} */ (
+  process.env.SPREADSHEET_ID_MASTERDATA
+);
 
 /**
  * @readonly
@@ -213,9 +215,9 @@ async function saveMasterdataChanges(maintObj) {
     updatedFields.map(async (key) => {
       await sheet.updateCell(SPREADSHEET_ID_MASTERDATA, {
         range: `'${allgDatenSheetName}'!${util.convertNumberToColumn(
-          (/** @type {Record<string, any>} */ (allgDatenColumns))[key]
+          /** @type {Record<string, any>} */ (allgDatenColumns)[key]
         )}${user.id + 1}`,
-        values: [[(/** @type {Record<string, any>} */ (maintObj))[key]]]
+        values: [[/** @type {Record<string, any>} */ (maintObj)[key]]]
       });
     })
   );

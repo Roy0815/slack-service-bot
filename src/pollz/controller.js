@@ -10,9 +10,11 @@ import { SlackViewSubmissionError } from '../general/types.js';
  * @returns {string}
  */
 export function getChannelFromView({ view }) {
-  return view.state.values[constants.creationModalBlocks.conversationSelect][
-    constants.creationModalActions.conversationSelect
-  ].selected_conversation ?? '';
+  return (
+    view.state.values[constants.creationModalBlocks.conversationSelect][
+      constants.creationModalActions.conversationSelect
+    ].selected_conversation ?? ''
+  );
 }
 
 /**
@@ -52,7 +54,7 @@ export function addAnswer({ id, hash, blocks, state }) {
   // create new block for the answer
   const newAnswerView = util.deepCopy(views.answerView);
 
-  (/** @type {any} */ (newAnswerView)).text.text =
+  /** @type {any} */ (newAnswerView).text.text =
     state.values[constants.creationModalBlocks.newAnswer][
       constants.creationModalActions.newAnswerInput
     ].value ?? '';
@@ -150,14 +152,16 @@ export function getPollMessage({ user, view }) {
     (actionsBlock.elements[1]);
 
   // set text in Message
-  (/** @type {any} */ (retViewBlocks[0])).text.text = `Neue Umfrage von <@${user.id}>\n*${
-    view.state.values[constants.creationModalBlocks.question][
-      constants.creationModalActions.questionInput
-    ].value ?? ''
-  }*`;
+  /** @type {any} */ (retViewBlocks[0]).text.text =
+    `Neue Umfrage von <@${user.id}>\n*${
+      view.state.values[constants.creationModalBlocks.question][
+        constants.creationModalActions.questionInput
+      ].value ?? ''
+    }*`;
 
   // store admin in overflow button
-  (/** @type {any} */ (actionsBlock.elements[2])).options[0].value += `-${user.id}`;
+  /** @type {any} */ (actionsBlock.elements[2]).options[0].value +=
+    `-${user.id}`;
 
   // -- set options --//
   // anonymous
@@ -220,8 +224,8 @@ export function getPollMessage({ user, view }) {
       /** @type {import('@slack/types').Button} */
       (answerView.accessory).value = `${index}`;
 
-      (/** @type {any} */ (answerView)).text.text = `*${
-        (/** @type {any} */ (block)).text?.text ?? ''
+      /** @type {any} */ (answerView).text.text = `*${
+        /** @type {any} */ (block).text?.text ?? ''
       }*`;
 
       const resultView = util.deepCopy(views.resultBlockMessage);
@@ -235,9 +239,10 @@ export function getPollMessage({ user, view }) {
       view.state.values[constants.creationModalBlocks.conversationSelect][
         constants.creationModalActions.conversationSelect
       ].selected_conversation ?? '',
-    text: view.state.values[constants.creationModalBlocks.question][
-      constants.creationModalActions.questionInput
-    ].value ?? '',
+    text:
+      view.state.values[constants.creationModalBlocks.question][
+        constants.creationModalActions.questionInput
+      ].value ?? '',
     blocks: retViewBlocks
   };
 }
@@ -263,11 +268,12 @@ export function answerOptionsValid({ view }) {
 
   if (answers.length === 0) {
     // check options
-    const addAnswers = (view.state.values[constants.creationModalBlocks.options][
-      constants.creationModalActions.options
-    ]?.selected_options?.filter(
-      (option) => option.value === constants.optionCheckboxes.addAllowed
-    ) ?? []);
+    const addAnswers =
+      view.state.values[constants.creationModalBlocks.options][
+        constants.creationModalActions.options
+      ]?.selected_options?.filter(
+        (option) => option.value === constants.optionCheckboxes.addAllowed
+      ) ?? [];
 
     // add Options not selected: error
     if (addAnswers.length === 0) {
@@ -437,7 +443,14 @@ export function addAnswerMessage(
   // count current answers to get index
   let idx = 0;
   blocks.forEach((block) => {
-    if (block.accessory && /^\d*/.test((/** @type {import('@slack/types').Button} */ (block.accessory)).value ?? '')) idx += 1;
+    if (
+      block.accessory &&
+      /^\d*/.test(
+        /** @type {import('@slack/types').Button} */ (block.accessory).value ??
+          ''
+      )
+    )
+      idx += 1;
   });
 
   const answerView = util.deepCopy(views.answerBlockMessage);
@@ -445,7 +458,7 @@ export function addAnswerMessage(
   /** @type {import('@slack/types').Button} */
   (answerView.accessory).value = `${idx}`;
 
-  (/** @type {any} */ (answerView)).text.text = `*${
+  /** @type {any} */ (answerView).text.text = `*${
     values[constants.creationModalBlocks.newAnswer][
       constants.pollMessageActions.addAnswerViewTextInput
     ].value
@@ -453,7 +466,7 @@ export function addAnswerMessage(
 
   // required for typing
   if ('blocks' in updateMessage)
-    (/** @type {any} */ (updateMessage)).blocks.splice(
+    /** @type {any} */ (updateMessage).blocks.splice(
       blocks.length - 2,
       0,
       answerView,

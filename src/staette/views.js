@@ -162,20 +162,21 @@ export function getWhoIsThereMessage({ user_id, text }) {
 
   /** @type {import('@slack/types').Overflow} */
   // eslint-disable-next-line camelcase
-  (actionsBlock.elements[2]).options[0].value += `-${user_id}`;
+  actionsBlock.elements[2].options[0].value += `-${user_id}`;
 
   // get day description
   const day =
     text === `${util.formatDate(new Date())}` ? 'heute' : `am ${text}`;
 
   // set date
-  (/** @type {any} */ (view.blocks[0])).text.text = `\`${text}\``;
+  /** @type {any} */ (view.blocks[0]).text.text = `\`${text}\``;
 
   // set questions
   // eslint-disable-next-line camelcase
-  view.text = (/** @type {any} */ (view.blocks[1])).text.text = `<@${user_id}> will wissen wer ${day} in der Stätte ist`;
+  view.text = /** @type {any} */ (view.blocks[1]).text.text =
+    `<@${user_id}> will wissen wer ${day} in der Stätte ist`;
 
-  (/** @type {any} */ (view.blocks[2])).text.text = `Wann bist du ${day} da?`;
+  /** @type {any} */ (view.blocks[2]).text.text = `Wann bist du ${day} da?`;
 
   return view;
 }

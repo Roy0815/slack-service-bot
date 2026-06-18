@@ -106,9 +106,10 @@ export function setupApp(app) {
         views.updateWhoIsThereMessage(
           {
             user: blockAction.user.id,
-            time: blockAction.state?.values[views.whoIsThereInputBlockName][
-              views.whoIsThereTimePickerName
-            ].selected_time ?? '',
+            time:
+              blockAction.state?.values[views.whoIsThereInputBlockName][
+                views.whoIsThereTimePickerName
+              ].selected_time ?? '',
             xdelete:
               /** @type {import('@slack/bolt').ButtonAction} */ (action)
                 .value === 'delete'

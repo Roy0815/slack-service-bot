@@ -33,8 +33,8 @@ export async function getChangeMasterdataView(slackId) {
 
   // set placeholders
   Object.keys(constants.changeMasterdataViewBlocks).forEach((key, index) => {
-    (/** @type {any} */ (view.blocks[index + 1])).element.placeholder.text =
-      (/** @type {Record<string, any>} */ (userInfo))[key];
+    /** @type {any} */ (view.blocks[index + 1]).element.placeholder.text =
+      /** @type {Record<string, any>} */ (userInfo)[key];
   });
 
   return view;
@@ -50,10 +50,14 @@ export function buildMaintainObject(body) {
   const maintObj = {};
 
   // extract data from view
-  const viewBlocks = /** @type {Record<string, any>} */ (constants.changeMasterdataViewBlocks);
-  const viewActions = /** @type {Record<string, any>} */ (constants.changeMasterdataViewActions);
+  const viewBlocks = /** @type {Record<string, any>} */ (
+    constants.changeMasterdataViewBlocks
+  );
+  const viewActions = /** @type {Record<string, any>} */ (
+    constants.changeMasterdataViewActions
+  );
   Object.keys(constants.changeMasterdataViewBlocks).forEach((key) => {
-    (/** @type {Record<string, any>} */ (maintObj))[key] =
+    /** @type {Record<string, any>} */ (maintObj)[key] =
       body.view.state.values[viewBlocks[key]][viewActions[key]].value;
   });
 
@@ -83,7 +87,7 @@ export async function getMaintainConfirmDialog(maintObj, changesMessage) {
   }
 
   // set text in blocks and message preview
-  view.text = (/** @type {any} */ (view.blocks[0])).text.text =
+  view.text = /** @type {any} */ (view.blocks[0]).text.text =
     `<@${maintObj.slackId}> möchte folgende Änderungen den Stammdaten vornehmen:${changesMessage}`;
 
   const actionBlock = /** @type {import('@slack/types').ActionsBlock} */ (
@@ -122,7 +126,9 @@ export async function getChangesMessage(maintObj) {
 
   const userInfoAny = /** @type {Record<string, any>} */ (userInfo);
   const maintObjAny = /** @type {Record<string, any>} */ (maintObj);
-  const fieldNames = /** @type {Record<string, any>} */ (constants.masterDataFieldNames);
+  const fieldNames = /** @type {Record<string, any>} */ (
+    constants.masterDataFieldNames
+  );
 
   Object.keys(maintObj).forEach((key) => {
     // check if field was filled and changed (except slackId)

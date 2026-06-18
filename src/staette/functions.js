@@ -8,11 +8,12 @@ export async function cleanup({ client }) {
   const STAETTE_CHANNEL = /** @type {string} */ (process.env.STAETTE_CHANNEL);
 
   // get bot ID
-  const botId = (
-    await client.auth.test({
-      token: process.env.SLACK_BOT_TOKEN
-    })
-  ).bot_id ?? '';
+  const botId =
+    (
+      await client.auth.test({
+        token: process.env.SLACK_BOT_TOKEN
+      })
+    ).bot_id ?? '';
 
   // get messages in channel
   const result = await client.conversations.history({
@@ -38,7 +39,9 @@ export async function cleanup({ client }) {
 
   filtered.forEach((msg) => {
     // get date from message
-    const text = /** @type {string} */ ((/** @type {any} */ (msg.blocks))[0].text.text).replace(/`/g, '');
+    const text = /** @type {string} */ (
+      /** @type {any} */ (msg.blocks)[0].text.text
+    ).replace(/`/g, '');
 
     const [day, month, year] = text.split('.');
     const date = new Date(Number(year), Number(month) - 1, Number(day));
@@ -67,11 +70,12 @@ export async function sortMessages({ client, date }) {
   const STAETTE_CHANNEL = /** @type {string} */ (process.env.STAETTE_CHANNEL);
 
   // get bot ID
-  const botId = (
-    await client.auth.test({
-      token: process.env.SLACK_BOT_TOKEN
-    })
-  ).bot_id ?? '';
+  const botId =
+    (
+      await client.auth.test({
+        token: process.env.SLACK_BOT_TOKEN
+      })
+    ).bot_id ?? '';
 
   // get messages in channel
   const result = await client.conversations.history({
@@ -96,7 +100,9 @@ export async function sortMessages({ client, date }) {
   const messagesOrdered = [];
 
   filtered.forEach((msg) => {
-    const text = /** @type {string} */ ((/** @type {any} */ (msg.blocks))[0].text.text).replace(/`/g, '');
+    const text = /** @type {string} */ (
+      /** @type {any} */ (msg.blocks)[0].text.text
+    ).replace(/`/g, '');
 
     const [day, month, year] = text.split('.');
     const msgDate = new Date(Number(year), Number(month) - 1, Number(day));
@@ -117,7 +123,9 @@ export async function sortMessages({ client, date }) {
   for (let index = 0; index < messagesOrdered.length; index++) {
     const msg = {
       channel: STAETTE_CHANNEL,
-      text: /** @type {string} */ ((/** @type {any} */ (messagesOrdered[index].blocks))[1].text.text),
+      text: /** @type {string} */ (
+        /** @type {any} */ (messagesOrdered[index].blocks)[1].text.text
+      ),
       blocks: messagesOrdered[index].blocks
     };
 
@@ -136,11 +144,12 @@ export async function dateIsUnique({ client, date }) {
   const STAETTE_CHANNEL = /** @type {string} */ (process.env.STAETTE_CHANNEL);
 
   // get bot ID
-  const botId = (
-    await client.auth.test({
-      token: process.env.SLACK_BOT_TOKEN
-    })
-  ).bot_id ?? '';
+  const botId =
+    (
+      await client.auth.test({
+        token: process.env.SLACK_BOT_TOKEN
+      })
+    ).bot_id ?? '';
 
   // get messages in channel
   const result = await client.conversations.history({

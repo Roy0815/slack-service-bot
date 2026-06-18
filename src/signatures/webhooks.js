@@ -112,8 +112,11 @@ export async function handleFormCompleted(event) {
   applicationInfo.docusealFileURL = submission.data.documents?.[0]?.url;
 
   // start slack workflow
-  await fetch(/** @type {string} */ (process.env.SIGNATURE_WORKFLOW_SLACK_WEBHOOK), {
-    method: 'post',
-    body: JSON.stringify(applicationInfo)
-  });
+  await fetch(
+    /** @type {string} */ (process.env.SIGNATURE_WORKFLOW_SLACK_WEBHOOK),
+    {
+      method: 'post',
+      body: JSON.stringify(applicationInfo)
+    }
+  );
 }
