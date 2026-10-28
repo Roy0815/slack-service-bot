@@ -4,6 +4,10 @@ import * as sheet from '../general/sheet.js';
 import { masterdataService } from '../general/masterdata/service.js';
 import * as masterdataTypes from '../general/masterdata/types.js';
 
+const SPREADSHEET_ID_MASTERDATA = /** @type {string} */ (
+  process.env.SPREADSHEET_ID_MASTERDATA
+);
+
 /**
  * @readonly
  * @enum {string}
@@ -57,20 +61,16 @@ async function copySheetToNewYear(nameBase, year) {
   await checkYearSheetsExists(oldYear);
 
   const copiedName = await sheet.copySheet(
-    process.env.SPREADSHEET_ID_MASTERDATA,
+    SPREADSHEET_ID_MASTERDATA,
     `${nameBase} ${oldYear}`
   );
   const newName = `${nameBase} ${currYear}`;
 
-  await sheet.renameSheet(
-    process.env.SPREADSHEET_ID_MASTERDATA,
-    copiedName,
-    newName
-  );
+  await sheet.renameSheet(SPREADSHEET_ID_MASTERDATA, copiedName, newName);
 
   if (nameBase === sheetNames.stundenSumme) {
     // update year field in sheet
-    await sheet.updateCell(process.env.SPREADSHEET_ID_MASTERDATA, {
+    await sheet.updateCell(SPREADSHEET_ID_MASTERDATA, {
       range: `'${newName}'!${util.convertNumberToColumn(
         stundenSummeColumns.year
       )}1`,
@@ -81,7 +81,7 @@ async function copySheetToNewYear(nameBase, year) {
 
   if (nameBase === sheetNames.stunden) {
     // clear all hours
-    await sheet.clearCell(process.env.SPREADSHEET_ID_MASTERDATA, {
+    await sheet.clearCell(SPREADSHEET_ID_MASTERDATA, {
       range: `'${newName}'!$A2:${stundenColumns.lastColumn}`
     });
   }
@@ -94,7 +94,7 @@ async function copySheetToNewYear(nameBase, year) {
 async function checkYearSheetsExists(year) {
   try {
     await sheet.getSheetID(
-      process.env.SPREADSHEET_ID_MASTERDATA,
+      SPREADSHEET_ID_MASTERDATA,
       getSheetNameYear(sheetNames.stunden, year)
     );
   } catch (err) {
@@ -102,7 +102,7 @@ async function checkYearSheetsExists(year) {
   }
   try {
     await sheet.getSheetID(
-      process.env.SPREADSHEET_ID_MASTERDATA,
+      SPREADSHEET_ID_MASTERDATA,
       getSheetNameYear(sheetNames.stundenSumme, year)
     );
   } catch (err) {
@@ -130,7 +130,7 @@ function getSheetNameYear(name, year) {
  */
 async function getDetails({ fullname, year }) {
   const dataDetails = await sheet.getCells(
-    process.env.SPREADSHEET_ID_MASTERDATA,
+    SPREADSHEET_ID_MASTERDATA,
 
     getSheetNameYear(sheetNames.stunden, year)
   );
@@ -174,7 +174,7 @@ export async function getHoursFromSlackId({ id, year, details }) {
   await checkYearSheetsExists(year);
 
   let dataSum = await sheet.getCells(
-    process.env.SPREADSHEET_ID_MASTERDATA,
+    SPREADSHEET_ID_MASTERDATA,
     getSheetNameYear(sheetNames.stundenSumme, year)
   );
 
@@ -187,7 +187,7 @@ export async function getHoursFromSlackId({ id, year, details }) {
     // if not, wait a second and try again
     await new Promise((resolve) => setTimeout(resolve, 1000));
     dataSum = await sheet.getCells(
-      process.env.SPREADSHEET_ID_MASTERDATA,
+      SPREADSHEET_ID_MASTERDATA,
       getSheetNameYear(sheetNames.stundenSumme, year)
     );
   }
@@ -228,7 +228,7 @@ export async function getAllUsers() {
 export async function getAdminChannel() {
   await checkYearSheetsExists(new Date().getFullYear());
   const sumData = await sheet.getCells(
-    process.env.SPREADSHEET_ID_MASTERDATA,
+    SPREADSHEET_ID_MASTERDATA,
     getSheetNameYear(sheetNames.stundenSumme)
   );
 
@@ -253,7 +253,7 @@ export async function saveHours({ slackId, description, hours, date }) {
   const user = await masterdataService.getUserFromId({ slackId });
   await checkYearSheetsExists(Number(date.split('-')[0]));
 
-  await sheet.appendRow(process.env.SPREADSHEET_ID_MASTERDATA, {
+  await sheet.appendRow(SPREADSHEET_ID_MASTERDATA, {
     range: `'${getSheetNameYear(
       sheetNames.stunden,
       Number(date.split('-')[0])

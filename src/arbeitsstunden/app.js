@@ -91,15 +91,16 @@ function setupApp(app) {
 
     const blckAction = /** @type {import("@slack/bolt").BlockAction} */ (body);
 
-    const year =
-      blckAction.view.state.values[constants.homeView.inputBlockId][
+    const year = /** @type {import('@slack/bolt').ViewStateValue} */ (
+      blckAction.view?.state.values[constants.homeView.inputBlockId][
         constants.homeView.yearSelect
-      ].selected_option.value;
+      ]
+    ).selected_option?.value;
 
     const details =
-      blckAction.view.state.values[constants.homeView.inputBlockId][
+      (blckAction.view?.state.values[constants.homeView.inputBlockId]?.[
         constants.homeView.detailsSelect
-      ].selected_options.length > 0;
+      ]?.selected_options?.length ?? 0) > 0;
 
     const hoursObj = await controller.getHoursFromSlackId({
       id: body.user.id,
@@ -122,7 +123,7 @@ function setupApp(app) {
     await client.chat.postMessage({
       channel: body.user.id,
       text: response.text,
-      blocks: 'blocks' in response ? response.blocks : undefined // required for correct typing
+      blocks: 'blocks' in response ? response.blocks : [] // required for correct typing
     });
   });
 
@@ -172,7 +173,7 @@ function setupApp(app) {
       );
 
       /** @type {types.registerObjectFinalizer} */
-      const registerObj = JSON.parse(btnAction.value);
+      const registerObj = JSON.parse(btnAction.value ?? '');
 
       registerObj.approved = btnAction.action_id.split('-')[1] === 'approve';
 
@@ -213,11 +214,11 @@ function setupApp(app) {
       );
 
       const selOpt =
-        blckAction.state.values[constants.autoRegisterView.inputBlock][
+        blckAction.state?.values[constants.autoRegisterView.inputBlock][
           constants.autoRegisterView.actionNameSelect
-        ].selected_option;
+        ].selected_option ?? undefined;
 
-      if (selOpt === null) {
+      if (selOpt === undefined) {
         return;
       }
 
@@ -235,7 +236,7 @@ function setupApp(app) {
       // update data in sheet
       await controller.saveSlackId({
         id: Number(selOpt.value),
-        slackId: btnAction.value
+        slackId: btnAction.value ?? ''
       });
 
       // provide admins the contact
@@ -243,11 +244,13 @@ function setupApp(app) {
         Number(selOpt.value)
       );
 
+      if (!contact) return;
+
       await app.client.filesUploadV2({
         channel_id: await controller.getAdminChannel(),
         filename: `${contact.firstname} ${contact.lastname}.vcf`,
         title: `${contact.firstname} ${contact.lastname}`,
-        content: contact.vCardContent
+        content: contact.vCardContent ?? ''
       });
     }
   );
@@ -268,7 +271,7 @@ function setupApp(app) {
       );
 
       /** @type {types.hoursMaintFinalizer} */
-      const maintObj = JSON.parse(btnAction.value);
+      const maintObj = JSON.parse(btnAction.value ?? '');
 
       maintObj.approved = btnAction.action_id.split('-')[1] === 'approve';
 
@@ -350,16 +353,16 @@ function setupApp(app) {
     /** @type {types.registerObj} */
     const registerObj = {
       id: Number(
-        body.view.state.values[constants.registerView.blockNameSelect][
+        body.view?.state.values[constants.registerView.blockNameSelect][
           constants.registerView.actionNameSelect
-        ].selected_option.value
+        ].selected_option?.value
       ),
 
       slackId: body.user.id,
 
-      name: body.view.state.values[constants.registerView.blockNameSelect][
+      name: body.view?.state.values[constants.registerView.blockNameSelect][
         constants.registerView.actionNameSelect
-      ].selected_option.text.text
+      ].selected_option?.text.text
     };
 
     // register confirmation message
@@ -420,7 +423,7 @@ function setupApp(app) {
 
     // check if user can be identified by email
     const masterdataUser = await masterdataService.getUserFromEmail(
-      user?.profile?.email
+      user?.profile?.email ?? ''
     );
 
     // no email or no ID found: manual admin registration
@@ -437,7 +440,7 @@ function setupApp(app) {
     // notify admins
     await client.chat.postMessage({
       channel: await controller.getAdminChannel(),
-      text: `Neuer User automatisch registriert: <@${event.user.id}> :arrow_right: ${masterdataUser.firstname} ${masterdataUser.lastname} (${user.profile.email})`
+      text: `Neuer User automatisch registriert: <@${event.user.id}> :arrow_right: ${masterdataUser.firstname} ${masterdataUser.lastname} (${user.profile?.email ?? ''})`
     });
   });
 }

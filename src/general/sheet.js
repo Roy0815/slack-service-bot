@@ -39,7 +39,7 @@ export async function getCells(spreadsheetID, sheetname) {
     range: sheetname
   };
 
-  return (await sheets.spreadsheets.values.get(request)).data.values;
+  return (await sheets.spreadsheets.values.get(request)).data.values ?? [];
 }
 
 /**
@@ -106,7 +106,7 @@ export async function getSheets(spreadsheetID) {
   const request = {
     spreadsheetId: spreadsheetID
   };
-  return (await sheets.spreadsheets.get(request)).data.sheets;
+  return (await sheets.spreadsheets.get(request)).data.sheets ?? [];
 }
 
 /**
@@ -128,7 +128,7 @@ export async function copySheet(spreadsheetID, sheetName) {
   };
 
   // return new name
-  return (await sheets.spreadsheets.sheets.copyTo(request)).data.title;
+  return (await sheets.spreadsheets.sheets.copyTo(request)).data.title ?? '';
 }
 
 /**
@@ -139,8 +139,10 @@ export async function copySheet(spreadsheetID, sheetName) {
  */
 export async function getSheetID(spreadsheetID, sheetName) {
   const sheetArray = await getSheets(spreadsheetID);
-  const sheet = sheetArray.find((s) => s.properties.title === sheetName);
-  return sheet.properties.sheetId;
+  const sheet = sheetArray.find((s) => s.properties?.title === sheetName);
+  const sheetId = sheet?.properties?.sheetId;
+  if (sheetId == null) throw new Error(`Sheet "${sheetName}" not found`);
+  return sheetId;
 }
 
 /**

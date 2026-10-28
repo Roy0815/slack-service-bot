@@ -23,7 +23,8 @@ function setupApp(app) {
         file = {
           fileName: `${inputs.fileDate ? /** @type {string} */ (inputs.fileDate).replace(/-*/g, '') + ' ' : ''}${inputs.fileName}`,
           driveFolderID: /** @type {string} */ (inputs.driveFolderID),
-          fileID: inputs.fileID?.[0].elements[0].elements[0].text,
+          fileID: /** @type {any} */ (inputs.fileID)?.[0].elements[0]
+            .elements[0].text,
           publicFileURL: /** @type {string} */ (inputs?.fileURL)
         };
 
@@ -43,7 +44,9 @@ function setupApp(app) {
         await app.client.chat.postMessage(
           controller.getUploadFailureMessage(
             file,
-            /** @type {string} */ (inputs.approverChannel)
+            /** @type {string} */ (
+              /** @type {unknown} */ (inputs.approverChannel)
+            )
           )
         );
 
@@ -74,7 +77,7 @@ function setupApp(app) {
       // get file information from action
       /** @type {types.fileInformation} */
       const file = JSON.parse(
-        /** @type {import("@slack/bolt").ButtonAction} */ (action).value
+        /** @type {import("@slack/bolt").ButtonAction} */ (action).value ?? '{}'
       );
 
       // upload file to drive folder
@@ -93,7 +96,7 @@ function setupApp(app) {
       } catch (error) {
         client.chat.postEphemeral({
           user: body.user.id,
-          channel: body.channel.id,
+          channel: body.channel?.id || '',
           text: `Beim Hochladen der Datei \`${file.fileName}\` ist ein Fehler aufgetreten. Bitte versuche es erneut.`
         });
       }
