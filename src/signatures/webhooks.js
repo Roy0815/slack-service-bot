@@ -75,17 +75,26 @@ export async function handler(event, context) {
 export async function handleFormCompleted(event) {
   const submission = JSON.parse(event.body);
 
-  // check correct template
-  if (
-    !submission.data ||
-    !submission.data.template ||
-    `${submission.data.template.id}` !==
-      process.env.APPLICATION_FORM_TEMPLATE_ID
-  ) {
-    console.log('Template not handled', submission);
-    return;
-  }
+  // branch by template
+  const templateId = `${submission.data?.template?.id}`;
+  switch (templateId) {
+    case process.env.APPLICATION_FORM_TEMPLATE_ID:
+      await handleApplicationCompleted(submission);
+      return;
 
+    case process.env.BANK_CHANGE_FORM_TEMPLATE_ID:
+      await handleBankChangeCompleted(submission);
+      return;
+
+    default:
+      console.log('Template not handled', submission);
+  }
+}
+
+/**
+ * @param {any} submission
+ */
+async function handleApplicationCompleted(submission) {
   // check values exist
   if (!submission.data.values) {
     console.log('No values in submission', submission);
@@ -119,4 +128,53 @@ export async function handleFormCompleted(event) {
       body: JSON.stringify(applicationInfo)
     }
   );
+}
+
+// fields of the bank change form, dates stay in ISO format for the workflow
+const bankChangeFields = ['accountOwner', 'IBAN', 'BIC', 'signingDate'];
+
+/**
+ * @param {any} submission
+ */
+async function handleBankChangeCompleted(submission) {
+  // slack id is set by the bot via metadata, needed to identify the member
+  const slackId = submission.data?.metadata?.slackId;
+  if (!slackId) {
+    console.log('No slackId in submission metadata', submission);
+    return;
+  }
+
+  /** @type {Record<string, string>} */
+  const bankChangeInfo = {
+    slackId: `${slackId}`,
+    changeDate: `${submission.data.metadata.changeDate ?? ''}`
+  };
+
+  // Extract values from the submission, empty fields as empty string
+  bankChangeFields.forEach((field) => {
+    const value = submission.data.values?.find(
+      (/** @type {any} */ v) => v.field === field
+    )?.value;
+    bankChangeInfo[field] = `${value ?? ''}`;
+  });
+
+  bankChangeInfo.email = `${submission.data.email ?? ''}`;
+  bankChangeInfo.docusealFileURL = `${submission.data.documents?.[0]?.url ?? ''}`;
+
+  // start slack workflow
+  const response = await fetch(
+    /** @type {string} */ (process.env.BANK_CHANGE_WORKFLOW_SLACK_WEBHOOK),
+    {
+      method: 'post',
+      body: JSON.stringify(bankChangeInfo)
+    }
+  );
+
+  if (!response.ok) {
+    console.error(
+      'Bank change workflow webhook failed',
+      response.status,
+      await response.text()
+    );
+  }
 }
