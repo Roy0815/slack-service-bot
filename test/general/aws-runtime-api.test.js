@@ -8,9 +8,8 @@ mockModule('node-fetch', {
   defaultExport: fetchMock
 });
 
-const { globalData, sendResponse } = await import(
-  '../../src/general/aws-runtime-api.js'
-);
+const { globalData, sendResponse } =
+  await import('../../src/general/aws-runtime-api.js');
 
 describe('general/aws-runtime-api', () => {
   beforeEach(() => {

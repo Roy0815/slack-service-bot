@@ -6,9 +6,8 @@ import * as constants from '../../src/arbeitsstunden/constants.js';
 const sheetsMock = setupGoogleSheetsMock();
 
 await import('../../src/general/apps.js');
-const { masterdataService } = await import(
-  '../../src/general/masterdata/service.js'
-);
+const { masterdataService } =
+  await import('../../src/general/masterdata/service.js');
 const { asApp } = await import('../../src/arbeitsstunden/app.js');
 
 describe('arbeitsstunden/app', () => {

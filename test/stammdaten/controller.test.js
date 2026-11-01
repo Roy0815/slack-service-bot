@@ -5,9 +5,8 @@ import { setupGoogleSheetsMock } from '../helpers/mocks.js';
 
 const sheetsMock = setupGoogleSheetsMock();
 
-const { masterdataService } = await import(
-  '../../src/general/masterdata/service.js'
-);
+const { masterdataService } =
+  await import('../../src/general/masterdata/service.js');
 const controller = await import('../../src/stammdaten/controller.js');
 
 const sampleContactCard = {

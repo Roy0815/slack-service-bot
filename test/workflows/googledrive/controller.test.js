@@ -25,9 +25,8 @@ mockModule('node-fetch', {
   defaultExport: fetchMock
 });
 
-const controller = await import(
-  '../../../src/workflows/googledrive/controller.js'
-);
+const controller =
+  await import('../../../src/workflows/googledrive/controller.js');
 
 describe('workflows/googledrive/controller', () => {
   beforeEach(() => {

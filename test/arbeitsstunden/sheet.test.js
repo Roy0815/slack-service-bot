@@ -4,9 +4,8 @@ import { setupGoogleSheetsMock } from '../helpers/mocks.js';
 
 const sheetsMock = setupGoogleSheetsMock();
 
-const { masterdataService } = await import(
-  '../../src/general/masterdata/service.js'
-);
+const { masterdataService } =
+  await import('../../src/general/masterdata/service.js');
 const asSheet = await import('../../src/arbeitsstunden/sheet.js');
 
 describe('arbeitsstunden/sheet', () => {

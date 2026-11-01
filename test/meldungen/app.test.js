@@ -7,9 +7,8 @@ const sheetsMock = setupGoogleSheetsMock();
 
 await import('../../src/general/apps.js');
 const controller = await import('../../src/meldungen/controller.js');
-const { masterdataService } = await import(
-  '../../src/general/masterdata/service.js'
-);
+const { masterdataService } =
+  await import('../../src/general/masterdata/service.js');
 const { meldungenApp } = await import('../../src/meldungen/app.js');
 
 const sampleUser = {

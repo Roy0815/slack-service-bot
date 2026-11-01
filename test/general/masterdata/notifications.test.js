@@ -22,12 +22,10 @@ mockModule('@slack/bolt', {
   }
 });
 
-const { masterdataService } = await import(
-  '../../../src/general/masterdata/service.js'
-);
-const { run } = await import(
-  '../../../src/general/masterdata/notifications.js'
-);
+const { masterdataService } =
+  await import('../../../src/general/masterdata/service.js');
+const { run } =
+  await import('../../../src/general/masterdata/notifications.js');
 
 describe('general/masterdata/notifications', () => {
   beforeEach(() => {

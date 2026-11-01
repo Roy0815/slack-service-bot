@@ -8,9 +8,8 @@ mockModule('node-fetch', {
   defaultExport: fetchMock
 });
 
-const { handler, handleFormCompleted } = await import(
-  '../../src/signatures/webhooks.js'
-);
+const { handler, handleFormCompleted } =
+  await import('../../src/signatures/webhooks.js');
 
 describe('signatures/webhooks', () => {
   beforeEach(() => {

@@ -6,9 +6,8 @@ import * as constants from '../../src/stammdaten/constants.js';
 const sheetsMock = setupGoogleSheetsMock();
 
 await import('../../src/general/apps.js');
-const { masterdataService } = await import(
-  '../../src/general/masterdata/service.js'
-);
+const { masterdataService } =
+  await import('../../src/general/masterdata/service.js');
 const { stammdatenApp } = await import('../../src/stammdaten/app.js');
 
 const sampleContactCard = {

@@ -14,9 +14,8 @@ mockModule('node-fetch', {
   defaultExport: fetchMock
 });
 
-const { masterdataService } = await import(
-  '../../src/general/masterdata/service.js'
-);
+const { masterdataService } =
+  await import('../../src/general/masterdata/service.js');
 const { workflowsApp } = await import('../../src/workflows/app.js');
 
 describe('workflows/app (utility, masterdata, googledrive)', () => {
