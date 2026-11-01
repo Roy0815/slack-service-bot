@@ -1,6 +1,5 @@
 // eslint-disable-next-line camelcase
 import { drive_v3, google } from 'googleapis';
-import fetch from 'node-fetch';
 import stream from 'node:stream';
 
 import * as types from './types.js';
@@ -85,7 +84,6 @@ export async function uploadFileToDriveFolder(file) {
       body: stream.Readable.fromWeb(/** @type {any} */ (response.body))
     }
   });
-
 }
 
 /**
