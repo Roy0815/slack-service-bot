@@ -22,7 +22,7 @@
  * @customfunction
  */
 function zuLeistendeStundenBerechnen(beitritt, austritt, aktuellerStatus, name, umstellungen, staetten, jahr, stunden, staettenStunden) {
-  if (!(beitritt instanceof Date)) return 0;
+  if (!(beitritt instanceof Date) || !norm_(name) || !jahr) return 0;
 
   const jahrStart = tagNr_(new Date(jahr, 0, 1));
   const jahrEnde = tagNr_(new Date(jahr, 11, 31));
