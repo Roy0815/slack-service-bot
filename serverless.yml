@@ -40,6 +40,8 @@ package:
     - '!.prettierrc'
     - '!.env.example'
     - '!docs/**'
+    - '!test/**'
+    - '!lcov.info'
 
 functions:
   slack-service-bot:
