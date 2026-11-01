@@ -110,12 +110,12 @@ app.error(async ({ error, context, body }) => {
  * Handle the Lambda function event
  * @param {import('@slack/bolt/dist/receivers/AwsLambdaReceiver.js').AwsEvent} event
  * @param {any} context
- * @param {import('@slack/bolt/dist/receivers/AwsLambdaReceiver.js').AwsCallback} callback
  * @returns {Promise<import('@slack/bolt/dist/receivers/AwsLambdaReceiver.js').AwsResponse>} AWS Lambda response
  */
-export async function handler(event, context, callback) {
+export async function handler(event, context) {
   const handler = await awsLambdaReceiver.start();
   // buffer AWS Request ID to interact with the runtime API
   globalData.awsRequestId = context.awsRequestId;
-  return handler(event, context, callback);
+  // @ts-ignore - @slack/bolt types callback as required, but ignores it at runtime (AWS Lambda Node 24+ dropped callbacks)
+  return handler(event, context);
 }

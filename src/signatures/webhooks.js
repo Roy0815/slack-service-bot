@@ -1,8 +1,6 @@
 import * as awsRtAPI from '../general/aws-runtime-api.js';
 import { userJoiningFields } from '../general/masterdata/types.js';
 
-import fetch from 'node-fetch';
-
 // Handle webhook events from docuseal
 /** @type {import('aws-lambda').LambdaFunctionURLHandler } */
 export async function handler(event, context) {
