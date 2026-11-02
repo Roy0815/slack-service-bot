@@ -4,3 +4,5 @@ aws
 .serverless
 docs/.vitepress/dist
 docs/.vitepress/cache
+coverage/
+lcov.info

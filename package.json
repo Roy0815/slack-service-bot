@@ -6,8 +6,10 @@
   "type": "module",
   "scripts": {
     "start": "node app.js",
-    "lint": "eslint src/",
-    "prettier-format": "prettier --config .prettierrc src/",
+    "test": "node --test --experimental-test-module-mocks 'test/**/*.test.js'",
+    "test:coverage": "node --test --experimental-test-module-mocks --experimental-test-coverage --test-coverage-include='src/**' --test-reporter=spec --test-reporter-destination=stdout --test-reporter=lcov --test-reporter-destination=lcov.info 'test/**/*.test.js'",
+    "lint": "eslint src/ test/",
+    "prettier-format": "prettier --config .prettierrc src/ test/",
     "docs:dev": "vitepress dev docs",
     "docs:build": "vitepress build docs",
     "docs:preview": "vitepress preview docs"
